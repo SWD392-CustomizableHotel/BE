@@ -1,8 +1,8 @@
-using JwtAuthAspNet7WebAPI.Core.OtherObjects;
+using Core.OtherObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace JwtAuthAspNet7WebAPI.Controllers
+namespace Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -38,7 +38,7 @@ namespace JwtAuthAspNet7WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("GetOwnerRole")]
+        [Route("GetStaffRole")]
         [Authorize(Roles = StaticUserRoles.STAFF)]
         public IActionResult GetOwnerRole()
         {

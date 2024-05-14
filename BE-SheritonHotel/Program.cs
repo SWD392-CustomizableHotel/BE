@@ -1,7 +1,7 @@
-using JwtAuthAspNet7WebAPI.Core.DbContext;
-using JwtAuthAspNet7WebAPI.Core.Entities;
-using JwtAuthAspNet7WebAPI.Core.Interfaces;
-using JwtAuthAspNet7WebAPI.Core.Services;
+using Core.DbContext;
+using Core.Entities;
+using Core.Interfaces;
+using Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +23,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("local");
     options.UseSqlServer(connectionString);
 });
+
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(MyAllowSpecificOrigins,
+                          policy =>
+                          {
+                              policy.WithOrigins("http://localhost:4200")
+                                                  .AllowAnyHeader()
+                                                  .AllowAnyMethod();
+                          });
+});
+
 
 // Add Identity
 builder.Services
@@ -70,6 +84,7 @@ builder.Services
 
 // Inject app Dependencies (Dependency Injection)
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -117,6 +132,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();

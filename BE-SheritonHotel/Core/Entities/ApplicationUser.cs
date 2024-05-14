@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace JwtAuthAspNet7WebAPI.Core.Entities
+namespace Core.Entities
 {
     public class ApplicationUser : IdentityUser
     {

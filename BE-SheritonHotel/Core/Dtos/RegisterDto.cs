@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace JwtAuthAspNet7WebAPI.Core.Dtos
+namespace Core.Dtos
 {
     public class RegisterDto
     {

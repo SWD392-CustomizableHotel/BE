@@ -1,26 +1,22 @@
-﻿using JwtAuthAspNet7WebAPI.Core.Dtos;
-using JwtAuthAspNet7WebAPI.Core.Entities;
-using JwtAuthAspNet7WebAPI.Core.Interfaces;
-using JwtAuthAspNet7WebAPI.Core.OtherObjects;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Core.Dtos;
+using Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
-namespace JwtAuthAspNet7WebAPI.Controllers
+
+namespace Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
-    { 
+    {
         private readonly IAuthService _authService;
+        private readonly IUserService _userService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IUserService userService)
         {
             _authService = authService;
+            _userService = userService;
         }
 
         // Route For Seeding my roles to DB
@@ -28,11 +24,25 @@ namespace JwtAuthAspNet7WebAPI.Controllers
         [Route("seed-roles")]
         public async Task<IActionResult> SeedRoles()
         {
-             var seerRoles = await _authService.SeedRolesAsync();
+            var seerRoles = await _authService.SeedRolesAsync();
 
             return Ok(seerRoles);
         }
 
+        [HttpGet]
+        [Authorize]
+        [Route("users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var users = await _userService.GetAllUsers();
+
+            if(!ModelState.IsValid)
+            {
+                return NotFound();
+            }
+
+            return Ok(users);
+        }
 
         // Route -> Register
         [HttpPost]
@@ -55,22 +65,22 @@ namespace JwtAuthAspNet7WebAPI.Controllers
         {
             var loginResult = await _authService.LoginAsync(loginDto);
 
-            if(loginResult.IsSucceed)
+            if (loginResult.IsSucceed)
                 return Ok(loginResult);
 
-            return Unauthorized(loginResult);
+            return BadRequest(new { message = "Username or password is incorrect" });
         }
 
-        
+
 
         // Route -> make customer -> admin
         [HttpPost]
         [Route("make-admin")]
         public async Task<IActionResult> MakeAdmin([FromBody] UpdatePermissionDto updatePermissionDto)
         {
-             var operationResult = await _authService.MakeAdminAsync(updatePermissionDto);
+            var operationResult = await _authService.MakeAdminAsync(updatePermissionDto);
 
-            if(operationResult.IsSucceed)
+            if (operationResult.IsSucceed)
                 return Ok(operationResult);
 
             return BadRequest(operationResult);

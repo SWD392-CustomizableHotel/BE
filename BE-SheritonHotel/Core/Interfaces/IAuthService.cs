@@ -1,6 +1,6 @@
-﻿using JwtAuthAspNet7WebAPI.Core.Dtos;
+﻿using Core.Dtos;
 
-namespace JwtAuthAspNet7WebAPI.Core.Interfaces
+namespace Core.Interfaces
 {
     public interface IAuthService
     {

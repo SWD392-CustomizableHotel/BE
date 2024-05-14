@@ -1,4 +1,4 @@
-﻿namespace JwtAuthAspNet7WebAPI.Core.OtherObjects
+﻿namespace Core.OtherObjects
 {
     public static class StaticUserRoles
     {

@@ -1,14 +1,14 @@
-﻿using JwtAuthAspNet7WebAPI.Core.Dtos;
-using JwtAuthAspNet7WebAPI.Core.Entities;
-using JwtAuthAspNet7WebAPI.Core.Interfaces;
-using JwtAuthAspNet7WebAPI.Core.OtherObjects;
+﻿using Core.Dtos;
+using Core.Entities;
+using Core.Interfaces;
+using Core.OtherObjects;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace JwtAuthAspNet7WebAPI.Core.Services
+namespace Core.Services
 {
     public class AuthService : IAuthService
     {
@@ -32,7 +32,7 @@ namespace JwtAuthAspNet7WebAPI.Core.Services
                 return new AuthServiceResponseDto()
                 {
                     IsSucceed = false,
-                    Message = "Invalid Credentials"
+                    Token = "Invalid Credentials"
                 };
 
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginDto.Password);
@@ -41,7 +41,7 @@ namespace JwtAuthAspNet7WebAPI.Core.Services
                 return new AuthServiceResponseDto()
                 {
                     IsSucceed = false,
-                    Message = "Invalid Credentials"
+                    Token = "Invalid Credentials"
                 };
 
             var userRoles = await _userManager.GetRolesAsync(user);
@@ -65,7 +65,7 @@ namespace JwtAuthAspNet7WebAPI.Core.Services
             return new AuthServiceResponseDto()
             {
                 IsSucceed = true,
-                Message = token
+                Token = token
             };
         }
 
@@ -77,15 +77,17 @@ namespace JwtAuthAspNet7WebAPI.Core.Services
                 return new AuthServiceResponseDto()
                 {
                     IsSucceed = false,
-                    Message = "Invalid User name!!!!!!!!"
+                    Token = "Invalid User name!!!!!!!!"
                 };
+            var roles = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRolesAsync(user, roles.ToArray());
 
             await _userManager.AddToRoleAsync(user, StaticUserRoles.ADMIN);
 
             return new AuthServiceResponseDto()
             {
                 IsSucceed = true,
-                Message = "User is now an ADMIN"
+                Token = "User is now an ADMIN"
             };
         }
 
@@ -97,15 +99,17 @@ namespace JwtAuthAspNet7WebAPI.Core.Services
                 return new AuthServiceResponseDto()
                 {
                     IsSucceed = false,
-                    Message = "Invalid User name!!!!!!!!"
+                    Token = "Invalid User name!!!!!!!!"
                 };
+            var roles = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRolesAsync(user, roles.ToArray());
 
             await _userManager.AddToRoleAsync(user, StaticUserRoles.STAFF);
 
             return new AuthServiceResponseDto()
             {
                 IsSucceed = true,
-                Message = "User is now an STAFF"
+                Token = "User is now an STAFF"
             };
         }
 
@@ -117,9 +121,9 @@ namespace JwtAuthAspNet7WebAPI.Core.Services
                 return new AuthServiceResponseDto()
                 {
                     IsSucceed = false,
-                    Message = "UserName Already Exists"
+                    Token = "UserName Already Exists"
                 };
-            
+
 
             ApplicationUser newUser = new ApplicationUser()
             {
@@ -142,7 +146,7 @@ namespace JwtAuthAspNet7WebAPI.Core.Services
                 return new AuthServiceResponseDto()
                 {
                     IsSucceed = false,
-                    Message = errorString
+                    Token = errorString
                 };
             }
 
@@ -152,7 +156,7 @@ namespace JwtAuthAspNet7WebAPI.Core.Services
             return new AuthServiceResponseDto()
             {
                 IsSucceed = true,
-                Message = "User Created Successfully"
+                Token = "User Created Successfully"
             };
         }
 
@@ -166,17 +170,17 @@ namespace JwtAuthAspNet7WebAPI.Core.Services
                 return new AuthServiceResponseDto()
                 {
                     IsSucceed = true,
-                    Message = "Roles Seeding is Already Done"
+                    Token = "Roles Seeding is Already Done"
                 };
 
             await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.CUSTOMER));
             await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.ADMIN));
             await _roleManager.CreateAsync(new IdentityRole(StaticUserRoles.STAFF));
-          
+
             return new AuthServiceResponseDto()
             {
                 IsSucceed = true,
-                Message = "Role Seeding Done Successfully"
+                Token = "Role Seeding Done Successfully"
             };
         }
 
