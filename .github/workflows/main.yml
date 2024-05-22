@@ -1,4 +1,4 @@
-name: Publish
+name: Publish 🚀
 
 on:
   workflow_dispatch:
@@ -8,11 +8,11 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-lastest
-
+    runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v3
-
+      
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -20,9 +20,9 @@ jobs:
 
       - name: Restore
         run: dotnet restore ./BE-SheritonHotelSolution.sln
-
+        
       - name: Build
         run: dotnet build ./BE-SheritonHotelSolution.sln --configuration Release --no-restore
-
+        
       - name: Publish
         run: dotnet publish ./BE-SheritonHotelSolution.sln --configuration Release --no-build
