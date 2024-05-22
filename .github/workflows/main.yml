@@ -8,7 +8,7 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: be-sheritonhotel-solution
-  AZURE_WEBAPP_PACKAGE_PATH: ./publish
+  AZURE_WEBAPP_PACKAGE_PATH: "./publish"
   
 jobs:
   publish:
@@ -20,7 +20,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '6.0.x'
 
       - name: Restore
         run: dotnet restore ./BE-SheritonHotelSolution.sln
