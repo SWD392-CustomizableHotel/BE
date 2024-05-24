@@ -1,0 +1,23 @@
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Core.Entities
+{
+    public class Amenity
+    {
+        [Key]
+        public int AmenityId { get; set; }
+        public string AmenityCode { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public string Description { get; set; }
+        public string Status { get; set; }
+
+        [ForeignKey("HotelId")]
+        public int HotelId { get; set; }
+        public Hotel Hotel { get; set; }
+
+        public virtual ICollection<BookingAmenity> BookingAmenities { get; set; } = new List<BookingAmenity>();
+    }
+}
