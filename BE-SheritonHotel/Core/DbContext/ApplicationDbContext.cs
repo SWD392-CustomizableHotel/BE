@@ -8,6 +8,7 @@ namespace Core.DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
+
         }
     }
 }
