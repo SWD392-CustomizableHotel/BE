@@ -20,7 +20,7 @@ builder.Services.AddSwaggerGen();
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("local");
+    var connectionString = builder.Configuration.GetConnectionString("serverDatabase");
     options.UseSqlServer(connectionString);
 });
 
@@ -116,6 +116,12 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+//CORS
+builder.Services.AddCors(p=>p.AddPolicy("corspolicy", build =>
+{
+    build.WithOrigins("https://fe-customizablehotel.vercel.app", "http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+}));
+
 
 
 
@@ -131,6 +137,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("corspolicy");
+
 app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
@@ -139,5 +147,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+//RUN
 app.Run();
