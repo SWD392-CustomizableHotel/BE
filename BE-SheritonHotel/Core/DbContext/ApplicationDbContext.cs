@@ -11,16 +11,16 @@ namespace Core.DbContext
         {
         }
 
-        public DbSet<ApplicationUser> Users { get; set; }
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<Booking> Bookings { get; set; }
-        public DbSet<Room> Rooms { get; set; }
-        public DbSet<Hotel> Hotels { get; set; }
-        public DbSet<Amenity> Amenities { get; set; }
-        public DbSet<Payment> Payments { get; set; }
-        public DbSet<Service> Services { get; set; }
-        public DbSet<BookingService> BookingServices { get; set; }
-        public DbSet<BookingAmenity> BookingAmenities { get; set; }
+        public DbSet<ApplicationUser> User { get; set; }
+        public DbSet<Role> Role { get; set; }
+        public DbSet<Booking> Booking { get; set; }
+        public DbSet<Room> Room { get; set; }
+        public DbSet<Hotel> Hotel { get; set; }
+        public DbSet<Amenity> Amenity { get; set; }
+        public DbSet<Payment> Payment { get; set; }
+        public DbSet<Service> Service { get; set; }
+        public DbSet<BookingService> BookingService { get; set; }
+        public DbSet<BookingAmenity> BookingAmenity { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

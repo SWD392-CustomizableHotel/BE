@@ -26,7 +26,7 @@ namespace BESheritonHotel.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Hotels",
+                name: "Hotel",
                 columns: table => new
                 {
                     HotelId = table.Column<int>(type: "int", nullable: false)
@@ -38,11 +38,11 @@ namespace BESheritonHotel.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Hotels", x => x.HotelId);
+                    table.PrimaryKey("PK_Hotel", x => x.HotelId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Roles",
+                name: "Role",
                 columns: table => new
                 {
                     RoleId = table.Column<int>(type: "int", nullable: false)
@@ -56,7 +56,7 @@ namespace BESheritonHotel.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Roles", x => x.RoleId);
+                    table.PrimaryKey("PK_Role", x => x.RoleId);
                 });
 
             migrationBuilder.CreateTable(
@@ -81,7 +81,7 @@ namespace BESheritonHotel.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Amenities",
+                name: "Amenity",
                 columns: table => new
                 {
                     AmenityId = table.Column<int>(type: "int", nullable: false)
@@ -95,17 +95,17 @@ namespace BESheritonHotel.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Amenities", x => x.AmenityId);
+                    table.PrimaryKey("PK_Amenity", x => x.AmenityId);
                     table.ForeignKey(
-                        name: "FK_Amenities_Hotels_HotelId",
+                        name: "FK_Amenity_Hotel_HotelId",
                         column: x => x.HotelId,
-                        principalTable: "Hotels",
+                        principalTable: "Hotel",
                         principalColumn: "HotelId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Rooms",
+                name: "Room",
                 columns: table => new
                 {
                     RoomId = table.Column<int>(type: "int", nullable: false)
@@ -121,17 +121,17 @@ namespace BESheritonHotel.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rooms", x => x.RoomId);
+                    table.PrimaryKey("PK_Room", x => x.RoomId);
                     table.ForeignKey(
-                        name: "FK_Rooms_Hotels_HotelId",
+                        name: "FK_Room_Hotel_HotelId",
                         column: x => x.HotelId,
-                        principalTable: "Hotels",
+                        principalTable: "Hotel",
                         principalColumn: "HotelId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Services",
+                name: "Service",
                 columns: table => new
                 {
                     ServiceId = table.Column<int>(type: "int", nullable: false)
@@ -145,11 +145,11 @@ namespace BESheritonHotel.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Services", x => x.ServiceId);
+                    table.PrimaryKey("PK_Service", x => x.ServiceId);
                     table.ForeignKey(
-                        name: "FK_Services_Hotels_HotelId",
+                        name: "FK_Service_Hotel_HotelId",
                         column: x => x.HotelId,
-                        principalTable: "Hotels",
+                        principalTable: "Hotel",
                         principalColumn: "HotelId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -184,9 +184,9 @@ namespace BESheritonHotel.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Roles_RoleId",
+                        name: "FK_AspNetUsers_Role_RoleId",
                         column: x => x.RoleId,
-                        principalTable: "Roles",
+                        principalTable: "Role",
                         principalColumn: "RoleId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -277,7 +277,7 @@ namespace BESheritonHotel.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Bookings",
+                name: "Booking",
                 columns: table => new
                 {
                     BookingId = table.Column<int>(type: "int", nullable: false)
@@ -291,23 +291,23 @@ namespace BESheritonHotel.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Bookings", x => x.BookingId);
+                    table.PrimaryKey("PK_Booking", x => x.BookingId);
                     table.ForeignKey(
-                        name: "FK_Bookings_AspNetUsers_UserId",
+                        name: "FK_Booking_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Bookings_Rooms_RoomId",
+                        name: "FK_Booking_Room_RoomId",
                         column: x => x.RoomId,
-                        principalTable: "Rooms",
+                        principalTable: "Room",
                         principalColumn: "RoomId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "BookingAmenities",
+                name: "BookingAmenity",
                 columns: table => new
                 {
                     BookingId = table.Column<int>(type: "int", nullable: false),
@@ -318,23 +318,23 @@ namespace BESheritonHotel.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BookingAmenities", x => new { x.BookingId, x.AmenityId });
+                    table.PrimaryKey("PK_BookingAmenity", x => new { x.BookingId, x.AmenityId });
                     table.ForeignKey(
-                        name: "FK_BookingAmenities_Amenities_AmenityId",
+                        name: "FK_BookingAmenity_Amenity_AmenityId",
                         column: x => x.AmenityId,
-                        principalTable: "Amenities",
+                        principalTable: "Amenity",
                         principalColumn: "AmenityId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_BookingAmenities_Bookings_BookingId",
+                        name: "FK_BookingAmenity_Booking_BookingId",
                         column: x => x.BookingId,
-                        principalTable: "Bookings",
+                        principalTable: "Booking",
                         principalColumn: "BookingId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "BookingServices",
+                name: "BookingService",
                 columns: table => new
                 {
                     BookingId = table.Column<int>(type: "int", nullable: false),
@@ -345,23 +345,23 @@ namespace BESheritonHotel.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BookingServices", x => new { x.BookingId, x.ServiceId });
+                    table.PrimaryKey("PK_BookingService", x => new { x.BookingId, x.ServiceId });
                     table.ForeignKey(
-                        name: "FK_BookingServices_Bookings_BookingId",
+                        name: "FK_BookingService_Booking_BookingId",
                         column: x => x.BookingId,
-                        principalTable: "Bookings",
+                        principalTable: "Booking",
                         principalColumn: "BookingId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_BookingServices_Services_ServiceId",
+                        name: "FK_BookingService_Service_ServiceId",
                         column: x => x.ServiceId,
-                        principalTable: "Services",
+                        principalTable: "Service",
                         principalColumn: "ServiceId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Payments",
+                name: "Payment",
                 columns: table => new
                 {
                     PaymentId = table.Column<int>(type: "int", nullable: false)
@@ -374,18 +374,18 @@ namespace BESheritonHotel.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payments", x => x.PaymentId);
+                    table.PrimaryKey("PK_Payment", x => x.PaymentId);
                     table.ForeignKey(
-                        name: "FK_Payments_Bookings_BookingId",
+                        name: "FK_Payment_Booking_BookingId",
                         column: x => x.BookingId,
-                        principalTable: "Bookings",
+                        principalTable: "Booking",
                         principalColumn: "BookingId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Amenities_HotelId",
-                table: "Amenities",
+                name: "IX_Amenity_HotelId",
+                table: "Amenity",
                 column: "HotelId");
 
             migrationBuilder.CreateIndex(
@@ -433,38 +433,38 @@ namespace BESheritonHotel.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookingAmenities_AmenityId",
-                table: "BookingAmenities",
-                column: "AmenityId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Bookings_RoomId",
-                table: "Bookings",
+                name: "IX_Booking_RoomId",
+                table: "Booking",
                 column: "RoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookings_UserId",
-                table: "Bookings",
+                name: "IX_Booking_UserId",
+                table: "Booking",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookingServices_ServiceId",
-                table: "BookingServices",
+                name: "IX_BookingAmenity_AmenityId",
+                table: "BookingAmenity",
+                column: "AmenityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BookingService_ServiceId",
+                table: "BookingService",
                 column: "ServiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payments_BookingId",
-                table: "Payments",
+                name: "IX_Payment_BookingId",
+                table: "Payment",
                 column: "BookingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rooms_HotelId",
-                table: "Rooms",
+                name: "IX_Room_HotelId",
+                table: "Room",
                 column: "HotelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Services_HotelId",
-                table: "Services",
+                name: "IX_Service_HotelId",
+                table: "Service",
                 column: "HotelId");
         }
 
@@ -487,37 +487,37 @@ namespace BESheritonHotel.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "BookingAmenities");
+                name: "BookingAmenity");
 
             migrationBuilder.DropTable(
-                name: "BookingServices");
+                name: "BookingService");
 
             migrationBuilder.DropTable(
-                name: "Payments");
+                name: "Payment");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Amenities");
+                name: "Amenity");
 
             migrationBuilder.DropTable(
-                name: "Services");
+                name: "Service");
 
             migrationBuilder.DropTable(
-                name: "Bookings");
+                name: "Booking");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Rooms");
+                name: "Room");
 
             migrationBuilder.DropTable(
-                name: "Roles");
+                name: "Role");
 
             migrationBuilder.DropTable(
-                name: "Hotels");
+                name: "Hotel");
         }
     }
 }

@@ -57,7 +57,7 @@ namespace BESheritonHotel.Migrations
 
                     b.HasIndex("HotelId");
 
-                    b.ToTable("Amenities");
+                    b.ToTable("Amenity");
                 });
 
             modelBuilder.Entity("Core.Entities.ApplicationUser", b =>
@@ -181,7 +181,7 @@ namespace BESheritonHotel.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Booking");
                 });
 
             modelBuilder.Entity("Core.Entities.BookingAmenity", b =>
@@ -205,7 +205,7 @@ namespace BESheritonHotel.Migrations
 
                     b.HasIndex("AmenityId");
 
-                    b.ToTable("BookingAmenities");
+                    b.ToTable("BookingAmenity");
                 });
 
             modelBuilder.Entity("Core.Entities.BookingService", b =>
@@ -231,7 +231,7 @@ namespace BESheritonHotel.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("BookingServices");
+                    b.ToTable("BookingService");
                 });
 
             modelBuilder.Entity("Core.Entities.Hotel", b =>
@@ -260,7 +260,7 @@ namespace BESheritonHotel.Migrations
 
                     b.HasKey("HotelId");
 
-                    b.ToTable("Hotels");
+                    b.ToTable("Hotel");
                 });
 
             modelBuilder.Entity("Core.Entities.Payment", b =>
@@ -293,7 +293,7 @@ namespace BESheritonHotel.Migrations
 
                     b.HasIndex("BookingId");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("Core.Entities.Role", b =>
@@ -324,7 +324,7 @@ namespace BESheritonHotel.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("Core.Entities.Room", b =>
@@ -368,7 +368,7 @@ namespace BESheritonHotel.Migrations
 
                     b.HasIndex("HotelId");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Room");
                 });
 
             modelBuilder.Entity("Core.Entities.Service", b =>
@@ -406,7 +406,7 @@ namespace BESheritonHotel.Migrations
 
                     b.HasIndex("HotelId");
 
-                    b.ToTable("Services");
+                    b.ToTable("Service");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
