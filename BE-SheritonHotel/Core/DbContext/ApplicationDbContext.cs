@@ -9,6 +9,7 @@ namespace Core.DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
+
         }
 
         public DbSet<ApplicationUser> User { get; set; }
