@@ -7,7 +7,7 @@ on:
     - main
 
 env:
-  AZURE_WEBAPP_NAME: cbe-sheritonhotel
+  AZURE_WEBAPP_NAME: be-sheritonhotel
   AZURE_WEBAPP_PACKAGE_PATH: "./publish"
   
 jobs:
