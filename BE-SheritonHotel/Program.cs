@@ -20,7 +20,7 @@ builder.Services.AddSwaggerGen();
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("local");
+    var connectionString = builder.Configuration.GetConnectionString("serverDatabase");
     options.UseSqlServer(connectionString);
 });
 
@@ -31,7 +31,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(MyAllowSpecificOrigins,
                           policy =>
                           {
-                              policy.WithOrigins("http://localhost:4200")
+                              policy.WithOrigins("http://localhost:4200", "https://fe-pi-sepia.vercel.app/")
                                                   .AllowAnyHeader()
                                                   .AllowAnyMethod();
                           });
@@ -116,6 +116,12 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+//CORS
+builder.Services.AddCors(p=>p.AddPolicy("corspolicy", build =>
+{
+    build.WithOrigins("https://fe-customizablehotel.vercel.app", "http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+}));
+
 
 
 
@@ -130,6 +136,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("corspolicy");
 
 app.UseHttpsRedirection();
 
