@@ -5,79 +5,98 @@ using Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Starting SetUpDatabase
+var conn = string.Empty;
 
-builder.Services.AddControllers();
- 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-// Add DB
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+if (builder.Environment.IsDevelopment())
 {
-    var connectionString = builder.Configuration.GetConnectionString("serverDatabase");
-    options.UseSqlServer(connectionString);
-});
+	Console.WriteLine("[INFO]: Running in development mode.");
+	// Load environment variables and production settings if in development mode
+	builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+	//builder.Configuration.AddEnvironmentVariables();
+	conn = builder.Configuration.GetConnectionString("local");
+}
+else
+{
+	Console.WriteLine("[INFO]: Running in production mode.");
+	// Load environment variables
+	builder.Configuration.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: true);
+	//builder.Configuration.AddEnvironmentVariables();
+	conn = builder.Configuration.GetConnectionString("serverDatabase");
+}
+
+Console.WriteLine($"[INFO]: Using connection string: {conn}");
+
+// Add DbContext with the appropriate connection string
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+	options.UseSqlServer(conn));
+
+//Ending SetUpDatabase
+
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(MyAllowSpecificOrigins,
-                          policy =>
-                          {
-                              policy.WithOrigins("http://localhost:4200", "https://fe-pi-sepia.vercel.app/")
-                                                  .AllowAnyHeader()
-                                                  .AllowAnyMethod();
-                          });
+	options.AddPolicy(MyAllowSpecificOrigins,
+						  policy =>
+						  {
+							  policy.WithOrigins("http://localhost:4200", "https://fe-pi-sepia.vercel.app/")
+												  .AllowAnyHeader()
+												  .AllowAnyMethod();
+						  });
 });
 
 
 // Add Identity
 builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+	.AddIdentity<ApplicationUser, IdentityRole>()
+	.AddEntityFrameworkStores<ApplicationDbContext>()
+	.AddDefaultTokenProviders();
 
 
 // Config Identity
 builder.Services.Configure<IdentityOptions>(options =>
 {
-    options.Password.RequiredLength = 3;
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase= false;
-    options.Password.RequireUppercase= false;
-    options.Password.RequireNonAlphanumeric= false;
-    options.SignIn.RequireConfirmedEmail = false;
+	options.Password.RequiredLength = 3;
+	options.Password.RequireDigit = false;
+	options.Password.RequireLowercase = false;
+	options.Password.RequireUppercase = false;
+	options.Password.RequireNonAlphanumeric = false;
+	options.SignIn.RequireConfirmedEmail = false;
 });
 
 
 // Add Authentication and JwtBearer
 builder.Services
-    .AddAuthentication(options =>
-    {
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.SaveToken = true;
-        options.RequireHttpsMetadata= false;
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-            ValidAudience = builder.Configuration["JWT:ValidAudience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
-        };
-    });
+	.AddAuthentication(options =>
+	{
+		options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+		options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+		options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+	})
+	.AddJwtBearer(options =>
+	{
+		options.SaveToken = true;
+		options.RequireHttpsMetadata = false;
+		options.TokenValidationParameters = new TokenValidationParameters()
+		{
+			ValidateIssuer = true,
+			ValidateAudience = true,
+			ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+			ValidAudience = builder.Configuration["JWT:ValidAudience"],
+			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+		};
+	});
 
 
 
@@ -89,52 +108,62 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Please enter your token with this format: ''Bearer YOUR_TOKEN''",
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-        BearerFormat = "JWT",
-        Scheme = "bearer"
-    });
-    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Name = "Bearer",
-                In = ParameterLocation.Header,
-                Reference = new OpenApiReference
-                {
-                    Id = "Bearer",
-                    Type = ReferenceType.SecurityScheme
-                }
-            },
-            new List<string>()
-        }
-    });
+	options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+	{
+		Name = "Authorization",
+		In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+		Description = "Please enter your token with this format: ''Bearer YOUR_TOKEN''",
+		Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+		BearerFormat = "JWT",
+		Scheme = "bearer"
+	});
+	options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+	{
+		{
+			new OpenApiSecurityScheme
+			{
+				Name = "Bearer",
+				In = ParameterLocation.Header,
+				Reference = new OpenApiReference
+				{
+					Id = "Bearer",
+					Type = ReferenceType.SecurityScheme
+				}
+			},
+			new List<string>()
+		}
+	});
 });
 
 //CORS
-builder.Services.AddCors(p=>p.AddPolicy("corspolicy", build =>
+builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 {
-    build.WithOrigins("https://fe-customizablehotel.vercel.app", "http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
+	build.WithOrigins("https://fe-customizablehotel.vercel.app", "http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
 }));
 
 
 
 
-
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // pipeline
 var app = builder.Build();
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+{
+	app.UseSwagger();
+	app.UseSwaggerUI(c =>
+	{
+		c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+		c.RoutePrefix = string.Empty; 
+	});
+}
 
- 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
 app.UseCors("corspolicy");
