@@ -28,7 +28,7 @@ jobs:
         run: dotnet --list-sdks
         
       - name: Build
-        run: dotnet build ./BE-SheritonHotelSolution.sln --configuration Release --no-restore
+        run: dotnet build ./BE-SheritonHotelSolution/BE-SheritonHotel.csproj --configuration Release --no-restore
 
       - name: Publish
         run: dotnet publish ./BE-SheritonHotelSolution/BE-SheritonHotel.csproj --configuration Release --output ./publish
