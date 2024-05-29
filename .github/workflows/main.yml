@@ -7,7 +7,7 @@ on:
     - main
 
 env:
-  AZURE_WEBAPP_NAME: SheritonHotel
+  AZURE_WEBAPP_NAME: "SheritonHotel"
   
 jobs:
   publish:
@@ -16,16 +16,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Setup .NET
+      - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: 6.0.x
+
+      - name: Install dependencies
+        run: dotnet restore ./BE-SheritonHotelSolution/BE-SheritonHotel.csproj
         
       - name: Display .NET SDK versions
         run: dotnet --list-sdks
-          
-      - name: Restore
-        run: dotnet restore ./BE-SheritonHotelSolution.sln
         
       - name: Build
         run: dotnet build ./BE-SheritonHotelSolution.sln --configuration Release --no-restore
