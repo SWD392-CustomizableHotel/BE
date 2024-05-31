@@ -129,7 +129,7 @@ namespace Core.Services
 
             ApplicationUser newUser = new ApplicationUser()
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToString()  ,
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
