@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace Core.Entities
 {
@@ -18,6 +18,7 @@ namespace Core.Entities
         public int HotelId { get; set; }
         public Hotel Hotel { get; set; }
 
-        public virtual ICollection<BookingAmenity> BookingAmenities { get; set; } = new List<BookingAmenity>();
+        public virtual ICollection<BookingAmenity> BookingAmenities { get; set; } =
+            new List<BookingAmenity>();
     }
 }

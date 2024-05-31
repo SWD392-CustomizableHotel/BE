@@ -21,7 +21,9 @@ namespace Core.Entities
         public virtual ApplicationUser User { get; set; }
 
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
-        public virtual ICollection<BookingService> BookingServices { get; set; } = new List<BookingService>();
-        public virtual ICollection<BookingAmenity> BookingAmenities { get; set; } = new List<BookingAmenity>();
+        public virtual ICollection<BookingService> BookingServices { get; set; } =
+            new List<BookingService>();
+        public virtual ICollection<BookingAmenity> BookingAmenities { get; set; } =
+            new List<BookingAmenity>();
     }
 }
