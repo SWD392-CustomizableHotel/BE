@@ -20,7 +20,7 @@ builder.Services.AddSwaggerGen();
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("local");
+    var connectionString = builder.Configuration.GetConnectionString("serverDatabase");
     options.UseSqlServer(connectionString);
 });
 
@@ -31,7 +31,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(MyAllowSpecificOrigins,
                           policy =>
                           {
-                              policy.WithOrigins("http://localhost:4200")
+                              policy.WithOrigins("http://localhost:4200", "https://fe-customizablehotel.vercel.app/")
                                                   .AllowAnyHeader()
                                                   .AllowAnyMethod();
                           });
