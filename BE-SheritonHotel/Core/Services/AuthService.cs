@@ -1,12 +1,12 @@
-﻿using Core.Dtos;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Core.Dtos;
 using Core.Entities;
 using Core.Interfaces;
 using Core.OtherObjects;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace Core.Services
 {
@@ -16,13 +16,16 @@ namespace Core.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public AuthService(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            IConfiguration configuration
+        )
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
         }
-
 
         public async Task<AuthServiceResponseDto> LoginAsync(LoginDto loginDto)
         {
@@ -62,14 +65,12 @@ namespace Core.Services
 
             var token = GenerateNewJsonWebToken(authClaims);
 
-            return new AuthServiceResponseDto()
-            {
-                IsSucceed = true,
-                Token = token
-            };
+            return new AuthServiceResponseDto() { IsSucceed = true, Token = token };
         }
 
-        public async Task<AuthServiceResponseDto> MakeAdminAsync(UpdatePermissionDto updatePermissionDto)
+        public async Task<AuthServiceResponseDto> MakeAdminAsync(
+            UpdatePermissionDto updatePermissionDto
+        )
         {
             var user = await _userManager.FindByNameAsync(updatePermissionDto.UserName);
 
@@ -91,7 +92,9 @@ namespace Core.Services
             };
         }
 
-        public async Task<AuthServiceResponseDto> MakeStaffAsync(UpdatePermissionDto updatePermissionDto)
+        public async Task<AuthServiceResponseDto> MakeStaffAsync(
+            UpdatePermissionDto updatePermissionDto
+        )
         {
             var user = await _userManager.FindByNameAsync(updatePermissionDto.UserName);
 
@@ -124,9 +127,9 @@ namespace Core.Services
                     Token = "UserName Already Exists"
                 };
 
-
             ApplicationUser newUser = new ApplicationUser()
             {
+                Id = Guid.NewGuid().ToString()  ,
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
@@ -143,11 +146,7 @@ namespace Core.Services
                 {
                     errorString += " # " + error.Description;
                 }
-                return new AuthServiceResponseDto()
-                {
-                    IsSucceed = false,
-                    Token = errorString
-                };
+                return new AuthServiceResponseDto() { IsSucceed = false, Token = errorString };
             }
 
             // Add a Default USER Role to all users
@@ -186,15 +185,20 @@ namespace Core.Services
 
         private string GenerateNewJsonWebToken(List<Claim> claims)
         {
-            var authSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            var authSecret = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])
+            );
 
             var tokenObject = new JwtSecurityToken(
-                    issuer: _configuration["JWT:ValidIssuer"],
-                    audience: _configuration["JWT:ValidAudience"],
-                    expires: DateTime.Now.AddHours(1),
-                    claims: claims,
-                    signingCredentials: new SigningCredentials(authSecret, SecurityAlgorithms.HmacSha256)
-                );
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddHours(1),
+                claims: claims,
+                signingCredentials: new SigningCredentials(
+                    authSecret,
+                    SecurityAlgorithms.HmacSha256
+                )
+            );
 
             string token = new JwtSecurityTokenHandler().WriteToken(tokenObject);
 
