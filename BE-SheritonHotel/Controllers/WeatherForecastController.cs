@@ -1,6 +1,6 @@
-using Core.OtherObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OtherObjects;
 
 namespace Controllers
 {

@@ -1,12 +1,14 @@
-using Core.DbContext;
-using Core.Entities;
-using Core.Interfaces;
-using Core.Services;
+using DbContext;
+using Entities;
+using Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Services;
+using SWD.SheritonHotel.Data.Repositories;
+using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,28 +18,18 @@ builder.Services.AddControllers();
  
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+#region Add Dbcontext
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("serverDatabase");
+    var connectionString = builder.Configuration.GetConnectionString("local");
     options.UseSqlServer(connectionString);
 });
+#endregion
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(MyAllowSpecificOrigins,
-                          policy =>
-                          {
-                              policy.WithOrigins("http://localhost:4200", "https://fe-customizablehotel.vercel.app/")
-                                                  .AllowAnyHeader()
-                                                  .AllowAnyMethod();
-                          });
-});
-
-
+#region Add, Config Identity and Role
 // Add Identity
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
@@ -55,7 +47,9 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireNonAlphanumeric= false;
     options.SignIn.RequireConfirmedEmail = false;
 });
+#endregion
 
+#region JwtBear and Authentication, Swagger API
 
 // Add Authentication and JwtBearer
 builder.Services
@@ -78,13 +72,6 @@ builder.Services
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
         };
     });
-
-
-
-
-// Inject app Dependencies (Dependency Injection)
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -116,16 +103,23 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+#endregion
+
+#region Add Scoped
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+#endregion
+
+#region Add CORS
 //CORS
-builder.Services.AddCors(p=>p.AddPolicy("corspolicy", build =>
+builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 {
     build.WithOrigins("https://fe-customizablehotel.vercel.app", "http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
 }));
-
-
-
-
-
+#endregion
 
 // pipeline
 var app = builder.Build();
