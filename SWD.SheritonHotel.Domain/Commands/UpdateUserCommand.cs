@@ -1,11 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Identity;
-using SWD.SheritonHotel.Domain.Entities;
+﻿using Entities;
+using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Entities
+namespace SWD.SheritonHotel.Domain.Commands
 {
-    public class ApplicationUser : IdentityUser<string>
+    public class UpdateUserCommand : IRequest<ApplicationUser>
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
@@ -14,6 +17,5 @@ namespace Entities
         public string? PhoneNumber { get; set; } = null!;
         public string? PasswordResetToken { get; set; }
         public DateTime? ResetTokenExpires { get; set; }
-        public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     }
 }

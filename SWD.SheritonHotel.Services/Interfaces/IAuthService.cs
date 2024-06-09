@@ -1,4 +1,5 @@
 ﻿using Dtos;
+using Entities;
 
 namespace Interfaces
 {

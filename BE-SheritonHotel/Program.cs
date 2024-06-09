@@ -1,6 +1,7 @@
 using DbContext;
 using Entities;
 using Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,9 @@ using Microsoft.OpenApi.Models;
 using Services;
 using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.Utilities;
+using SWD.SheritonHotel.Handlers;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -110,6 +114,14 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<EmailSender>();
+
+#endregion
+
+#region Add MediatR
+
+var handler = typeof(AppHandler).GetTypeInfo().Assembly;
+builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
 
 #endregion
 
@@ -119,6 +131,12 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 {
     build.WithOrigins("https://fe-customizablehotel.vercel.app", "http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
 }));
+#endregion
+
+#region Mapping Profile
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 #endregion
 
 // pipeline
