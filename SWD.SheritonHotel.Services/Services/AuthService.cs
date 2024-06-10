@@ -1,13 +1,16 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Dynamic.Core.Tokenizer;
 using System.Security.Claims;
 using System.Text;
 using Dtos;
 using Entities;
 using Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using OtherObjects;
+using SWD.SheritonHotel.Domain.DTO;
 
 namespace Services
 {
@@ -130,7 +133,7 @@ namespace Services
 
             ApplicationUser newUser = new ApplicationUser()
             {
-                Id = Guid.NewGuid().ToString()  ,
+                Id = Guid.NewGuid().ToString(),
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
@@ -157,6 +160,36 @@ namespace Services
             {
                 IsSucceed = true,
                 Token = "User Created Successfully"
+            };
+        }
+
+        public async Task<BaseResponse<ApplicationUser>> ResetPassword(string email, string token, string newPassword)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(s => s.Email.ToLower().Equals(email.ToLower()));
+            if (user == null)
+            {
+                return new BaseResponse<ApplicationUser>
+                {
+                    IsSucceed = false,
+                    Message = "User email is not found."
+                };
+            }
+
+            var resetPasswordResult = await _userManager.ResetPasswordAsync(user, token, newPassword);
+            if (!resetPasswordResult.Succeeded)
+            {
+                return new BaseResponse<ApplicationUser>
+                {
+                    IsSucceed = false,
+                    Message = "Your request has been expired, please try request again."
+                };
+            }
+
+            return new BaseResponse<ApplicationUser>
+            {
+                IsSucceed = true,
+                Message = "Password reset successfully.",
+                Result = user
             };
         }
 

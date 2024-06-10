@@ -51,6 +51,10 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireNonAlphanumeric= false;
     options.SignIn.RequireConfirmedEmail = false;
 });
+
+// Config Token expiration
+builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+   opt.TokenLifespan = TimeSpan.FromDays(1));
 #endregion
 
 #region JwtBear and Authentication, Swagger API

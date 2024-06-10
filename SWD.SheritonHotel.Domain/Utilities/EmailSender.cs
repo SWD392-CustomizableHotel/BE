@@ -22,7 +22,7 @@ namespace SWD.SheritonHotel.Domain.Utilities
             var baseUrl = _config["Environment"] == "Production"
                 ? "https://fe-customizablehotel.vercel.app"
                 : "http://localhost:4200";
-            var verifyUrl = $"{baseUrl}/reset-password/verify?email={email}&token={token}";
+            var verifyUrl = $"{baseUrl}/reset-password?email={email}&token={token}";
             var message = @"
 <!DOCTYPE html>
 <html dir='ltr' xmlns='http://www.w3.org/1999/xhtml' xmlns:o='urn:schemas-microsoft-com:office:office'>
@@ -108,7 +108,7 @@ namespace SWD.SheritonHotel.Domain.Utilities
                               <tbody>
                                 <tr>
                                   <td align='center' valign='top' style='font-size: 0;'>
-                                    <a target='_blank' href='"+ baseUrl  +@"'>
+                                    <a target='_blank' href='" + baseUrl + @"'>
                                       <img src='https://ehzfwur.stripocdn.email/content/guids/CABINET_97e0cd87aa35382a18fc002af25dbcee8f5b6b25face755a881abd743feb9faa/images/logo_sheriton_1.png' alt='' width='190' style='display: block; font-size: 18px; border: 0; outline: none; text-decoration: none;'>
                                     </a>
                                   </td>
