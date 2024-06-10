@@ -15,7 +15,5 @@ namespace SWD.SheritonHotel.Domain.Commands
         public string? Email { get; set; }
         public DateTime? Dob { get; set; }
         public string? PhoneNumber { get; set; } = null!;
-        public string? PasswordResetToken { get; set; }
-        public DateTime? ResetTokenExpires { get; set; }
     }
 }

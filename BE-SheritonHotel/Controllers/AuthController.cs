@@ -120,7 +120,7 @@ namespace Controllers
                 return Ok(new BaseResponse<ApplicationUser>() { IsSucceed = false, Result = null, Message = "Cannot find your email. Please input correct email" });
             }
 
-            var token = await _userService.GenResetPasswordTokenAsync(user);
+            var token = await _mediator.Send(new GenerateResetPasswordCommand() { User = user });
             
             try
             {
