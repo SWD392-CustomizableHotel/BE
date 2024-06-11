@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SWD.SheritonHotel.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240605035544_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240609005602_Create-Init")]
+    partial class CreateInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

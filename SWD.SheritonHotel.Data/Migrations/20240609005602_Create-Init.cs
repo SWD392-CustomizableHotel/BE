@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SWD.SheritonHotel.Data.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class CreateInit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

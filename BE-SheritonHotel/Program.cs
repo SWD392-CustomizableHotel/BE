@@ -10,6 +10,12 @@ using Services;
 using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using System.Text;
+using MediatR;
+using Microsoft.Extensions.Options;
+using SWD.SheritonHotel.Domain.OtherObjects;
+using System.Reflection;
+using SWD.SheritonHotel.Handlers.Handlers;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -110,6 +116,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 
 #endregion
 
@@ -121,10 +128,22 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 }));
 #endregion
 
+
+#region Add MediateR
+var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;
+builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
+#endregion
 // pipeline
+
+#region Add JsonNaming
+builder.Services.AddControllers().AddJsonOptions(options => {
+    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
+});
+#endregion
 var app = builder.Build();
 
- 
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
