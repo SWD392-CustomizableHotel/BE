@@ -26,10 +26,12 @@ namespace SWD.SheritonHotel.Data.Repositories
         {
             return await _context.Room.CountAsync();
         }
-        public async Task<List<Room>> GetRoomsAsync(int pageNumber, int pageSize, RoomFilter? roomFilter)
+        public async Task<List<Room>> GetRoomsAsync(int pageNumber, int pageSize, 
+                    RoomFilter? roomFilter, string searchTerm = null)
         {
             var rooms = _context.Room.AsQueryable().AsNoTracking();
 
+            //Filter
             if (roomFilter != null)
             {
                 if (!string.IsNullOrEmpty(roomFilter.RoomStatus))
@@ -41,6 +43,14 @@ namespace SWD.SheritonHotel.Data.Repositories
                 {
                     rooms = rooms.Where(r => r.Type == roomFilter.RoomType);
                 }
+            }
+
+            //Search
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                rooms = rooms.Where(r => r.Code.Contains(searchTerm) ||
+                                         r.Type.Contains(searchTerm) ||
+                                         r.Status.Contains(searchTerm));
             }
 
             return await rooms.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

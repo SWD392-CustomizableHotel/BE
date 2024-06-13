@@ -35,9 +35,8 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             var totalRooms = await _roomRepository.GetTotalRoomsCountAsync();
             var validFilter = request.PaginationFilter;
             var rooms = await _roomRepository.GetRoomsAsync(validFilter.PageNumber, validFilter.PageSize, 
-                request.RoomFilter);
+                request.RoomFilter, request.SearchTerm);
 
-            //var rooms = await _roomRepository.GetRoomsAsync(validFilter.PageNumber, validFilter.PageSize);
 
             var roomDtos = rooms.Select(room => new RoomDto
             {

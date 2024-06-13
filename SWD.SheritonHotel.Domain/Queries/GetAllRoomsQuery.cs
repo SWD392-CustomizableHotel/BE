@@ -11,10 +11,12 @@ namespace SWD.SheritonHotel.Domain.Queries
 
         public RoomFilter RoomFilter { get; set; }
 
-        public GetAllRoomsQuery(PaginationFilter paginationFilter, RoomFilter roomFilter)
+        public string SearchTerm {  get; set; }
+        public GetAllRoomsQuery(PaginationFilter paginationFilter, RoomFilter roomFilter, string searchTerm)
         {
             PaginationFilter = paginationFilter ?? new PaginationFilter();
             RoomFilter = roomFilter ?? new RoomFilter();
+            SearchTerm = searchTerm;
         }
     }
 }
