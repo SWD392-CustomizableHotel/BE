@@ -1,6 +1,7 @@
 using DbContext;
 using Entities;
 using Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,13 +10,16 @@ using Microsoft.OpenApi.Models;
 using Services;
 using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Handlers.Handlers;
+using SWD.SheritonHotel.Services.Interfaces;
+using SWD.SheritonHotel.Services.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllers();
- 
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 #region Add Dbcontext
@@ -42,9 +46,9 @@ builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequiredLength = 3;
     options.Password.RequireDigit = false;
-    options.Password.RequireLowercase= false;
-    options.Password.RequireUppercase= false;
-    options.Password.RequireNonAlphanumeric= false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
     options.SignIn.RequireConfirmedEmail = false;
 });
 #endregion
@@ -62,7 +66,7 @@ builder.Services
     .AddJwtBearer(options =>
     {
         options.SaveToken = true;
-        options.RequireHttpsMetadata= false;
+        options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters()
         {
             ValidateIssuer = true,
@@ -110,7 +114,9 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+builder.Services.AddScoped<IViewRoomRepository, ViewRoomRepository>();
+builder.Services.AddScoped<IViewRoomService, ViewRoomService>();
+builder.Services.AddMediatR(typeof(GetAllAvailableRoomQueryHandler).Assembly);
 #endregion
 
 #region Add CORS
@@ -124,7 +130,7 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 // pipeline
 var app = builder.Build();
 
- 
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
