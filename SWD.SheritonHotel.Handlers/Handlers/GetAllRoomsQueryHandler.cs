@@ -40,10 +40,12 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 
             var roomDtos = rooms.Select(room => new RoomDto
             {
+                RoomId = room.Id,
                 RoomNumber = room.Code,
                 RoomType = room.Type,
                 RoomStatus = room.Status,
                 RoomPrice = room.Price,
+                IsDeleted = room.IsDeleted
             }).ToList();
 
             var totalPages = (int)Math.Ceiling(totalRooms/ (double)validFilter.PageSize);

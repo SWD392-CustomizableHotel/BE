@@ -135,11 +135,12 @@ builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
 #endregion
 // pipeline
 
-#region Add JsonNaming
-builder.Services.AddControllers().AddJsonOptions(options => {
-    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
-});
-#endregion
+//#region Add JsonNaming
+//builder.Services.AddControllers().AddJsonOptions(options => {
+//    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
+//});
+//#endregion
+
 var app = builder.Build();
 
 

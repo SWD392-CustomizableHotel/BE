@@ -44,10 +44,12 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 
                 var roomDto = new RoomDto
                 {
+                    RoomId = room.Id,
                     RoomNumber = room.Code,
                     RoomType = room.Type,
                     RoomStatus = room.Status,
-                    RoomPrice = room.Price
+                    RoomPrice = room.Price,
+                    IsDeleted = room.IsDeleted
                 };
 
                 return new ResponseDto<RoomDto>
