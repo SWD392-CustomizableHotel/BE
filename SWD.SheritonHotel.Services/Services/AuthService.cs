@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using OtherObjects;
+using SWD.SheritonHotel.Domain.Utilities;
 
 namespace Services
 {
@@ -16,16 +17,22 @@ namespace Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
+        private readonly EmailVerify _emailVerify;
+        private readonly TokenGenerator _tokenGenerator;
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            IConfiguration configuration
+            IConfiguration configuration,
+            EmailVerify emailVerify,
+            TokenGenerator tokenGenerator
         )
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _emailVerify = emailVerify;
+            _tokenGenerator = tokenGenerator;
         }
 
         public async Task<AuthServiceResponseDto> LoginAsync(LoginDto loginDto)
@@ -38,6 +45,14 @@ namespace Services
                     IsSucceed = false,
                     Token = "Invalid Credentials"
                 };
+            if (!user.isActived)
+            {
+                return new AuthServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    Token = "Account not verified!"
+                };
+            }
 
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
@@ -122,43 +137,89 @@ namespace Services
             var isExistsUser = await _userManager.FindByNameAsync(registerDto.UserName);
 
             if (isExistsUser != null)
+            {
                 return new AuthServiceResponseDto()
                 {
                     IsSucceed = false,
                     Token = "UserName Already Exists"
                 };
+            }
+
+            // Check if email is already in use
+            var isExistsEmail = await _userManager.FindByEmailAsync(registerDto.Email);
+            if (isExistsEmail != null)
+            {
+                return new AuthServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    Token = "Email Already Exists"
+                };
+            }
+
+            if (registerDto.Password != registerDto.ConfirmPassword)
+            {
+                return new AuthServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    Token = "The password and confirmation password do not match."
+                };
+            }
 
             ApplicationUser newUser = new ApplicationUser()
             {
-                Id = Guid.NewGuid().ToString()  ,
+                Id = Guid.NewGuid().ToString(),
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
                 UserName = registerDto.UserName,
                 SecurityStamp = Guid.NewGuid().ToString(),
+                VerifyTokenExpires = DateTime.Now.AddHours(24)
             };
 
             var createUserResult = await _userManager.CreateAsync(newUser, registerDto.Password);
 
             if (!createUserResult.Succeeded)
             {
-                var errorString = "User Creation Failed Beacause: ";
-                foreach (var error in createUserResult.Errors)
-                {
-                    errorString += " # " + error.Description;
-                }
+                var errorString = "User Creation Failed Because: " +
+                                  string.Join(" # ", createUserResult.Errors.Select(e => e.Description));
                 return new AuthServiceResponseDto() { IsSucceed = false, Token = errorString };
             }
 
             // Add a Default USER Role to all users
             await _userManager.AddToRoleAsync(newUser, StaticUserRoles.CUSTOMER);
 
+            // Generate verification token using custom TokenGenerator
+            var verificationToken = TokenGenerator.CreateRandomToken();
+            newUser.VerifyToken = verificationToken;
+
+            // Update user with verification token
+            var updateUserResult = await _userManager.UpdateAsync(newUser);
+            if (!updateUserResult.Succeeded)
+            {
+                var errorString = "User Update Failed Because: " +
+                                  string.Join(" # ", updateUserResult.Errors.Select(e => e.Description));
+                return new AuthServiceResponseDto() { IsSucceed = false, Token = errorString };
+            }
+
+            // Send verification email
+            bool emailSent = _emailVerify.SendVerifyAccountEmail(newUser.Email, verificationToken);
+            if (!emailSent)
+            {
+                return new AuthServiceResponseDto()
+                {
+                    IsSucceed = false,
+                    Token = "Email sending failed!"
+                };
+            }
+
             return new AuthServiceResponseDto()
             {
                 IsSucceed = true,
-                Token = "User Created Successfully"
+                Token = "Account created successfully and check your email to verify account! "
             };
         }
+
+
 
         public async Task<AuthServiceResponseDto> SeedRolesAsync()
         {

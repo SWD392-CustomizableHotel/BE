@@ -1,4 +1,3 @@
-using DbContext;
 using Entities;
 using Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,6 +9,8 @@ using Services;
 using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using System.Text;
+using SWD.SheritonHotel.Domain.Utilities;
+using SWD.SheritonHotel.Data.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -110,7 +111,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+builder.Services.AddScoped<EmailVerify>();
+builder.Services.AddScoped<TokenGenerator>();
 #endregion
 
 #region Add CORS
