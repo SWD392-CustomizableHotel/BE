@@ -9,9 +9,7 @@ namespace SWD.SheritonHotel.Domain.Commands
         public decimal Price { get; set; }
         public string Description { get; set; }
         public string Status { get; set; }
-
-        public string RoomNumber {  get; set; }
-
+        public string RoomNumber { get; set; }
         public int HotelId { get; set; }
     }
 }

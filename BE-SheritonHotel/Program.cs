@@ -19,6 +19,9 @@ using Microsoft.Extensions.Options;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Reflection;
 using SWD.SheritonHotel.Handlers.Handlers;
+using SWD.SheritonHotel.Services.Interfaces;
+using SWD.SheritonHotel.Services;
+using SWD.SheritonHotel.Services.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -125,6 +128,9 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IHotelService, HotelService>();
+builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<EmailSender>();
 
 #endregion

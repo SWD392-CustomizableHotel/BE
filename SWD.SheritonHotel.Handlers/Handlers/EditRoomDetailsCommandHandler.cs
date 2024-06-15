@@ -1,10 +1,12 @@
-﻿using Entities;
+﻿using AutoMapper;
+using Entities;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +17,13 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 {
     public class EditRoomDetailsCommandHandler : IRequestHandler<EditRoomDetailsCommand, ResponseDto<Room>>
     {
-        private readonly IRoomRepository _roomRepository;
+        private readonly IRoomService _roomService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public EditRoomDetailsCommandHandler(IRoomRepository roomRepository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public EditRoomDetailsCommandHandler(IRoomService roomService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _roomRepository = roomRepository;
+            _roomService = roomService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -41,7 +43,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 
             try
             {
-                var room = await _roomRepository.UpdateRoomAsync(request.RoomId, request.RoomType, request.RoomPrice);
+                var room = await _roomService.UpdateRoomAsync(request.RoomId, request.RoomType, request.RoomPrice);
                 return new ResponseDto<Room>(room); 
             }
             catch (Exception ex)

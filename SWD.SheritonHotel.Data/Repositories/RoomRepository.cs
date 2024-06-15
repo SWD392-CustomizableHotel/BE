@@ -24,12 +24,15 @@ namespace SWD.SheritonHotel.Data.Repositories
 
         public async Task<int> GetTotalRoomsCountAsync()
         {
-            return await _context.Room.CountAsync();
+            return await _context.Room.Where(r => !r.IsDeleted).CountAsync();
         }
         public async Task<List<Room>> GetRoomsAsync(int pageNumber, int pageSize, 
                     RoomFilter? roomFilter, string searchTerm = null)
         {
             var rooms = _context.Room.AsQueryable().AsNoTracking();
+
+            //Filter room that is deleted
+            rooms = rooms.Where(r => !r.IsDeleted);
 
             //Filter
             if (roomFilter != null)

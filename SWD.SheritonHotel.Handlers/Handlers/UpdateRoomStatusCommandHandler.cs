@@ -5,18 +5,19 @@ using Microsoft.AspNetCore.Identity;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Services.Interfaces;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
     public class UpdateRoomStatusCommandHandler : IRequestHandler<UpdateRoomStatusCommand, ResponseDto<Room>>
     {
-        private readonly IRoomRepository _roomRepository;
+        private readonly IRoomService _roomService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UpdateRoomStatusCommandHandler(IRoomRepository roomRepository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public UpdateRoomStatusCommandHandler(IRoomService roomService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _roomRepository = roomRepository;
+            _roomService = roomService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -37,7 +38,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 
             try
             {
-                var updatedRoom = await _roomRepository.UpdateRoomStatusAsync(request.RoomId, 
+                var updatedRoom = await _roomService.UpdateRoomStatusAsync(request.RoomId,
                     request.RoomStatus, user.UserName);
                 return new ResponseDto<Room>(updatedRoom);
             }

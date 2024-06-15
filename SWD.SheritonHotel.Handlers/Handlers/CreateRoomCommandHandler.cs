@@ -5,19 +5,20 @@ using Microsoft.AspNetCore.Identity;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Services.Interfaces;
 
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
     public class CreateRoomCommandHandler : IRequestHandler<CreateRoomCommand, ResponseDto<int>>
     {
-        private readonly IRoomRepository _roomRepository;
+        private readonly IRoomService _roomService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CreateRoomCommandHandler(IRoomRepository roomRepository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public CreateRoomCommandHandler(IRoomService roomService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _roomRepository = roomRepository;
+            _roomService = roomService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -48,7 +49,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 
             try
             {
-                var newRoomId = await _roomRepository.CreateRoomAsync(newRoom);
+                var newRoomId = await _roomService.CreateRoomAsync(newRoom);
                 return new ResponseDto<int>(newRoomId);
             }
             catch (Exception ex)

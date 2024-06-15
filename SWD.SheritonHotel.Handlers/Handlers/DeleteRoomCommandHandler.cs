@@ -2,21 +2,21 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Services.Interfaces;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
     public class DeleteRoomCommandHandler : IRequestHandler<DeleteRoomCommand, ResponseDto<bool>>
     {
-        private readonly IRoomRepository _roomRepository;
+        private readonly IRoomService _roomService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DeleteRoomCommandHandler(IRoomRepository roomRepository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public DeleteRoomCommandHandler(IRoomService roomService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _roomRepository = roomRepository;
+            _roomService = roomService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -35,7 +35,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             }
             try
             {
-                await _roomRepository.DeleteRoomAsync(request.RoomId);
+                await _roomService.DeleteRoomAsync(request.RoomId);
                 return new ResponseDto<bool>(true);
             }
             catch (Exception ex)

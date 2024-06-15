@@ -1,24 +1,28 @@
-﻿using Entities;
+﻿using AutoMapper;
+using Entities;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
+using SWD.SheritonHotel.Services.Interfaces;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
     public class GetAllRoomsQueryHandler : IRequestHandler<GetAllRoomsQuery, PagedResponse<List<RoomDto>>>
     {
-        private readonly IRoomRepository _roomRepository;
+        private readonly IRoomService _roomService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMapper _mapper;
 
-        public GetAllRoomsQueryHandler(IRoomRepository roomRepository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public GetAllRoomsQueryHandler(IRoomService roomService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
-            _roomRepository = roomRepository;
+            _roomService = roomService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
         }
 
         public async Task<PagedResponse<List<RoomDto>>> Handle(GetAllRoomsQuery request, CancellationToken cancellationToken)
@@ -32,11 +36,10 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             }
 
             //Filter
-            var totalRooms = await _roomRepository.GetTotalRoomsCountAsync();
+            var totalRooms = await _roomService.GetTotalRoomsCountAsync();
             var validFilter = request.PaginationFilter;
-            var rooms = await _roomRepository.GetRoomsAsync(validFilter.PageNumber, validFilter.PageSize, 
+            var rooms = await _roomService.GetRoomsAsync(validFilter.PageNumber, validFilter.PageSize,
                 request.RoomFilter, request.SearchTerm);
-
 
             var roomDtos = rooms.Select(room => new RoomDto
             {
@@ -49,9 +52,10 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             }).ToList();
 
             var totalPages = (int)Math.Ceiling(totalRooms/ (double)validFilter.PageSize);
-
+            var totalRecords = await _roomService.GetTotalRoomsCountAsync();
             var response = new PagedResponse<List<RoomDto>>(roomDtos, validFilter.PageNumber, validFilter.PageSize)
             {
+                TotalRecords = totalRecords,
                 TotalPages = totalPages,
             };
             return response;
