@@ -20,7 +20,7 @@ namespace SWD.SheritonHotel.Data.Repositories
         }
         public async Task<List<Room>> GetAllAvailableRoom()
         {
-            return await _context.Room.Where(r => r.Status == "Available").ToListAsync();
+            return await _context.Room.Where(r => r.Status == "Available" & !r.IsDeleted).ToListAsync();
         }
     }
 }
