@@ -10,10 +10,20 @@ using Microsoft.OpenApi.Models;
 using Services;
 using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.Utilities;
+using SWD.SheritonHotel.Handlers;
+using System.Reflection;
+using System.Text;
+using MediatR;
+using Microsoft.Extensions.Options;
+using SWD.SheritonHotel.Domain.OtherObjects;
+using System.Reflection;
 using SWD.SheritonHotel.Handlers.Handlers;
 using SWD.SheritonHotel.Services.Interfaces;
+using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
-using System.Text;
+using Microsoft.Extensions.Hosting;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +61,10 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.SignIn.RequireConfirmedEmail = false;
 });
+
+// Config Token expiration
+builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+   opt.TokenLifespan = TimeSpan.FromDays(1));
 #endregion
 
 #region JwtBear and Authentication, Swagger API
@@ -117,6 +131,19 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IViewRoomRepository, ViewRoomRepository>();
 builder.Services.AddScoped<IViewRoomService, ViewRoomService>();
 builder.Services.AddMediatR(typeof(GetAllAvailableRoomQueryHandler).Assembly);
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IHotelService, HotelService>();
+builder.Services.AddScoped<IHotelRepository, HotelRepository>();
+builder.Services.AddScoped<EmailSender>();
+
+#endregion
+
+#region Add MediatR
+
+var handler = typeof(AppHandler).GetTypeInfo().Assembly;
+builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
+
 #endregion
 
 #region Add CORS
@@ -127,8 +154,33 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 }));
 #endregion
 
+#region Mapping Profile
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+#endregion
+
+#region Mapping Profile
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+#endregion
+
+
+// #region Add MediateR
+// var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;
+// builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
+// #endregion
 // pipeline
+
+//#region Add JsonNaming
+//builder.Services.AddControllers().AddJsonOptions(options => {
+//    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
+//});
+//#endregion
+
 var app = builder.Build();
+
 
 
 if (app.Environment.IsDevelopment())
