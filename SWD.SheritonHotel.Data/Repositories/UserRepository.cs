@@ -52,16 +52,12 @@ namespace SWD.SheritonHotel.Data.Repositories
             var users = await _context.Users
                 .Where(u => u.Email == email)
                 .ToListAsync();
-
             if (users.Count > 1)
             {
                 throw new InvalidOperationException("Sequence contains more than one element.");
             }
-
             return users.SingleOrDefault();
         }
-
-
         public async Task UpdateUserAsync(ApplicationUser user)
         {
             _context.Users.Update(user);
