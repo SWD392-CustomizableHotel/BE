@@ -1,43 +1,49 @@
-using Core.DbContext;
-using Core.Entities;
-using Core.Interfaces;
-using Core.Services;
+using Entities;
+using Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Services;
+using SWD.SheritonHotel.Data.Repositories;
+using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.Utilities;
+using SWD.SheritonHotel.Handlers;
+using System.Reflection;
 using System.Text;
+using MediatR;
+using Microsoft.Extensions.Options;
+using SWD.SheritonHotel.Domain.OtherObjects;
+using System.Reflection;
+using SWD.SheritonHotel.Handlers.Handlers;
+using SWD.SheritonHotel.Services.Interfaces;
+using SWD.SheritonHotel.Services;
+using SWD.SheritonHotel.Services.Services;
+using SWD.SheritonHotel.Domain.Utilities;
+using SWD.SheritonHotel.Data.Context;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllers();
- 
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+#region Add Dbcontext
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("serverDatabase");
+    var connectionString = builder.Configuration.GetConnectionString("local");
     options.UseSqlServer(connectionString);
 });
+#endregion
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(MyAllowSpecificOrigins,
-                          policy =>
-                          {
-                              policy.WithOrigins("http://localhost:4200", "https://fe-customizablehotel.vercel.app/")
-                                                  .AllowAnyHeader()
-                                                  .AllowAnyMethod();
-                          });
-});
-
-
+#region Add, Config Identity and Role
 // Add Identity
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
@@ -50,12 +56,18 @@ builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequiredLength = 3;
     options.Password.RequireDigit = false;
-    options.Password.RequireLowercase= false;
-    options.Password.RequireUppercase= false;
-    options.Password.RequireNonAlphanumeric= false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
     options.SignIn.RequireConfirmedEmail = false;
 });
 
+// Config Token expiration
+builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+   opt.TokenLifespan = TimeSpan.FromDays(1));
+#endregion
+
+#region JwtBear and Authentication, Swagger API
 
 // Add Authentication and JwtBearer
 builder.Services
@@ -68,7 +80,7 @@ builder.Services
     .AddJwtBearer(options =>
     {
         options.SaveToken = true;
-        options.RequireHttpsMetadata= false;
+        options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters()
         {
             ValidateIssuer = true,
@@ -78,13 +90,6 @@ builder.Services
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
         };
     });
-
-
-
-
-// Inject app Dependencies (Dependency Injection)
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -116,21 +121,70 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+#endregion
+
+#region Add Scoped
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IViewRoomRepository, ViewRoomRepository>();
+builder.Services.AddScoped<IViewRoomService, ViewRoomService>();
+builder.Services.AddMediatR(typeof(GetAllAvailableRoomQueryHandler).Assembly);
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IHotelService, HotelService>();
+builder.Services.AddScoped<IHotelRepository, HotelRepository>();
+builder.Services.AddScoped<EmailSender>();
+
+#endregion
+
+#region Add MediatR
+
+var handler = typeof(AppHandler).GetTypeInfo().Assembly;
+builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
+
+builder.Services.AddScoped<EmailVerify>();
+builder.Services.AddScoped<TokenGenerator>();
+#endregion
+
+#region Add CORS
 //CORS
-builder.Services.AddCors(p=>p.AddPolicy("corspolicy", build =>
+builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 {
     build.WithOrigins("https://fe-customizablehotel.vercel.app", "http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
 }));
+#endregion
+
+#region Mapping Profile
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+#endregion
+
+#region Mapping Profile
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+#endregion
 
 
-
-
-
-
+// #region Add MediateR
+// var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;
+// builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
+// #endregion
 // pipeline
+
+//#region Add JsonNaming
+//builder.Services.AddControllers().AddJsonOptions(options => {
+//    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
+//});
+//#endregion
+
 var app = builder.Build();
 
- 
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

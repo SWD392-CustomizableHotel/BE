@@ -1,8 +1,19 @@
-﻿using Core.Dtos;
-using Core.Interfaces;
+﻿using AutoMapper;
+using System.ComponentModel.DataAnnotations;﻿
+using AutoMapper;
+using Dtos;
+using Entities;
+using Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.Queries;
+using SWD.SheritonHotel.Domain.Utilities;
+using SWD.SheritonHotel.Handlers.Handlers;
+using System.ComponentModel.DataAnnotations;
 
 namespace Controllers
 {
@@ -12,11 +23,17 @@ namespace Controllers
     {
         private readonly IAuthService _authService;
         private readonly IUserService _userService;
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
+        private readonly EmailSender _sender;
 
-        public AuthController(IAuthService authService, IUserService userService)
+        public AuthController(IAuthService authService, IUserService userService, IMediator mediator, EmailSender sender, IMapper mapper)
         {
             _authService = authService;
             _userService = userService;
+            _mediator = mediator;
+            _sender = sender;
+            _mapper = mapper;
         }
 
         // Route For Seeding my roles to DB
@@ -36,7 +53,7 @@ namespace Controllers
         {
             var users = await _userService.GetAllUsers();
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return NotFound();
             }
@@ -47,16 +64,24 @@ namespace Controllers
         // Route -> Register
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromBody][Required] RegisterDto registerDto)
         {
-            var registerResult = await _authService.RegisterAsync(registerDto);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = "Invalid model state", Result = null });
+            }
 
-            if (registerResult.IsSucceed)
-                return Ok(registerResult);
+            var authServiceResponse = await _authService.RegisterAsync(registerDto);
 
-            return BadRequest(registerResult);
+            if (authServiceResponse.IsSucceed)
+            {
+                return Ok(new BaseResponse<object> { IsSucceed = true, Message = "Account created successfully and check your email to verify account!", Result = null });
+            }
+            else
+            {
+                return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = authServiceResponse.Token, Result = null });
+            }
         }
-
 
         // Route -> Login
         [HttpPost]
@@ -70,8 +95,6 @@ namespace Controllers
 
             return BadRequest(new { message = "Username or password is incorrect" });
         }
-
-
 
         // Route -> make customer -> admin
         [HttpPost]
@@ -98,6 +121,69 @@ namespace Controllers
 
             return BadRequest(operationResult);
         }
+
+        [HttpPost]
+        [Route("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([Required] [FromBody] GetUserByEmailQuery query)
+        {
+            var user = await _mediator.Send(query);
+            if (user == null)
+            {
+                return Ok(new BaseResponse<ApplicationUser>() { IsSucceed = false, Result = null, Message = "Cannot find your email. Please input correct email" });
+            }
+
+            var token = await _mediator.Send(new GenerateResetPasswordCommand() { User = user });
+
+            try
+            {
+                if (!_sender.SendForgotPasswordEmail(user.Email, token))
+                {
+                    return Ok(new BaseResponse<ApplicationUser>() { IsSucceed = false, Message = "Failed to send email" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Ok(new BaseResponse<ApplicationUser>() { IsSucceed = false, Result = null, Message = "Failed to send email or update user" });
+            }
+            return Ok(new BaseResponse<ApplicationUser>() { IsSucceed = true, Result = null, Message = "Successfully request forgot password. Please check your email" });
+        }
+
+        [HttpPost]
+        [Route("reset-password")]
+        public async Task<IActionResult> ResetPassword([Required] [FromBody] ResetPasswordQuery query)
+        {
+            try
+            {
+                var response = await _mediator.Send(query);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return Ok(new BaseResponse<ApplicationUser>() { IsSucceed = false, Result = null, Message = "Failed to reset the password" });
+            }
+        }
+        //verify
+        [HttpGet]
+        [Route("verify-email")]
+        public async Task<IActionResult> VerifyEmail(string email, string token)
+        {
+            try
+            {
+                var result = await _userService.VerifyEmailTokenAsync(email, token);
+
+                if (result)
+                {
+                    return Ok(new BaseResponse<object> { IsSucceed = true, Message = "Email verified successfully.", Result = null });
+                }
+                else
+                {
+                    return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = "Invalid or expired token.", Result = null });
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = ex.Message, Result = null });
+            }
+        }
     }
 }
-
