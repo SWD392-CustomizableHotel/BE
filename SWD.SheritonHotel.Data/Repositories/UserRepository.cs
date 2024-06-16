@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Data.Repositories
@@ -15,17 +12,39 @@ namespace SWD.SheritonHotel.Data.Repositories
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
+
         public UserRepository(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _context = context;
         }
 
+        public async Task<ApplicationUser> FindUserByEmail(string email)
+        {
+            return await _userManager.Users.FirstOrDefaultAsync(s => s.Email.ToLower().Equals(email.ToLower()));
+        }
+
+        public async Task<string> GeneratePasswordResetTokenAsync(ApplicationUser user)
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            return token;
+        }
+
         public async Task<List<ApplicationUser>> GetAllUsers()
         {
-            using (var context = _context)
+            return await _userManager.Users.ToListAsync();
+        }
+
+        public async Task UpdateAsync(ApplicationUser user)
+        {
+            try
             {
-                return await _userManager.Users.ToListAsync();
+                await _userManager.UpdateAsync(user);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error: " + ex.Message);
             }
         }
         public async Task<ApplicationUser> GetUserByEmailAsync(string email)

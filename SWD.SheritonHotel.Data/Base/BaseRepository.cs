@@ -28,6 +28,7 @@ namespace SWD.SheritonHotel.Data.Base
                 return dbSet;
             }
         }
+
         #region Add(TEntity) + AddRange(IEnumerable<TEntity>)
         public void Add(TEntity entity)
         {
@@ -42,6 +43,7 @@ namespace SWD.SheritonHotel.Data.Base
             }
         }
         #endregion
+
         #region Check(int) + CheckCancellationToken(CancellationToken)
         public async Task<bool> Check(int id)
         {
@@ -54,6 +56,7 @@ namespace SWD.SheritonHotel.Data.Base
                 throw new OperationCanceledException("Request was cancelled");
         }
         #endregion
+
         #region Delete(TEntity) + DeleteRange(IEnumerable<TEntity>)
         public void Delete(TEntity entity)
         {
@@ -65,6 +68,7 @@ namespace SWD.SheritonHotel.Data.Base
             DbSet.UpdateRange(entities);
         }
         #endregion
+
         #region Update(TEntity) + UpdateRange(IEnumerable<TEntity>)
         public void Update(TEntity entity)
         {
@@ -79,13 +83,7 @@ namespace SWD.SheritonHotel.Data.Base
             }
         }
         #endregion
-        #region Other
-        protected DbSet<T> GetDbSet<T>() where T : class
-        {
-            var dbSet = _context.Set<T>();
-            return dbSet;
-        }
-        #endregion
+
         #region GetAll(CancellationToken)
 
         public Task<IList<TEntity>> GetAll(CancellationToken cancellationToken = default)
@@ -93,12 +91,14 @@ namespace SWD.SheritonHotel.Data.Base
             throw new NotImplementedException();
         }
         #endregion
+
         #region GetTotalCount()
         public Task<long> GetTotalCount()
         {
             throw new NotImplementedException();
         }
         #endregion
+
         #region GetById(int) + GetByIds(List<int>)
         public virtual async Task<TEntity> GetById(int id)
         {
@@ -116,6 +116,7 @@ namespace SWD.SheritonHotel.Data.Base
             return entity;
         }
         #endregion
+
         #region GetQueryable(CancellationToken) + GetQueryable() + GetQueryable(Expression<Func<TEntity, bool>>)
 
         public IQueryable<TEntity> GetQueryable(CancellationToken cancellationToken = default)
@@ -141,5 +142,14 @@ namespace SWD.SheritonHotel.Data.Base
             return queryable;
         }
         #endregion
+
+        #region Other
+        protected DbSet<T> GetDbSet<T>() where T : class
+        {
+            var dbSet = _context.Set<T>();
+            return dbSet;
+        }
+        #endregion
+
     }
 }

@@ -12,6 +12,7 @@ namespace SWD.SheritonHotel.Domain.Utilities
     public class EmailVerify
     {
         private readonly IConfiguration _config;
+
         public EmailVerify(IConfiguration config)
         {
             _config = config;
