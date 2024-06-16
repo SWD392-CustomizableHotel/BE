@@ -29,7 +29,7 @@ namespace Services
 
         public async Task UpdateAsync(ApplicationUser user)
         {
-            await _userRepo.UpdateAsync(user); 
+            await _userRepo.UpdateAsync(user);
         }
     }
 }
