@@ -35,13 +35,12 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                 return new PagedResponse<List<RoomDto>>(new List<RoomDto>(), 0, 0);
             }
 
-            //Filter
-            var totalRooms = await _roomService.GetTotalRoomsCountAsync();
+            // Apply filters and search
             var validFilter = request.PaginationFilter;
-            var rooms = await _roomService.GetRoomsAsync(validFilter.PageNumber, validFilter.PageSize,
+            var (filteredRooms, totalRecords) = await _roomService.GetRoomsAsync(validFilter.PageNumber, validFilter.PageSize,
                 request.RoomFilter, request.SearchTerm);
 
-            var roomDtos = rooms.Select(room => new RoomDto
+            var roomDtos = filteredRooms.Select(room => new RoomDto
             {
                 RoomId = room.Id,
                 RoomNumber = room.Code,
@@ -51,8 +50,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                 IsDeleted = room.IsDeleted
             }).ToList();
 
-            var totalPages = (int)Math.Ceiling(totalRooms/ (double)validFilter.PageSize);
-            var totalRecords = await _roomService.GetTotalRoomsCountAsync();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)request.PaginationFilter.PageSize);
             var response = new PagedResponse<List<RoomDto>>(roomDtos, validFilter.PageNumber, validFilter.PageSize)
             {
                 TotalRecords = totalRecords,
