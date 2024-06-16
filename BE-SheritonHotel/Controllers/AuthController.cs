@@ -113,7 +113,7 @@ namespace Controllers
 
         [HttpPost]
         [Route("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([Required][FromBody] GetUserByEmailQuery query)
+        public async Task<IActionResult> ForgotPassword([Required] [FromBody] GetUserByEmailQuery query)
         {
             var user = await _mediator.Send(query);
             if (user == null)
@@ -139,7 +139,7 @@ namespace Controllers
 
         [HttpPost]
         [Route("reset-password")]
-        public async Task<IActionResult> ResetPassword([Required][FromBody] ResetPasswordQuery query)
+        public async Task<IActionResult> ResetPassword([Required] [FromBody] ResetPasswordQuery query)
         {
             try
             {

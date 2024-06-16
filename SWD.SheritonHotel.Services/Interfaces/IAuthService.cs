@@ -1,5 +1,4 @@
-﻿
-using Dtos;
+﻿using Dtos;
 using Entities;
 using SWD.SheritonHotel.Domain.DTO;
 
