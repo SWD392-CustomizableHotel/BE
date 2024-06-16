@@ -39,11 +39,9 @@ namespace Services
                 await _userRepo.UpdateUserAsync(user);
                 return true;
             }
-
             return false;
         }
         
-
         public async Task UpdateAsync(ApplicationUser user)
         {
             await _userRepo.UpdateAsync(user); 

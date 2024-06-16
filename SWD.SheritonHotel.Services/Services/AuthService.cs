@@ -203,7 +203,6 @@ namespace Services
                                   string.Join(" # ", updateUserResult.Errors.Select(e => e.Description));
                 return new AuthServiceResponseDto() { IsSucceed = false, Token = errorString };
             }
-
             // Send verification email
             bool emailSent = _emailVerify.SendVerifyAccountEmail(newUser.Email, verificationToken);
             if (!emailSent)
