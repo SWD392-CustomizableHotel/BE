@@ -27,7 +27,7 @@ namespace SWD.SheritonHotel.Data.Repositories
         {
             return await _context.Room.Where(r => !r.IsDeleted).CountAsync();
         }
-        public async Task<List<Room>> GetRoomsAsync(int pageNumber, int pageSize, 
+        public async Task<(List<Room>, int)> GetRoomsAsync(int pageNumber, int pageSize, 
                     RoomFilter? roomFilter, string searchTerm = null)
         {
             var rooms = _context.Room.AsQueryable().AsNoTracking();
@@ -56,8 +56,13 @@ namespace SWD.SheritonHotel.Data.Repositories
                                          r.Type.Contains(searchTerm) ||
                                          r.Status.Contains(searchTerm));
             }
+            // Count total records that match the search term for pagination
+            var totalRecords = await rooms.CountAsync();
 
-            return await rooms.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            // Apply pagination
+            var paginatedRooms = await rooms.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return (paginatedRooms, totalRecords);
         }
 
         public async Task<Room> UpdateRoomStatusAsync(int roomId, string status, string updatedBy)

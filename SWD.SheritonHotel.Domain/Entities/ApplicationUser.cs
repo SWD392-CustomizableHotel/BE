@@ -1,7 +1,7 @@
-﻿    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using Microsoft.AspNetCore.Identity;
-    using SWD.SheritonHotel.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
+using SWD.SheritonHotel.Domain.Entities;
 
 namespace Entities
 {

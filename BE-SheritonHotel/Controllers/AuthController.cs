@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;﻿
+using AutoMapper;
 using Dtos;
 using Entities;
 using Interfaces;
@@ -52,7 +53,7 @@ namespace Controllers
         {
             var users = await _userService.GetAllUsers();
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return NotFound();
             }
@@ -132,14 +133,15 @@ namespace Controllers
             }
 
             var token = await _mediator.Send(new GenerateResetPasswordCommand() { User = user });
-            
+
             try
             {
                 if (!_sender.SendForgotPasswordEmail(user.Email, token))
                 {
                     return Ok(new BaseResponse<ApplicationUser>() { IsSucceed = false, Message = "Failed to send email" });
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return Ok(new BaseResponse<ApplicationUser>() { IsSucceed = false, Result = null, Message = "Failed to send email or update user" });
             }
@@ -154,7 +156,8 @@ namespace Controllers
             {
                 var response = await _mediator.Send(query);
                 return Ok(response);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return Ok(new BaseResponse<ApplicationUser>() { IsSucceed = false, Result = null, Message = "Failed to reset the password" });
             }
@@ -184,4 +187,3 @@ namespace Controllers
         }
     }
 }
-
