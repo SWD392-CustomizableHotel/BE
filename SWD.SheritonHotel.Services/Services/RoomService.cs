@@ -24,7 +24,7 @@ namespace SWD.SheritonHotel.Services
             return await _roomRepository.GetTotalRoomsCountAsync();
         }
 
-        public async Task<List<Room>> GetRoomsAsync(int pageNumber, int pageSize,
+        public async Task<(List<Room>, int)> GetRoomsAsync(int pageNumber, int pageSize,
                     RoomFilter? roomFilter, string searchTerm = null)
         {
             return await _roomRepository.GetRoomsAsync(pageNumber, pageSize, roomFilter, searchTerm);

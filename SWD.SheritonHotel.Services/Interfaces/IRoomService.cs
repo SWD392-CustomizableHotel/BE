@@ -12,7 +12,8 @@ namespace SWD.SheritonHotel.Services.Interfaces
     {
         Task<int> CreateRoomAsync(Room room);
         Task<int> GetTotalRoomsCountAsync();
-        Task<List<Room>> GetRoomsAsync(int pageNumber, int pageSize, RoomFilter? roomFilter, string searchTerm = null);
+        Task<(List<Room>, int)> GetRoomsAsync(int pageNumber, int pageSize,
+                    RoomFilter? roomFilter, string searchTerm = null);
         Task<Room> UpdateRoomStatusAsync(int roomId, string status, string updatedBy);
         Task DeleteRoomAsync(int roomId);
         Task<Room> GetRoomByIdAsync(int roomId);
