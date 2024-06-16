@@ -1,4 +1,4 @@
-﻿using DbContext;
+﻿using static Microsoft.EntityFrameworkCore.DbContext;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SWD.SheritonHotel.Data.Context;
 
 namespace SWD.SheritonHotel.Data.Repositories
 {

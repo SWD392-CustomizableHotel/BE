@@ -1,4 +1,3 @@
-using DbContext;
 using Entities;
 using Interfaces;
 using MediatR;
@@ -22,6 +21,8 @@ using SWD.SheritonHotel.Handlers.Handlers;
 using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
+using SWD.SheritonHotel.Domain.Utilities;
+using SWD.SheritonHotel.Data.Context;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -143,6 +144,8 @@ builder.Services.AddScoped<EmailSender>();
 var handler = typeof(AppHandler).GetTypeInfo().Assembly;
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
 
+builder.Services.AddScoped<EmailVerify>();
+builder.Services.AddScoped<TokenGenerator>();
 #endregion
 
 #region Add CORS

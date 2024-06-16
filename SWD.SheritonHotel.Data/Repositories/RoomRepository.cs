@@ -1,8 +1,9 @@
-﻿using DbContext;
+﻿using static Microsoft.EntityFrameworkCore.DbContext;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.OtherObjects;
+using SWD.SheritonHotel.Data.Context;
 
 namespace SWD.SheritonHotel.Data.Repositories
 {

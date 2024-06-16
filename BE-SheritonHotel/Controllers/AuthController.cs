@@ -1,4 +1,5 @@
-﻿
+﻿using AutoMapper;
+using System.ComponentModel.DataAnnotations;﻿
 using AutoMapper;
 using Dtos;
 using Entities;
@@ -6,6 +7,7 @@ using Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
@@ -62,14 +64,23 @@ namespace Controllers
         // Route -> Register
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromBody][Required] RegisterDto registerDto)
         {
-            var registerResult = await _authService.RegisterAsync(registerDto);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = "Invalid model state", Result = null });
+            }
 
-            if (registerResult.IsSucceed)
-                return Ok(registerResult);
+            var authServiceResponse = await _authService.RegisterAsync(registerDto);
 
-            return BadRequest(registerResult);
+            if (authServiceResponse.IsSucceed)
+            {
+                return Ok(new BaseResponse<object> { IsSucceed = true, Message = "Account created successfully and check your email to verify account!", Result = null });
+            }
+            else
+            {
+                return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = authServiceResponse.Token, Result = null });
+            }
         }
 
         // Route -> Login
@@ -149,6 +160,29 @@ namespace Controllers
             catch (Exception ex)
             {
                 return Ok(new BaseResponse<ApplicationUser>() { IsSucceed = false, Result = null, Message = "Failed to reset the password" });
+            }
+        }
+        //verify
+        [HttpGet]
+        [Route("verify-email")]
+        public async Task<IActionResult> VerifyEmail(string email, string token)
+        {
+            try
+            {
+                var result = await _userService.VerifyEmailTokenAsync(email, token);
+
+                if (result)
+                {
+                    return Ok(new BaseResponse<object> { IsSucceed = true, Message = "Email verified successfully.", Result = null });
+                }
+                else
+                {
+                    return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = "Invalid or expired token.", Result = null });
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = ex.Message, Result = null });
             }
         }
     }

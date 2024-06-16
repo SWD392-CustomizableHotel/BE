@@ -8,5 +8,7 @@ namespace Interfaces
         Task<ApplicationUser> FindUserByEmail(string email);
         Task<string> GenResetPasswordTokenAsync(ApplicationUser user);
         Task UpdateAsync(ApplicationUser user);
+        
+        Task<bool> VerifyEmailTokenAsync(string email, string token);
     }
 }

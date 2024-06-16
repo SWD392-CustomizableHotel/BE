@@ -1,7 +1,7 @@
-﻿using DbContext;
-using Entities;
+﻿using Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -46,6 +46,22 @@ namespace SWD.SheritonHotel.Data.Repositories
             {
                 throw new Exception("Error: " + ex.Message);
             }
+        }
+        public async Task<ApplicationUser> GetUserByEmailAsync(string email)
+        {
+            var users = await _context.Users
+                .Where(u => u.Email == email)
+                .ToListAsync();
+            if (users.Count > 1)
+            {
+                throw new InvalidOperationException("Sequence contains more than one element.");
+            }
+            return users.SingleOrDefault();
+        }
+        public async Task UpdateUserAsync(ApplicationUser user)
+        {
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
     }
 }
