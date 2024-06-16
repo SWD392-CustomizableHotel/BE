@@ -22,10 +22,4 @@
 		<ProjectReference Include="..\SWD.SheritonHotel.Domain\SWD.SheritonHotel.Domain.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Reference Include="SWD.SheritonHotel.Domain">
-	    <HintPath>..\SWD.SheritonHotel.Domain\obj\Debug\net6.0\ref\SWD.SheritonHotel.Domain.dll</HintPath>
-	  </Reference>
-	</ItemGroup>
-
 </Project>
