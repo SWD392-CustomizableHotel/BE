@@ -57,14 +57,16 @@ namespace SWD.SheritonHotel.Data.Base
         }
         #endregion
 
-        #region Delete(TEntity) + DeleteRange(IEnumerable<TEntity>)
+        #region Hard Delete(TEntity) + DeleteRange(IEnumerable<TEntity>)
         public void Delete(TEntity entity)
         {
+            entity.IsDeleted = true;
             DbSet.Update(entity);
         }
 
         public void DeleteRange(IEnumerable<TEntity> entities)
         {
+            entities.Where(e => e.IsDeleted == false ? e.IsDeleted = true : e.IsDeleted = false);
             DbSet.UpdateRange(entities);
         }
         #endregion
@@ -86,16 +88,19 @@ namespace SWD.SheritonHotel.Data.Base
 
         #region GetAll(CancellationToken)
 
-        public Task<IList<TEntity>> GetAll(CancellationToken cancellationToken = default)
+        public async Task<IList<TEntity>> GetAll(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var queryable = GetQueryable(cancellationToken);
+            var result = await queryable.Where(entity => !entity.IsDeleted).ToListAsync();
+            return result;
         }
         #endregion
 
         #region GetTotalCount()
-        public Task<long> GetTotalCount()
+        public async Task<long> GetTotalCount()
         {
-            throw new NotImplementedException();
+            var result = await GetQueryable().LongCountAsync();
+            return result;
         }
         #endregion
 
