@@ -446,6 +446,10 @@ namespace SWD.SheritonHotel.Data.Migrations
                     b.Property<int>("HotelId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -455,6 +459,9 @@ namespace SWD.SheritonHotel.Data.Migrations
 
                     b.Property<DateTime?>("LastUpdatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("NumberOfPeople")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
