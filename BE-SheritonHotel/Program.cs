@@ -1,3 +1,4 @@
+using System.Net;
 using Entities;
 using Interfaces;
 using MediatR;
@@ -17,6 +18,7 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Reflection;
+using SWD.SheritonHotel.API.WebSocket;
 using SWD.SheritonHotel.Handlers.Handlers;
 using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
@@ -26,7 +28,8 @@ using SWD.SheritonHotel.Data.Context;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddSingleton<SocketIOServer>();
+builder.Services.AddHostedService<ApplicationWorker>();
 
 builder.Services.AddControllers();
 
@@ -202,4 +205,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 //RUN
-app.Run();
+await app.RunAsync();
