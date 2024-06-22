@@ -1,8 +1,15 @@
-﻿using Dtos;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using Dtos;
+using Entities;
 using Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.IdentityModel.Tokens;
+using OtherObjects;
 
 namespace Controllers
 {
@@ -12,11 +19,14 @@ namespace Controllers
     {
         private readonly IAuthService _authService;
         private readonly IUserService _userService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AuthController(IAuthService authService, IUserService userService)
+        public AuthController(IAuthService authService, IUserService userService,
+            UserManager<ApplicationUser> userManager)
         {
             _authService = authService;
             _userService = userService;
+            _userManager = userManager;
         }
 
         // Route For Seeding my roles to DB
@@ -36,12 +46,12 @@ namespace Controllers
         {
             var users = await _userService.GetAllUsers();
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return NotFound();
             }
 
-            return Ok(users);
+            return Ok();
         }
 
         // Route -> Register
@@ -72,7 +82,6 @@ namespace Controllers
         }
 
 
-
         // Route -> make customer -> admin
         [HttpPost]
         [Route("make-admin")]
@@ -98,6 +107,78 @@ namespace Controllers
 
             return BadRequest(operationResult);
         }
+
+        [HttpPost]
+        [Route("ExternalLogin")]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] AuthGoogleDto authGoogleDto)
+        {
+            var payload = await _authService.VerifyGoogleToken(authGoogleDto);
+            if (payload == null)
+                return BadRequest("Invalid External Authentication.");
+
+            var info = new UserLoginInfo(authGoogleDto.Provider, payload.Subject, authGoogleDto.Provider);
+
+            var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+
+            if (user == null)
+            {
+                user = await _userManager.FindByEmailAsync(payload.Email);
+                if (user == null)
+                {
+                    user = new ApplicationUser
+                        { Email = payload.Email, UserName = payload.Email, Id = Guid.NewGuid().ToString() };
+                    await _userManager.CreateAsync(user);
+
+                    //prepare and send an email for the email confirmation
+                    await _userManager.AddToRoleAsync(user, StaticUserRoles.CUSTOMER);
+                    await _userManager.AddLoginAsync(user, info);
+                }
+                else
+                {
+                    await _userManager.AddLoginAsync(user, info);
+                }
+            }
+
+            if (user == null)
+                return BadRequest("Invalid External Authentication.");
+
+            var token = await _authService.GenerateToken(user);
+            return Ok(new AuthServiceResponseDto { Token = token, IsSucceed = true });
+        }
+
+        [HttpGet]
+        [Route("CheckUserRegistrationStatus")]
+        public async Task<IActionResult> CheckUserRegistrationStatus([FromQuery] string idToken)
+        {
+            try
+            {
+                var isRegistered = await _authService.CheckUserRegistrationStatus(idToken);
+                return Ok(isRegistered);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it appropriately
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error checking user registration status");
+            }
+        }
+
+        [HttpPost]
+        [Route("RegisterAdditionalInfo")]
+        public async Task<IActionResult> RegisterAdditionalInfo([FromBody] RegisterAdditionalInfoDto additionalInfoDto)
+        {
+            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var response = await _authService.RegisterAdditionalInfoAsync(additionalInfoDto);
+            if (response.IsSucceed)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response);
+        }
     }
 }
-

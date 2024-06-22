@@ -1,4 +1,6 @@
 ﻿using Dtos;
+using Entities;
+using Google.Apis.Auth;
 
 namespace Interfaces
 {
@@ -9,5 +11,9 @@ namespace Interfaces
         Task<AuthServiceResponseDto> LoginAsync(LoginDto loginDto);
         Task<AuthServiceResponseDto> MakeAdminAsync(UpdatePermissionDto updatePermissionDto);
         Task<AuthServiceResponseDto> MakeStaffAsync(UpdatePermissionDto updatePermissionDto);
+        Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(AuthGoogleDto authGoogleDTO);
+        Task<string> GenerateToken(ApplicationUser user);
+        Task<bool> CheckUserRegistrationStatus(string userId);
+        Task<AuthServiceResponseDto> RegisterAdditionalInfoAsync(RegisterAdditionalInfoDto additionalInfoDto);
     }
 }
