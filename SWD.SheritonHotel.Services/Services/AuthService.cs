@@ -32,13 +32,12 @@ namespace Services
         public AuthService(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            IConfiguration configuration,
-            ILogger<AuthService> logger
+            ILogger<AuthService> logger,
             IConfiguration configuration,
             EmailVerify emailVerify,
             TokenGenerator tokenGenerator
         )
-        {
+        { 
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;

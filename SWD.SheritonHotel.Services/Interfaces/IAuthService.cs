@@ -1,6 +1,7 @@
 ﻿using Dtos;
 using Entities;
 using Google.Apis.Auth;
+using SWD.SheritonHotel.Domain.DTO;
 
 namespace Interfaces
 {
@@ -15,5 +16,6 @@ namespace Interfaces
         Task<string> GenerateToken(ApplicationUser user);
         Task<bool> CheckUserRegistrationStatus(string userId);
         Task<AuthServiceResponseDto> RegisterAdditionalInfoAsync(RegisterAdditionalInfoDto additionalInfoDto);
+        Task<BaseResponse<ApplicationUser>> ResetPassword(string email, string token, string password);
     }
 }

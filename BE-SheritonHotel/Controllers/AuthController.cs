@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
-using System.ComponentModel.DataAnnotations;﻿
-using AutoMapper;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -35,9 +34,7 @@ namespace Controllers
         private readonly EmailSender _sender;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AuthController(IAuthService authService, IUserService userService,
-            UserManager<ApplicationUser> userManager)
-        public AuthController(IAuthService authService, IUserService userService, IMediator mediator, EmailSender sender, IMapper mapper)
+        public AuthController(IAuthService authService, IUserService userService, IMediator mediator, EmailSender sender, IMapper mapper, UserManager<ApplicationUser> userManager)
         {
             _authService = authService;
             _userService = userService;
@@ -69,7 +66,7 @@ namespace Controllers
                 return NotFound();
             }
 
-            return Ok();
+            return Ok(users);
         }
 
         // Route -> Register
@@ -107,7 +104,6 @@ namespace Controllers
             return BadRequest(new { message = "Username or password is incorrect" });
         }
 
-
         // Route -> make customer -> admin
         [HttpPost]
         [Route("make-admin")]
@@ -135,39 +131,8 @@ namespace Controllers
         }
 
         [HttpPost]
-        [Route("ExternalLogin")]
-        public async Task<IActionResult> LoginWithGoogle([FromBody] AuthGoogleDto authGoogleDto)
-        {
-            var payload = await _authService.VerifyGoogleToken(authGoogleDto);
-            if (payload == null)
-                return BadRequest("Invalid External Authentication.");
-
-            var info = new UserLoginInfo(authGoogleDto.Provider, payload.Subject, authGoogleDto.Provider);
-
-            var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
-
-            if (user == null)
-            {
-                user = await _userManager.FindByEmailAsync(payload.Email);
-                if (user == null)
-                {
-                    user = new ApplicationUser
-                        { Email = payload.Email, UserName = payload.Email, Id = Guid.NewGuid().ToString() };
-                    await _userManager.CreateAsync(user);
-
-                    //prepare and send an email for the email confirmation
-                    await _userManager.AddToRoleAsync(user, StaticUserRoles.CUSTOMER);
-                    await _userManager.AddLoginAsync(user, info);
-                }
-                else
-                {
-                    await _userManager.AddLoginAsync(user, info);
-                }
-            }
-
-        [HttpPost]
         [Route("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([Required] [FromBody] GetUserByEmailQuery query)
+        public async Task<IActionResult> ForgotPassword([Required][FromBody] GetUserByEmailQuery query)
         {
             var user = await _mediator.Send(query);
             if (user == null)
@@ -193,7 +158,7 @@ namespace Controllers
 
         [HttpPost]
         [Route("reset-password")]
-        public async Task<IActionResult> ResetPassword([Required] [FromBody] ResetPasswordQuery query)
+        public async Task<IActionResult> ResetPassword([Required][FromBody] ResetPasswordQuery query)
         {
             try
             {
@@ -214,11 +179,37 @@ namespace Controllers
             {
                 var result = await _userService.VerifyEmailTokenAsync(email, token);
 
-            if (user == null)
-                return BadRequest("Invalid External Authentication.");
+                if (result)
+                {
+                    return Ok(new BaseResponse<object> { IsSucceed = true, Message = "Email verified successfully.", Result = null });
+                }
+                else
+                {
+                    return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = "Invalid or expired token.", Result = null });
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = ex.Message, Result = null });
+            }
+        }
 
-            var token = await _authService.GenerateToken(user);
-            return Ok(new AuthServiceResponseDto { Token = token, IsSucceed = true });
+        [HttpPost]
+        [Route("RegisterAdditionalInfo")]
+        public async Task<IActionResult> RegisterAdditionalInfo([FromBody] RegisterAdditionalInfoDto additionalInfoDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var response = await _authService.RegisterAdditionalInfoAsync(additionalInfoDto);
+            if (response.IsSucceed)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response);
         }
 
         [HttpGet]
@@ -238,38 +229,40 @@ namespace Controllers
         }
 
         [HttpPost]
-        [Route("RegisterAdditionalInfo")]
-        public async Task<IActionResult> RegisterAdditionalInfo([FromBody] RegisterAdditionalInfoDto additionalInfoDto)
+        [Route("ExternalLogin")]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] AuthGoogleDto authGoogleDto)
         {
-            
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            var payload = await _authService.VerifyGoogleToken(authGoogleDto);
+            if (payload == null)
+                return BadRequest("Invalid External Authentication.");
 
-            var response = await _authService.RegisterAdditionalInfoAsync(additionalInfoDto);
-            if (response.IsSucceed)
-            {
-                return Ok(response);
-            }
+            var info = new UserLoginInfo(authGoogleDto.Provider, payload.Subject, authGoogleDto.Provider);
 
-            return BadRequest(response);
-        }
-    }
-}
-                if (result)
+            var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+
+            if (user == null)
+            {
+                user = await _userManager.FindByEmailAsync(payload.Email);
+                if (user == null)
                 {
-                    return Ok(new BaseResponse<object> { IsSucceed = true, Message = "Email verified successfully.", Result = null });
+                    user = new ApplicationUser { Email = payload.Email, UserName = payload.Email, Id = Guid.NewGuid().ToString() };
+                    await _userManager.CreateAsync(user);
+
+                    //prepare and send an email for the email confirmation
+                    await _userManager.AddToRoleAsync(user, "Customer");
+                    await _userManager.AddLoginAsync(user, info);
                 }
                 else
                 {
-                    return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = "Invalid or expired token.", Result = null });
+                    await _userManager.AddLoginAsync(user, info);
                 }
             }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = ex.Message, Result = null });
-            }
+
+            if (user == null)
+                return BadRequest("Invalid External Authentication.");
+
+            var token = await _authService.GenerateToken(user);
+            return Ok(new AuthServiceResponseDto { Token = token, IsSucceed = true });
         }
     }
 }
