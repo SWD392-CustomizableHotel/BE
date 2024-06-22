@@ -10,6 +10,10 @@
 		<PackageReference Include="Google.Apis.Auth" Version="1.68.0" />
 		<PackageReference Include="Google.Apis.Auth.AspNetCore3" Version="1.68.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.18" />
+		<PackageReference Include="MediatR" Version="11.1.0" />
+		<PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
+		<PackageReference Include="MediatR" Version="11.1.0" />
+		<PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.18" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.18" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.19" />
@@ -21,9 +25,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Handlers\" />
-		<Folder Include="Commands\" />
-		<Folder Include="Queries\" />
+	  <ProjectReference Include="..\SWD.SheritonHotel.Data\SWD.SheritonHotel.Data.csproj" />
+	  <ProjectReference Include="..\SWD.SheritonHotel.Domain\SWD.SheritonHotel.Domain.csproj" />
+	  <ProjectReference Include="..\SWD.SheritonHotel.Services\SWD.SheritonHotel.Services.csproj" />
 	</ItemGroup>
 
 </Project>

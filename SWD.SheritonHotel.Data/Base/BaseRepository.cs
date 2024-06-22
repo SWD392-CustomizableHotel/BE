@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DbContext;
 using Microsoft.EntityFrameworkCore;
+using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Domain.Base;
 using SWD.SheritonHotel.Domain.Entities;
 using System.Linq.Expressions;
@@ -28,6 +28,7 @@ namespace SWD.SheritonHotel.Data.Base
                 return dbSet;
             }
         }
+
         #region Add(TEntity) + AddRange(IEnumerable<TEntity>)
         public void Add(TEntity entity)
         {
@@ -42,6 +43,7 @@ namespace SWD.SheritonHotel.Data.Base
             }
         }
         #endregion
+
         #region Check(int) + CheckCancellationToken(CancellationToken)
         public async Task<bool> Check(int id)
         {
@@ -54,17 +56,21 @@ namespace SWD.SheritonHotel.Data.Base
                 throw new OperationCanceledException("Request was cancelled");
         }
         #endregion
-        #region Delete(TEntity) + DeleteRange(IEnumerable<TEntity>)
+
+        #region Hard Delete(TEntity) + DeleteRange(IEnumerable<TEntity>)
         public void Delete(TEntity entity)
         {
+            entity.IsDeleted = true;
             DbSet.Update(entity);
         }
 
         public void DeleteRange(IEnumerable<TEntity> entities)
         {
+            entities.Where(e => e.IsDeleted == false ? e.IsDeleted = true : e.IsDeleted = false);
             DbSet.UpdateRange(entities);
         }
         #endregion
+
         #region Update(TEntity) + UpdateRange(IEnumerable<TEntity>)
         public void Update(TEntity entity)
         {
@@ -79,26 +85,25 @@ namespace SWD.SheritonHotel.Data.Base
             }
         }
         #endregion
-        #region Other
-        protected DbSet<T> GetDbSet<T>() where T : class
-        {
-            var dbSet = _context.Set<T>();
-            return dbSet;
-        }
-        #endregion
+
         #region GetAll(CancellationToken)
 
-        public Task<IList<TEntity>> GetAll(CancellationToken cancellationToken = default)
+        public async Task<IList<TEntity>> GetAll(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var queryable = GetQueryable(cancellationToken);
+            var result = await queryable.Where(entity => !entity.IsDeleted).ToListAsync();
+            return result;
         }
         #endregion
+
         #region GetTotalCount()
-        public Task<long> GetTotalCount()
+        public async Task<long> GetTotalCount()
         {
-            throw new NotImplementedException();
+            var result = await GetQueryable().LongCountAsync();
+            return result;
         }
         #endregion
+
         #region GetById(int) + GetByIds(List<int>)
         public virtual async Task<TEntity> GetById(int id)
         {
@@ -116,6 +121,7 @@ namespace SWD.SheritonHotel.Data.Base
             return entity;
         }
         #endregion
+
         #region GetQueryable(CancellationToken) + GetQueryable() + GetQueryable(Expression<Func<TEntity, bool>>)
 
         public IQueryable<TEntity> GetQueryable(CancellationToken cancellationToken = default)
@@ -141,5 +147,14 @@ namespace SWD.SheritonHotel.Data.Base
             return queryable;
         }
         #endregion
+
+        #region Other
+        protected DbSet<T> GetDbSet<T>() where T : class
+        {
+            var dbSet = _context.Set<T>();
+            return dbSet;
+        }
+        #endregion
+
     }
 }
