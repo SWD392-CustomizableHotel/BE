@@ -1,4 +1,4 @@
-﻿namespace Dtos
+﻿namespace SWD.SheritonHotel.Domain.DTO
 {
     public class AuthServiceResponseDto
     {
