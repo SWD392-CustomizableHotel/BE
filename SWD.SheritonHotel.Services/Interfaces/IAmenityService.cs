@@ -22,5 +22,6 @@ namespace SWD.SheritonHotel.Services.Interfaces
         Task DeleteAmenityAsync(int amenityId);
         Task<(List<Amenity>, int)> GetAllAmenityAsync(int pageNumber, int pageSize,
                     AmenityFilter? amenityFilter, string searchTerm = null);
+        Task<List<Amenity>> GetAmenitiesByRoomIdAsync(int roomId);
     }
 }

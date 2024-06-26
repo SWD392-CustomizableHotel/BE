@@ -61,17 +61,25 @@ namespace SWD.SheritonHotel.Data.Repositories
             var amenity = await GetById(amenityId);
             if (amenity != null)
             {
-                amenity.Status = status;
-                amenity.LastUpdatedBy = updatedBy;
-                Update(amenity);
-                await _context.SaveChangesAsync();
-                return amenity;
+                if (Enum.TryParse(status, true, out AmenityStatus parsedStatus))
+                {
+                    amenity.Status = parsedStatus;
+                    amenity.LastUpdatedBy = updatedBy;
+                    Update(amenity);
+                    await _context.SaveChangesAsync();
+                    return amenity;
+                }
+                else
+                {
+                    throw new ArgumentException($"Invalid status value: {status}");
+                }
             }
             else
             {
                 throw new KeyNotFoundException($"No amenity found with ID {amenityId}");
             }
         }
+
 
         public async Task DeleteAmenityAsync(int amenityId)
         {
@@ -97,9 +105,9 @@ namespace SWD.SheritonHotel.Data.Repositories
             //Filter
             if (amenityFilter != null)
             {
-                if (!string.IsNullOrEmpty(amenityFilter.AmentiyStatus))
+                if (amenityFilter.AmenityStatus.HasValue)
                 {
-                    query = query.Where(r => r.Status == amenityFilter.AmentiyStatus);
+                    query = query.Where(r => r.Status == amenityFilter.AmenityStatus.Value);
                 }
 
                 if (amenityFilter.HotelId != 0)
@@ -112,13 +120,27 @@ namespace SWD.SheritonHotel.Data.Repositories
             {
                 query = query.Where(r => r.Code.Contains(searchTerm) ||
                                          r.Description.Contains(searchTerm) ||
-                                         r.Status.Contains(searchTerm));
+                                         r.Status.ToString().Contains(searchTerm));
             }
 
             var totalItems = await query.Where(a => a.IsDeleted == false).CountAsync();
             var paginatedAmenties = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             return (paginatedAmenties, totalItems);
+        }
+
+        public async Task<List<Amenity>> GetAmenitiesByRoomIdAsync(int roomId)
+        {
+            var room  = await GetQueryable<Room>().Include(r => r.Hotel).FirstOrDefaultAsync(r => r.Id  == roomId);
+            if (room == null)
+            {
+                throw new KeyNotFoundException($"No room found with ID {roomId}");
+            }
+
+            var amenities = await GetQueryable<Amenity>()
+                            .Where(a => a.HotelId == room.HotelId && !a.IsDeleted)
+                            .ToListAsync();
+            return amenities;
         }
     }
 }

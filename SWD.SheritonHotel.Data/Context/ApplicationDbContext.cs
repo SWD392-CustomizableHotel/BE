@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SWD.SheritonHotel.Domain.OtherObjects;
 
 namespace SWD.SheritonHotel.Data.Context
 {
@@ -138,11 +139,20 @@ namespace SWD.SheritonHotel.Data.Context
 
             builder
                 .Entity<Payment>()
-                .HasOne(p => p.Booking)
+                .HasOne(p => p.Booking) 
                 .WithMany(b => b.Payments)
                 .HasForeignKey(p => p.BookingId);
 
             builder.Entity<Payment>().Property(p => p.Amount).HasPrecision(18, 2);
+
+            // Enum configuration
+            builder
+                .Entity<Amenity>()
+                .Property(a => a.Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (AmenityStatus)Enum.Parse(typeof(AmenityStatus), v))
+                .IsRequired();
         }
     }
 }

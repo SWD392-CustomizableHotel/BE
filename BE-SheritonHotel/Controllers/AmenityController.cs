@@ -29,16 +29,6 @@ namespace SWD.SheritonHotel.API.Controllers
             return Ok(rooms);
         }
 
-        [HttpPost]
-        [Authorize(Roles = "ADMIN")]
-        [Route("create-amenity")]
-        public async Task<IActionResult> CreateAmenity(CreateAmenityCommand command)
-        {
-            var newAmenity = await _mediator.Send(command);
-            return Ok(newAmenity);
-        }
-
-
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
         [Route("get-amenity-details/{amenityId}")]
@@ -47,6 +37,25 @@ namespace SWD.SheritonHotel.API.Controllers
             var query = new GetAmenityByIdQuery(amenityId);
             var amenityDetails = await _mediator.Send(query);
             return Ok(amenityDetails);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
+        [Route("get-room-amenity/{roomId}")]
+        public async Task<IActionResult> GetAmenitiesByRoomId(int roomId)
+        {
+            var query = new GetAmenitiesByRoomIdQuery(roomId);
+            var list = await _mediator.Send(query);
+            return Ok(list);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        [Route("create-amenity")]
+        public async Task<IActionResult> CreateAmenity(CreateAmenityCommand command)
+        {
+            var newAmenity = await _mediator.Send(command);
+            return Ok(newAmenity);
         }
 
         [HttpPut]
@@ -77,7 +86,7 @@ namespace SWD.SheritonHotel.API.Controllers
         [HttpPut]
         [Authorize(Roles = "ADMIN")]
         [Route("update-amenity-status")]
-        public async Task<IActionResult> UpdateAmenityStatus(int amenityId, string status)
+        public async Task<IActionResult> UpdateAmenityStatus(int amenityId, AmenityStatus status)
         {
             var command = new UpdateAmenityStatusCommand
             {
@@ -100,5 +109,6 @@ namespace SWD.SheritonHotel.API.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
+
     }
 }

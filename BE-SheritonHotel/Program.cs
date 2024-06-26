@@ -5,25 +5,32 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 using Services;
 using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Handlers;
-using System.Reflection;
-using System.Text;
 using SWD.SheritonHotel.Handlers.Handlers;
 using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Data.Context;
-
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
+using System.Reflection;
+using System.Text;
+using SWD.SheritonHotel.Domain.OtherObjects;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.Converters.Add(new StringEnumConverter());
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -114,12 +121,20 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+
+    // Map the enum type to a string schema
+    options.MapType<AmenityStatus>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(AmenityStatus))
+                    .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
+    });
 });
+
 
 #endregion
 
 #region Add Scoped
-
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

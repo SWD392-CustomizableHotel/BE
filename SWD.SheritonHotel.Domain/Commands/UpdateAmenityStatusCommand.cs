@@ -1,6 +1,7 @@
 ﻿using Entities;
 using MediatR;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.OtherObjects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,6 +16,6 @@ namespace SWD.SheritonHotel.Domain.Commands
         [Required]
         public int AmenityId { get; set; }
         [Required]
-        public string Status { get; set; }
+        public AmenityStatus Status { get; set; }
     }
 }

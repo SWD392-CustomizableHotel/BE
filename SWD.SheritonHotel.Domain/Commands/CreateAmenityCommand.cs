@@ -1,6 +1,7 @@
 ﻿using Entities;
 using MediatR;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.OtherObjects;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -19,7 +20,7 @@ namespace SWD.SheritonHotel.Domain.Commands
         public decimal Price { get; set; }
 
         [DefaultValue("Normal")]
-        public string Status { get; set; } = "Normal";
+        public AmenityStatus Status { get; set; } = AmenityStatus.Normal;
         [Required]
         public int HotelId { get; set; }
     }

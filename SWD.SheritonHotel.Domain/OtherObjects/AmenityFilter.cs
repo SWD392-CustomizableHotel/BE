@@ -8,7 +8,7 @@ namespace SWD.SheritonHotel.Domain.OtherObjects
 {
     public class AmenityFilter
     {
-        public string AmentiyStatus { get; set; }
+        public AmenityStatus? AmenityStatus { get; set; }
         public int HotelId { get; set; }
     }
 }
