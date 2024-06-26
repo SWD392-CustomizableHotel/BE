@@ -23,12 +23,20 @@ using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Data.Context;
+using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.Queries;
+using OtherObjects;
+using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -42,19 +50,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 #endregion
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
-// #region Add Authentication Google
-//
-// builder.Services.AddAuthentication().AddGoogle(googleOptions =>
-// {
-//     //Read Authentication:Google information from appsettings.json
-//     IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("GoogleAuthSettings:Google");
-//
-//     //Setting ClientId and ClientSecret for access API Google
-//     googleOptions.ClientId = googleAuthNSection["ClientId"];
-//     googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
-// });
-// #endregion
 
 #region Add, Config Identity and Role
 // Add Identity
@@ -78,6 +73,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 // Config Token expiration
 builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
    opt.TokenLifespan = TimeSpan.FromDays(1));
+
 #endregion
 
 #region JwtBear and Authentication, Swagger API
@@ -159,7 +155,8 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<EmailSender>();
-
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IManageService, ManageServiceService>();
 #endregion
 
 #region Add MediatR
@@ -213,14 +210,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("corspolicy");
+
 app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseRouting();
-app.UseCors("corspolicy");
 
 app.MapControllers();
 //RUN
