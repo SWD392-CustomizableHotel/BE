@@ -14,8 +14,14 @@ namespace Entities
         [ForeignKey("HotelId")]
         public int HotelId { get; set; }
         public virtual Hotel Hotel { get; set; }
+        
+        public string StaffId { get; set; }
+        [ForeignKey("StaffId")]
+        
+        public virtual ApplicationUser User { get; set; }
 
         public virtual ICollection<BookingService> BookingServices { get; set; } =
             new List<BookingService>();
+       
     }
 }

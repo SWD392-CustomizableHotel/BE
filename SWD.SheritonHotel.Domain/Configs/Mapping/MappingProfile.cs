@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace SWD.SheritonHotel.Domain.Configs.Mapping
 {
@@ -16,6 +17,8 @@ namespace SWD.SheritonHotel.Domain.Configs.Mapping
         {
             CreateMap<ApplicationUser, UpdateUserCommand>();
             CreateMap<Room, RoomDto>().ReverseMap();
+            CreateMap<ApplicationUser, AccountDto>();
+
         }
     }
 }
