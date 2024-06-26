@@ -7,7 +7,7 @@ using SWD.SheritonHotel.Domain.Queries;
 
 namespace SWD.SheritonHotel.Handlers.Handlers;
 
-public class GetAccountDetailQueryHandler : IRequestHandler<GetAccountDetailQuery, AccountDto>
+public class GetAccountDetailQueryHandler : IRequestHandler<GetAccountDetailQuery, ResponseDto<AccountDto>>
 {
     private readonly IAccountRepository _accountRepository;
     private readonly IMapper _mapper;
@@ -18,17 +18,27 @@ public class GetAccountDetailQueryHandler : IRequestHandler<GetAccountDetailQuer
         _mapper = mapper;
     }
 
-    public async Task<AccountDto> Handle(GetAccountDetailQuery request, CancellationToken cancellationToken)
+    public async Task<ResponseDto<AccountDto>> Handle(GetAccountDetailQuery request, CancellationToken cancellationToken)
     {
         var user = await _accountRepository.GetAccountByIdAsync(request.AccountId);
             
         if (user == null)
         {
-            return null;
+            return new ResponseDto<AccountDto>
+            {
+                IsSucceeded = false,
+                Message = "Account not found",
+                Errors = new[] { "No account found with the provided ID." }
+            };
         }
 
         var accountDto = _mapper.Map<ApplicationUser, AccountDto>(user);
             
-        return accountDto;
+        return new ResponseDto<AccountDto>
+        {
+            IsSucceeded = true,
+            Message = "Account details fetched successfully",
+            Data = accountDto
+        };
     }
 }

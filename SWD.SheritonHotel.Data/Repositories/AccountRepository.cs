@@ -13,10 +13,12 @@ namespace SWD.SheritonHotel.Data.Repositories;
 public class AccountRepository : IAccountRepository
 {
     private readonly ApplicationDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager; 
 
-        public AccountRepository(ApplicationDbContext context)
+        public AccountRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<(List<ApplicationUser>, int)> GetAccountsAsync(int pageNumber, int pageSize, AccountFilter accountFilter, string searchTerm = null)
@@ -75,25 +77,34 @@ public class AccountRepository : IAccountRepository
             account.FirstName = accountDto.FirstName;
             account.LastName = accountDto.LastName;
             account.Dob = accountDto.Dob;
-            account.isActived = accountDto.IsActive;
             // Save changes
             await _context.SaveChangesAsync();
             return account;
         }
 
-        public async Task<bool> SoftDeleteAccountAsync(string accountId)
+        public async Task SoftDeleteAccountAsync(string accountId)
         {
-            var account = await _context.Users.FindAsync(accountId);
+            var account = await _context.Users.Include(u => u.AssignedServices).FirstOrDefaultAsync(u => u.Id == accountId);
+    
             if (account == null)
             {
                 throw new KeyNotFoundException($"No account found with ID {accountId}");
             }
 
+            if (await _userManager.IsInRoleAsync(account, "Staff"))
+            {
+                // Check if the staff account is assigned to any services
+                if (account.AssignedServices.Any())
+                {
+                    // Unassign the staff from all services
+                    _context.AssignedServices.RemoveRange(account.AssignedServices);
+                }
+            }
+
             // Perform soft delete by setting IsActive to false
             account.isActived = false;
-
-            // Save changes
+    
             await _context.SaveChangesAsync();
-            return true;
+            
         }
 }

@@ -161,8 +161,9 @@ builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<EmailSender>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<IAdminService, AdminService>();
-builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
+builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
+
 
 #endregion
 

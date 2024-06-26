@@ -10,5 +10,5 @@ public interface IAccountRepository
     Task<(List<ApplicationUser>, int)> GetAccountsAsync(int pageNumber, int pageSize, AccountFilter accountFilter, string searchTerm);
     Task<ApplicationUser> GetAccountByIdAsync(string accountId);
     Task<ApplicationUser> UpdateAccountAsync(string accountId, AccountDto accountDto);
-    Task<bool> SoftDeleteAccountAsync(string accountId);
+    Task SoftDeleteAccountAsync(string accountId);
 }

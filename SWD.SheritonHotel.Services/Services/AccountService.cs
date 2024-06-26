@@ -115,8 +115,8 @@ public class AccountService : IAccountService
     return updatedAccountDto;
 }
 
-    public async Task<bool> SoftDeleteAccountAsync(string accountId)
-    {
-        return await _accountRepository.SoftDeleteAccountAsync(accountId);
+    public async Task SoftDeleteAccountAsync(string accountId)
+    { 
+        await _accountRepository.SoftDeleteAccountAsync(accountId);
     }
 }

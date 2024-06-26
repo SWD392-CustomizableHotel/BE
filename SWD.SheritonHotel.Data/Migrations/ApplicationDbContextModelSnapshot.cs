@@ -672,6 +672,51 @@ namespace SWD.SheritonHotel.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.AssignedService", b =>
+                {
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastUpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastUpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ServiceId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AssignedServices");
+                });
+
             modelBuilder.Entity("Entities.Amenity", b =>
                 {
                     b.HasOne("Entities.Hotel", "Hotel")
@@ -824,6 +869,25 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.AssignedService", b =>
+                {
+                    b.HasOne("Entities.Service", "Service")
+                        .WithMany("AssignedServices")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Entities.ApplicationUser", "User")
+                        .WithMany("AssignedServices")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Service");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Entities.Amenity", b =>
                 {
                     b.Navigation("BookingAmenities");
@@ -831,6 +895,8 @@ namespace SWD.SheritonHotel.Data.Migrations
 
             modelBuilder.Entity("Entities.ApplicationUser", b =>
                 {
+                    b.Navigation("AssignedServices");
+
                     b.Navigation("Bookings");
                 });
 
@@ -859,6 +925,8 @@ namespace SWD.SheritonHotel.Data.Migrations
 
             modelBuilder.Entity("Entities.Service", b =>
                 {
+                    b.Navigation("AssignedServices");
+
                     b.Navigation("BookingServices");
                 });
 #pragma warning restore 612, 618

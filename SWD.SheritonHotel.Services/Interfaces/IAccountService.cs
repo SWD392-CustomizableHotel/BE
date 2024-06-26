@@ -9,5 +9,5 @@ public interface IAccountService
     Task<AccountDto> GetAccountByIdAsync(string accountId);
 
     Task<AccountDto> UpdateAccountAsync(string accountId, AccountDto accountDto);
-    Task<bool> SoftDeleteAccountAsync(string accountId);
+    Task SoftDeleteAccountAsync(string accountId);
 }

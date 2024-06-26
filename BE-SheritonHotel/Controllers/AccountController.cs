@@ -1,6 +1,8 @@
+using System.ComponentModel;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Domain.Queries;
@@ -10,7 +12,7 @@ namespace SWD.SheritonHotel.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-
+[Authorize(Roles = "ADMIN")]
 public class AccountController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -38,48 +40,28 @@ public class AccountController : ControllerBase
     [HttpGet("{accountId}")]
     public async Task<IActionResult> GetAccountDetail(string accountId)
     {
-        var account = await _accountService.GetAccountByIdAsync(accountId);
-        if (account == null)
-        {
-            return NotFound($"Account with ID {accountId} not found.");
-        }
-        return Ok(account);
+        var query = new GetAccountDetailQuery(accountId);
+        var accountDetail = await _mediator.Send(query);
+        return Ok(accountDetail);
     }
     
     [HttpPut("{accountId}")]
     public async Task<IActionResult> UpdateAccount(string accountId, [FromBody] AccountDto accountDto)
     {
-        if (accountDto == null || accountDto.Id != accountId)
-        {
-            return BadRequest("Invalid update data or ID mismatch.");
-        }
-
-        try
-        {
-            var updatedAccount = await _accountService.UpdateAccountAsync(accountId, accountDto);
-            return Ok(updatedAccount);
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound($"Account with ID {accountId} not found.");
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var command = new UpdateAccountDetailCommand(accountId, accountDto);
+        var result = await _mediator.Send(command);
+        return Ok(result);
     }
     
     [HttpDelete("{accountId}")]
     public async Task<IActionResult> DeleteAccount(string accountId)
     {
-        try
+        var command = new DeleteAccountCommand
         {
-            var result = await _accountService.SoftDeleteAccountAsync(accountId);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+            AccountId = accountId
+        };
+        var result = await _mediator.Send(command);
+        return Ok(result);
+
     }
 }

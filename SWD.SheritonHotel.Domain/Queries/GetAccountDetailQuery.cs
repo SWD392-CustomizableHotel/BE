@@ -3,7 +3,7 @@ using SWD.SheritonHotel.Domain.DTO;
 
 namespace SWD.SheritonHotel.Domain.Queries;
 
-public class GetAccountDetailQuery : IRequest<AccountDto>
+public class GetAccountDetailQuery : IRequest<ResponseDto<AccountDto>>
 {
     public GetAccountDetailQuery(string accountId)
     {
