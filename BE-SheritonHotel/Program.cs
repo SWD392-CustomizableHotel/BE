@@ -13,15 +13,10 @@ using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Handlers;
 using System.Reflection;
 using System.Text;
-using MediatR;
-using Microsoft.Extensions.Options;
-using SWD.SheritonHotel.Domain.OtherObjects;
-using System.Reflection;
 using SWD.SheritonHotel.Handlers.Handlers;
 using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
-using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Data.Context;
 
 
@@ -135,6 +130,8 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
+builder.Services.AddScoped<IAmentiyRepository, AmenityRepository>();
+builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<EmailSender>();
 
 #endregion

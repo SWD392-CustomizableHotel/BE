@@ -71,7 +71,6 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                     Errors = new[] { ex.Message }
                 };
             }
-            throw new NotImplementedException();
         }
     }
 }

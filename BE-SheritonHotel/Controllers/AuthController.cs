@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using System.ComponentModel.DataAnnotations;﻿
-using AutoMapper;
 using Dtos;
 using Entities;
 using Interfaces;
@@ -9,11 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Commands;
-using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
 using SWD.SheritonHotel.Domain.Utilities;
-using SWD.SheritonHotel.Handlers.Handlers;
-using System.ComponentModel.DataAnnotations;
 
 namespace Controllers
 {
