@@ -12,6 +12,7 @@ public class AccountDto
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public DateTime? Dob { get; set; }
-    public bool IsActive { get; set; }
+
+    public bool IsActive { get; set; } = true;
     public List<string> Roles { get; set; }
 }
