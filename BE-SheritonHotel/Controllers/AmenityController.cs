@@ -8,6 +8,8 @@ using SWD.SheritonHotel.Services.Interfaces;
 
 namespace SWD.SheritonHotel.API.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class AmenityController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -21,7 +23,7 @@ namespace SWD.SheritonHotel.API.Controllers
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
         [Route("get-amenities")]
-        public async Task<IActionResult> GetAllAmenities([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] AmenityFilter amenityFilter = null, [FromQuery] string searchTerm = null)
+        public async Task<IActionResult> GetAllAmenities([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] AmenityFilter amenityFilter = null, [FromQuery] string? searchTerm = null)
         {
             var paginationFilter = new PaginationFilter(pageNumber, pageSize);
             var query = new GetAllAmenitiesQuery(paginationFilter, amenityFilter, searchTerm);
