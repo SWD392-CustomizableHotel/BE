@@ -198,8 +198,15 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var user = await _authService.CheckUserRegistrationStatus(idToken);
-            return Ok(user);
+            var response = await _authService.CheckUserRegistrationStatus(idToken);
+            if (response.IsSucceed)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response);
+            }
         }
         catch (Exception ex)
         {

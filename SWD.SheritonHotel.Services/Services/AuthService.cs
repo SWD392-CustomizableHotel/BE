@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Data;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Dtos;
@@ -302,52 +303,68 @@ public class AuthService : IAuthService
         if (payload == null)
         {
             Console.WriteLine("Google token verification failed.");
-            return new AuthServiceResponseDto() { IsSucceed = false, Token = null};
+            return new AuthServiceResponseDto() { IsSucceed = false, Token = null };
         }
 
         var normalizedEmail = payload.Email.Trim().ToLower();
 
-        var user = await _userManager.FindByNameAsync(normalizedEmail);
+        var user = await _userManager.Users.SingleOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail.ToUpper());
         if (user == null)
         {
-            Console.WriteLine($"User with email {normalizedEmail} not found.");
+            Console.WriteLine($"User with email {normalizedEmail} not found. Needs to register additional info.");
             return new AuthServiceResponseDto() { IsSucceed = false, Token = null };
         }
-        var userRoles = await _userManager.GetRolesAsync(user);
 
+        if (!user.isActived)
+        {
+            return new AuthServiceResponseDto() { IsSucceed = false, Token = "Account not verified!" };
+        }
+
+        if (string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName) || string.IsNullOrEmpty(user.PhoneNumber))
+        {
+            Console.WriteLine("User has not completed additional information.");
+            return new AuthServiceResponseDto() { IsSucceed = false, Token = null };
+        }
+
+        var userRoles = await _userManager.GetRolesAsync(user);
+        var role = userRoles.FirstOrDefault() ?? StaticUserRoles.CUSTOMER;
         var authClaims = new List<Claim>
         {
             new(ClaimTypes.Name, user.UserName),
             new(ClaimTypes.NameIdentifier, user.Id),
             new("JWTID", Guid.NewGuid().ToString()),
             new("FirstName", user.FirstName),
-            new("LastName", user.LastName)
+            new("LastName", user.LastName),
+            new(ClaimTypes.Role, role)
         };
 
         foreach (var userRole in userRoles) authClaims.Add(new Claim(ClaimTypes.Role, userRole));
 
         var token = GenerateNewJsonWebToken(authClaims);
 
-
-        return new AuthServiceResponseDto() { IsSucceed = true, Token = token };
+        return new AuthServiceResponseDto() { IsSucceed = true, Token = token, Role = role };
     }
 
 
     public async Task<AuthServiceResponseDto> RegisterAdditionalInfoAsync(RegisterAdditionalInfoDto additionalInfoDto)
     {
-        var normalizedUsername = additionalInfoDto.UserName.Trim().ToLower();
+        var normalizedEmail = additionalInfoDto.UserName.Trim().ToLower();
+        var user = await _userManager.Users.SingleOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail.ToUpper());
 
-        var user = await _userManager.FindByNameAsync(normalizedUsername);
+        //var user = await _userManager.FindByNameAsync(normalizedEmail);
         if (user == null)
         {
             user = new ApplicationUser
             {
                 Email = additionalInfoDto.UserName,
                 UserName = additionalInfoDto.UserName,
+                NormalizedUserName = additionalInfoDto.UserName.ToUpper(),
+                NormalizedEmail = normalizedEmail.ToUpper(),
                 Id = Guid.NewGuid().ToString(),
                 FirstName = additionalInfoDto.FirstName,
                 LastName = additionalInfoDto.LastName,
-                PhoneNumber = additionalInfoDto.PhoneNumber
+                PhoneNumber = additionalInfoDto.PhoneNumber,
+                isActived = true
             };
 
             var createUserResult = await _userManager.CreateAsync(user);
@@ -366,6 +383,7 @@ public class AuthService : IAuthService
             user.FirstName = additionalInfoDto.FirstName;
             user.LastName = additionalInfoDto.LastName;
             user.PhoneNumber = additionalInfoDto.PhoneNumber;
+            user.isActived = true;
 
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
@@ -373,7 +391,10 @@ public class AuthService : IAuthService
         }
 
         var token = await GenerateToken(user);
-        return new AuthServiceResponseDto { IsSucceed = true, Token = token };
+        var userRoles = await _userManager.GetRolesAsync(user);
+        var role = userRoles.FirstOrDefault() ?? StaticUserRoles.CUSTOMER;
+
+        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role };
     }
 
     public async Task<ApplicationUser> FindByLoginOrEmailAsync(string loginProvider, string providerKey, string email)
