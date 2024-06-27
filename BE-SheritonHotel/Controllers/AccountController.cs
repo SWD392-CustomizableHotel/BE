@@ -53,7 +53,7 @@ public class AccountController : ControllerBase
     }
     
     [HttpPut("{accountId}")]
-    public async Task<IActionResult> UpdateAccount(string accountId, [FromBody] AccountDto accountDto)
+    public async Task<IActionResult> UpdateAccount(string accountId, [FromBody] AccountDto? accountDto)
     {
         var command = new UpdateAccountDetailCommand(accountId, accountDto);
         var result = await _mediator.Send(command);

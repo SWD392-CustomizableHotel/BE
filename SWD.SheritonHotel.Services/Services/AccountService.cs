@@ -54,65 +54,13 @@ public class AccountService : IAccountService
     }
 
     public async Task<AccountDto> UpdateAccountAsync(string accountId, AccountDto accountDto)
-{
-    var account = await _accountRepository.GetAccountByIdAsync(accountId);
-    if (account == null)
     {
-        throw new KeyNotFoundException($"No account found with ID {accountId}");
-    }
+        var account = await _accountRepository.UpdateAccountAsync(accountId, accountDto);
 
-    // Update account details
-    account.UserName = accountDto.UserName;
-    account.Email = accountDto.Email;
-    account.PhoneNumber = accountDto.PhoneNumber;
-    account.FirstName = accountDto.FirstName;
-    account.LastName = accountDto.LastName;
-    account.Dob = accountDto.Dob;
-    account.isActived = accountDto.IsActive;
+        var updatedAccountDto = _mapper.Map<AccountDto>(account);
+        updatedAccountDto.Roles = (List<string>)await _userManager.GetRolesAsync(account);
 
-    // Update roles if necessary
-    var currentRoles = await _userManager.GetRolesAsync(account);
-    var newRoles = accountDto.Roles;
-
-    var rolesToAdd = newRoles.Except(currentRoles).ToList();
-    var rolesToRemove = currentRoles.Except(newRoles).ToList();
-
-    // Ensure roles to add or remove are only CUSTOMER and STAFF roles
-    var allowedRoles = new List<string> { "CUSTOMER", "STAFF" };
-
-    if (rolesToAdd.Any(r => !allowedRoles.Contains(r)))
-    {
-        throw new InvalidOperationException("Only 'CUSTOMER' and 'STAFF' roles can be added.");
-    }
-
-    if (rolesToRemove.Any(r => !allowedRoles.Contains(r)))
-    {
-        throw new InvalidOperationException("Only 'CUSTOMER' and 'STAFF' roles can be removed.");
-    }
-
-    // Ensure no promotion to ADMIN
-    if (newRoles.Contains("ADMIN"))
-    {
-        throw new InvalidOperationException("Promotion to 'ADMIN' role is not allowed.");
-    }
-
-    if (rolesToAdd.Count > 0)
-    {
-        await _userManager.AddToRolesAsync(account, rolesToAdd);
-    }
-
-    if (rolesToRemove.Count > 0)
-    {
-        await _userManager.RemoveFromRolesAsync(account, rolesToRemove);
-    }
-
-    // Save changes
-    await _context.SaveChangesAsync();
-
-    var updatedAccountDto = _mapper.Map<AccountDto>(account);
-    updatedAccountDto.Roles = (List<string>)await _userManager.GetRolesAsync(account);
-
-    return updatedAccountDto;
+        return updatedAccountDto;
 }
 
     public async Task SoftDeleteAccountAsync(string accountId)

@@ -22,13 +22,12 @@ public class AccountRepository : IAccountRepository
             _userManager = userManager;
         }
 
-        public async Task<(List<ApplicationUser>, int)> GetAccountsAsync(int pageNumber, int pageSize, AccountFilter accountFilter, string searchTerm = null)
+        public async Task<(List<ApplicationUser>, int)> GetAccountsAsync(int pageNumber, int pageSize, AccountFilter accountFilter, string searchTerm)
         {
             var accounts = _context.Users.AsQueryable();
 
             accounts = accounts.Where(a => a.isActived);
-
-            // Apply filtersw
+            
             if (!string.IsNullOrEmpty(accountFilter.UserName))
             {
                 accounts = accounts.Where(a => a.UserName.Contains(accountFilter.UserName));
@@ -39,8 +38,6 @@ public class AccountRepository : IAccountRepository
                 accounts = accounts.Where(a => a.Email.Contains(accountFilter.Email));
             }
             
-
-            // Apply search term
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 accounts = accounts.Where(a => a.UserName.Contains(searchTerm) ||
@@ -48,13 +45,9 @@ public class AccountRepository : IAccountRepository
                                                a.FirstName.Contains(searchTerm) ||
                                                a.LastName.Contains(searchTerm));
             }
-
-            // Count total records that match the search term for pagination
+            
             var totalRecords = await accounts.CountAsync();
-
-            // Apply pagination
             var paginatedAccounts = await accounts.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
-
             return (paginatedAccounts, totalRecords);
         }
 
@@ -63,22 +56,53 @@ public class AccountRepository : IAccountRepository
             return await _context.Users.FindAsync(accountId);
         }
 
-        public async Task<ApplicationUser> UpdateAccountAsync(string accountId, AccountDto accountDto)
+        public async Task<ApplicationUser> UpdateAccountAsync(string accountId, AccountDto accountDto = null)
         {
             var account = await _context.Users.FindAsync(accountId);
             if (account == null)
             {
                 throw new KeyNotFoundException($"No account found with ID {accountId}");
             }
-
-            // Update account details
+            
             account.UserName = accountDto.UserName;
             account.Email = accountDto.Email;
             account.PhoneNumber = accountDto.PhoneNumber;
             account.FirstName = accountDto.FirstName;
             account.LastName = accountDto.LastName;
             account.Dob = accountDto.Dob;
-            // Save changes
+            
+            var currentRoles = await _userManager.GetRolesAsync(account);
+            var newRoles = accountDto.Roles;
+            var rolesToAdd = newRoles.Except(currentRoles).ToList();
+            var rolesToRemove = currentRoles.Except(newRoles).ToList();
+            // Ensure roles to add or remove are only CUSTOMER and STAFF roles
+            var allowedRoles = new List<string> { "CUSTOMER", "STAFF" };
+            if (rolesToAdd.Any(r => !allowedRoles.Contains(r)))
+            {
+                throw new InvalidOperationException("Only 'CUSTOMER' and 'STAFF' roles can be added.");
+            }
+
+            if (rolesToRemove.Any(r => !allowedRoles.Contains(r)))
+            {
+                throw new InvalidOperationException("Only 'CUSTOMER' and 'STAFF' roles can be removed.");
+            }
+
+            // Ensure no promotion to ADMIN
+            if (newRoles.Contains("ADMIN"))
+            {
+                throw new InvalidOperationException("Promotion to 'ADMIN' role is not allowed.");
+            }
+
+            if (rolesToAdd.Count > 0)
+            {
+                await _userManager.AddToRolesAsync(account, rolesToAdd);
+            }
+
+            if (rolesToRemove.Count > 0)
+            {
+                await _userManager.RemoveFromRolesAsync(account, rolesToRemove);
+            }
+            
             await _context.SaveChangesAsync();
             return account;
         }
@@ -94,15 +118,12 @@ public class AccountRepository : IAccountRepository
 
             if (await _userManager.IsInRoleAsync(account, "Staff"))
             {
-                // Check if the staff account is assigned to any services
                 if (account.AssignedServices.Any())
                 {
-                    // Unassign the staff from all services
                     _context.AssignedServices.RemoveRange(account.AssignedServices);
                 }
             }
-
-            // Perform soft delete by setting IsActive to false
+            
             account.isActived = false;
     
             await _context.SaveChangesAsync();
