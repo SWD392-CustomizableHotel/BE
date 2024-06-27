@@ -1,6 +1,7 @@
 using AutoMapper;
 using Entities;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
@@ -11,11 +12,13 @@ public class GetAccountDetailQueryHandler : IRequestHandler<GetAccountDetailQuer
 {
     private readonly IAccountRepository _accountRepository;
     private readonly IMapper _mapper;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public GetAccountDetailQueryHandler(IAccountRepository accountRepository, IMapper mapper)
+    public GetAccountDetailQueryHandler(IAccountRepository accountRepository, IMapper mapper, UserManager<ApplicationUser> userManager)
     {
         _accountRepository = accountRepository;
         _mapper = mapper;
+        _userManager = userManager;
     }
 
     public async Task<ResponseDto<AccountDto>> Handle(GetAccountDetailQuery request, CancellationToken cancellationToken)
@@ -33,6 +36,8 @@ public class GetAccountDetailQueryHandler : IRequestHandler<GetAccountDetailQuer
         }
 
         var accountDto = _mapper.Map<ApplicationUser, AccountDto>(user);
+        var roles = await _userManager.GetRolesAsync(user);
+        accountDto.Roles = roles.ToList();
             
         return new ResponseDto<AccountDto>
         {
