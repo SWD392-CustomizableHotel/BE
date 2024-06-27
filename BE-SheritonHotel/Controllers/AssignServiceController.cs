@@ -21,6 +21,11 @@ public class AssignServiceController : ControllerBase
     {
         var command = new AssignServiceCommand(userId, serviceId);
         var result = await _mediator.Send(command);
-        return Ok(result);
+        return Ok(new BaseResponse<string>
+        {
+            IsSucceed = result.IsSucceeded,
+            Result = result.IsSucceeded? "Service assigned successfully" : null,
+            Message = result.IsSucceeded? "Service assigned successfully" : "Failed to assign service"
+        });
     }
 }

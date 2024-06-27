@@ -45,9 +45,9 @@ public class AccountService : IAccountService
     {
         var account = await _accountRepository.GetAccountByIdAsync(accountId);
         if (account == null) return null;
-
-        var roles = await _userManager.GetRolesAsync(account);
+        
         var accountDto = _mapper.Map<AccountDto>(account);
+        var roles = await _userManager.GetRolesAsync(account);
         accountDto.Roles = roles.ToList();
 
         return accountDto;
