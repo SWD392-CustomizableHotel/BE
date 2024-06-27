@@ -6,6 +6,8 @@ using OtherObjects;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.OtherObjects;
+using SWD.SheritonHotel.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,13 +18,13 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 {
 	 public class UpdateServiceStatusCommandHandler : IRequestHandler<UpdateServiceStatusCommand, ResponseDto<Service>>
     {
-        private readonly IServiceRepository _repository;
+        private readonly IManageService _manageService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UpdateServiceStatusCommandHandler(IServiceRepository repository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public UpdateServiceStatusCommandHandler(IManageService manageService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _repository = repository;
+            _manageService = manageService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -40,35 +42,27 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                 };
             }
 
+            if (!Enum.TryParse<ServiceStatus>(request.Status.ToString(), true, out var status))
+            {
+                return new ResponseDto<Service>
+                {
+                    IsSucceeded = false,
+                    Message = "Invalid status value",
+                    Errors = new[] { "The provided status value is not valid." }
+                };
+            }
+
             try
             {
-                var service = await _repository.GetByIdAsync(request.ServiceId);
-                if (service == null)
-                {
-                    return new ResponseDto<Service>
-                    {
-                        IsSucceeded = false,
-                        Message = "Service not found",
-                        Errors = new[] { "No service found with the given ID." }
-                    };
-                }
-
-                service.Status = request.Status;
-                service.LastUpdatedBy = user.UserName;
-                service.LastUpdatedDate = DateTime.UtcNow;
-
-                await _repository.UpdateAsync(service);
-                return new ResponseDto<Service>(service)
-                {
-                    Message = "Service updated successfully"
-                };
+                var updatedService = await _manageService.UpdateServiceStatus(request.ServiceId, request.Status.ToString(), user.UserName);
+                return new ResponseDto<Service>(updatedService);
             }
             catch (Exception ex)
             {
                 return new ResponseDto<Service>
                 {
                     IsSucceeded = false,
-                    Message = "An error occurred while updating the service.",
+                    Message = "An error occurred while updating the Service status.",
                     Errors = new[] { ex.Message }
                 };
             }

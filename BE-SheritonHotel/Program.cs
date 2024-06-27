@@ -27,16 +27,19 @@ using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.Queries;
 using OtherObjects;
 using System.Text.Json.Serialization;
+using Microsoft.OpenApi.Any;
+using Newtonsoft.Json.Converters;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllers()
-    .AddJsonOptions(options =>
+    .AddNewtonsoftJson(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.SerializerSettings.Converters.Add(new StringEnumConverter());
     });
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -137,6 +140,12 @@ builder.Services.AddSwaggerGen(options =>
             },
             new List<string>()
         }
+    });
+    options.MapType<ServiceStatus>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(ServiceStatus))
+                    .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
     });
 });
 

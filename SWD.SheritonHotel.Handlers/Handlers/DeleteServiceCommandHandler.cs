@@ -6,6 +6,7 @@ using OtherObjects;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,15 +15,15 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
-	public class DeleteServiceCommandHandler : IRequestHandler<DeleteServiceCommand, ResponseDto<bool>>
+    public class DeleteServiceCommandHandler : IRequestHandler<DeleteServiceCommand, ResponseDto<bool>>
     {
-        private readonly IServiceRepository _repository;
+        private readonly IManageService _manageService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DeleteServiceCommandHandler(IServiceRepository repository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public DeleteServiceCommandHandler(IManageService manageService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _repository = repository;
+            _manageService = manageService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -42,22 +43,8 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 
             try
             {
-                var service = await _repository.GetByIdAsync(request.ServiceId);
-                if (service == null)
-                {
-                    return new ResponseDto<bool>
-                    {
-                        IsSucceeded = false,
-                        Message = "Service not found",
-                        Errors = new[] { "No service found with the given ID." }
-                    };
-                }
-
-                await _repository.DeleteAsync(service.Id);
-                return new ResponseDto<bool>(true)
-                {
-                    Message = "Service deleted successfully"
-                };
+                await _manageService.DeleteServiceAsync(request.ServiceId);
+                return new ResponseDto<bool>(true);
             }
             catch (Exception ex)
             {

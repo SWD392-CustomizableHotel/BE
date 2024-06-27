@@ -2,35 +2,33 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using OtherObjects;
-using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
-using SWD.SheritonHotel.Domain.Queries;
-using SWD.SheritonHotel.Services.Interfaces;
+using SWD.SheritonHotel.Domain.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SWD.SheritonHotel.Services.Interfaces;
+using OtherObjects;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
-    public class GetServiceByIdQueryHandler : IRequestHandler<GetServiceByIdQuery, ResponseDto<Service>>
+    public class UpdateServiceCommandHandler : IRequestHandler<UpdateServiceCommand, ResponseDto<Service>>
     {
-        private readonly IManageService _manageService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IManageService _manageService;
 
-        public GetServiceByIdQueryHandler(IManageService manageService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public UpdateServiceCommandHandler(IManageService manageService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _manageService = manageService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
+            _manageService = manageService;
         }
 
-        public async Task<ResponseDto<Service>> Handle(GetServiceByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ResponseDto<Service>> Handle(UpdateServiceCommand request, CancellationToken cancellationToken)
         {
-
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
             if (user == null || !(await _userManager.IsInRoleAsync(user, StaticUserRoles.ADMIN)))
             {
@@ -43,20 +41,16 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             }
             try
             {
-                var service = await _manageService.GetServiceByIdAsync(request.ServiceId);
-                return new ResponseDto<Service>
-                {
-                    IsSucceeded = true,
-                    Message = "Service details fetched successfully",
-                    Data = service,
-                };
+                var updatedService = await _manageService.UpdateServiceAsync(request.ServiceId, request.Name,
+                    request.Description, request.Price, user.UserName);
+                return new ResponseDto<Service>(updatedService);
             }
             catch (Exception ex)
             {
                 return new ResponseDto<Service>
                 {
                     IsSucceeded = false,
-                    Message = "An error occurred while getting service details",
+                    Message = "An error occurred while updating the Service.",
                     Errors = new[] { ex.Message }
                 };
             }

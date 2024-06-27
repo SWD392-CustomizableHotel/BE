@@ -7,6 +7,7 @@ using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,16 +18,14 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 {
     public class CreateServiceCommandHandler : IRequestHandler<CreateServiceCommand, ResponseDto<Service>>
     {
-        private readonly IServiceRepository _repository;
-        private readonly IHotelRepository _hotelRepository;
+        private readonly IManageService _manageService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CreateServiceCommandHandler(IServiceRepository repository, IHotelRepository hotelRepository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public CreateServiceCommandHandler(IManageService manageService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _repository = repository;
+            _manageService = manageService;
             _userManager = userManager;
-            _hotelRepository = hotelRepository;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -43,47 +42,32 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                 };
             }
 
-            var hotelExists = await _hotelRepository.GetByIdAsync(request.HotelId);
-            if (hotelExists == null)
+            var code = GenerateServiceCode();
+            var service = new Service
             {
-                return new ResponseDto<Service>
-                {
-                    IsSucceeded = false,
-                    Message = "Invalid HotelId",
-                    Errors = new[] { "The provided HotelId does not exist." }
-                };
-            }
+                Name = request.Name,
+                Price = request.Price,
+                Description = request.Description,
+                Status = request.Status,
+                Code = code,
+                CreatedBy = user.UserName,
+                CreatedDate = DateTime.UtcNow,
+                LastUpdatedBy = user.UserName,
+                HotelId = request.HotelId,
+                IsDeleted = false
+            };
 
             try
             {
-                var code = GenerateServiceCode();
-                var service = new Service
-                {
-                    Name = request.Name,
-                    Price = request.Price,
-                    Description = request.Description,
-                    Status = "Closed", // default status
-                    Code = code,
-                    CreatedBy = user.UserName,
-                    CreatedDate = DateTime.UtcNow,
-                    LastUpdatedBy = user.UserName, 
-                    LastUpdatedDate = DateTime.UtcNow,
-                    HotelId = request.HotelId,
-                    IsDeleted = false
-                };
-
-                await _repository.AddAsync(service);
-                return new ResponseDto<Service>(service)
-                {
-                    Message = "Service created successfully"
-                };
+                var newService = await _manageService.CreateServiceAsync(service);
+                return new ResponseDto<Service>(newService);
             }
             catch (Exception ex)
             {
                 return new ResponseDto<Service>
                 {
                     IsSucceeded = false,
-                    Message = "An error occurred while creating the service.",
+                    Message = "An error occurred while creating service.",
                     Errors = new[] { ex.Message }
                 };
             }
@@ -91,7 +75,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 
         private string GenerateServiceCode()
         {
-            return Guid.NewGuid().ToString().Replace("-", "").Substring(0, 6).ToUpper(); 
+            return Guid.NewGuid().ToString().Replace("-", "").Substring(0, 6).ToUpper();
         }
     }
 }
