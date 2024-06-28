@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.Entities;
 
 namespace SWD.SheritonHotel.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "ADMIN")]
 public class AssignServiceController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -17,15 +17,10 @@ public class AssignServiceController : ControllerBase
         _mediator = mediator;
     }
     [HttpPost("AssignServiceToStaff")]
-    public async Task<IActionResult> AssignServiceToStaff(string userId, int serviceId)
+    public async Task<IActionResult> AssignServiceToStaff([FromBody] AssignServiceDto assignServiceDto)
     {
-        var command = new AssignServiceCommand(userId, serviceId);
-        var result = await _mediator.Send(command);
-        return Ok(new BaseResponse<string>
-        {
-            IsSucceed = result.IsSucceeded,
-            Result = result.IsSucceeded? "Service assigned successfully" : null,
-            Message = result.IsSucceeded? "Service assigned successfully" : "Failed to assign service"
-        });
+        var command = new AssignServiceCommand(assignServiceDto);
+        var response = await _mediator.Send(command);
+        return Ok(response);
     }
 }

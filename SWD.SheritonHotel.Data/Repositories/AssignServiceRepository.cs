@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Base;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Entities;
 
 namespace SWD.SheritonHotel.Data.Repositories;
@@ -17,9 +18,21 @@ public class AssignServiceRepository : BaseRepository<AssignedService>, IAssignS
 
     public async Task<AssignedService> AssignServiceToStaff(AssignedService assignedService)
     {
-        base.Add(assignedService);
+        var serviceExists = await _context.Service.AnyAsync(s => s.Id == assignedService.ServiceId);
+        var userExists = await _context.Users.AnyAsync(u => u.Id == assignedService.UserId);
+
+        if (!serviceExists)
+        {
+            throw new KeyNotFoundException($"Service with ID {assignedService.ServiceId} not found.");
+        }
+
+        if (!userExists)
+        {
+            throw new KeyNotFoundException($"User with ID {assignedService.UserId} not found.");
+        }
+        
+        _context.AssignedServices.Add(assignedService);
         await _context.SaveChangesAsync();
         return assignedService;
     }
-    
 }

@@ -6,12 +6,10 @@ namespace SWD.SheritonHotel.Domain.Commands;
 
 public class AssignServiceCommand : IRequest<ResponseDto<AssignedService>>
 {
-    public string UserId { get; set; }
-    public int ServiceId { get; set; }
+    public AssignServiceDto AssignServiceDto { get; }
 
-    public AssignServiceCommand(string userId, int serviceId)
+    public AssignServiceCommand(AssignServiceDto assignServiceDto)
     {
-        UserId = userId;
-        ServiceId = serviceId;
+        AssignServiceDto = assignServiceDto;
     }
 }
