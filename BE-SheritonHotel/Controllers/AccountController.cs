@@ -1,5 +1,6 @@
 using System.Linq;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
@@ -11,7 +12,7 @@ namespace SWD.SheritonHotel.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-
+[Authorize(Roles = "ADMIN")]
 public class AccountController : ControllerBase
 {
     private readonly IMediator _mediator;
