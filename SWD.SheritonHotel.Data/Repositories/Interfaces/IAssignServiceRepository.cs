@@ -1,4 +1,5 @@
 using SWD.SheritonHotel.Domain.Base;
+using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Entities;
 
 namespace SWD.SheritonHotel.Data.Repositories.Interfaces;

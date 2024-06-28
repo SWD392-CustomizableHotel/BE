@@ -5,5 +5,5 @@ namespace SWD.SheritonHotel.Services.Interfaces;
 
 public interface IAssignServiceService
 {
-    Task<AssignedService> AssignServiceToStaff(string userId, int serviceId);
+    Task<AssignedService> AssignServiceToStaffAsync(AssignServiceDto assignServiceDto);
 }

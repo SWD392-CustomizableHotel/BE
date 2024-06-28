@@ -29,7 +29,7 @@ public class AccountRepository : IAccountRepository
             accounts = accounts.Where(a => a.isActived);
             
             if (!string.IsNullOrEmpty(accountFilter.UserName))
-            {
+            { 
                 accounts = accounts.Where(a => a.UserName.Contains(accountFilter.UserName));
             }
 
@@ -109,24 +109,21 @@ public class AccountRepository : IAccountRepository
 
         public async Task SoftDeleteAccountAsync(string accountId)
         {
-            var account = await _context.Users.Include(u => u.AssignedServices).FirstOrDefaultAsync(u => u.Id == accountId);
-    
+            var account = await _context.Users
+                .Include(u => u.AssignedServices)
+                .FirstOrDefaultAsync(u => u.Id == accountId);
+            
             if (account == null)
             {
                 throw new KeyNotFoundException($"No account found with ID {accountId}");
             }
-
-            if (await _userManager.IsInRoleAsync(account, "Staff"))
+            
+            if (account.AssignedServices.Any())
             {
-                if (account.AssignedServices.Any())
-                {
-                    _context.AssignedServices.RemoveRange(account.AssignedServices);
-                }
+                _context.AssignedServices.RemoveRange(account.AssignedServices);
             }
             
             account.isActived = false;
-    
             await _context.SaveChangesAsync();
-            
         }
 }
