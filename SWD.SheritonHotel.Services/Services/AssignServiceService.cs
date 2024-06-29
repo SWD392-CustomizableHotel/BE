@@ -23,11 +23,17 @@ public class AssignServiceService : IAssignServiceService
     public async Task<AssignedService> AssignServiceToStaffAsync(AssignServiceDto assignServiceDto)
     {
         var assignedService = _mapper.Map<AssignedService>(assignServiceDto);
-        var currentUser = _httpContextAccessor.HttpContext.User;
+        var currentUser = _httpContextAccessor.HttpContext.User;    
+        assignedService.Code = GenerateServiceCode(assignServiceDto.ServiceId);
+        assignedService.UserId = assignServiceDto.UserId;
         assignedService.CreatedBy = currentUser?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "system";
         assignedService.CreatedDate = DateTime.UtcNow;
         assignedService.LastUpdatedBy = currentUser?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "system";
         assignedService.LastUpdatedDate = assignedService.CreatedDate;
         return await _assignServiceRepository.AssignServiceToStaff(assignedService);
+    }
+    private string GenerateServiceCode(int serviceId)
+    {
+        return $"AS{serviceId}";
     }
 }

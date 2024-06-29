@@ -8,7 +8,7 @@ using SWD.SheritonHotel.Domain.Entities;
 namespace SWD.SheritonHotel.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "ADMIN")]
+
 public class AssignServiceController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -18,7 +18,7 @@ public class AssignServiceController : ControllerBase
         _mediator = mediator;
     }
     [HttpPost("AssignServiceToStaff")]
-    public async Task<IActionResult> AssignServiceToStaff([FromBody] AssignServiceDto assignServiceDto)
+    public async Task<IActionResult> AssignServiceToStaff([FromBody] AssignServiceDto? assignServiceDto)
     {
         var command = new AssignServiceCommand(assignServiceDto);
         var response = await _mediator.Send(command);
