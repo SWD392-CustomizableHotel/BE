@@ -18,7 +18,6 @@ using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Data.Context;
-using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using System.Reflection;
 using System.Text;
 using SWD.SheritonHotel.Domain.OtherObjects;
