@@ -302,17 +302,16 @@ public class AuthService : IAuthService
 
         if (payload == null)
         {
-            Console.WriteLine("Google token verification failed.");
-            return new AuthServiceResponseDto() { IsSucceed = false, Token = null };
+            throw new Exception("Google token verification failed.");
         }
-
+        
         var normalizedEmail = payload.Email.Trim().ToLower();
 
-        var user = await _userManager.Users.SingleOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail.ToUpper());
+        var user = await _userManager.Users.SingleOrDefaultAsync(u => u.NormalizedEmail.Trim().ToLower() == normalizedEmail);
         if (user == null)
         {
             Console.WriteLine($"User with email {normalizedEmail} not found. Needs to register additional info.");
-            return new AuthServiceResponseDto() { IsSucceed = false, Token = null };
+            return new AuthServiceResponseDto() { IsSucceed = false, Token = null, Role = null };
         }
 
         if (!user.isActived)
@@ -323,7 +322,7 @@ public class AuthService : IAuthService
         if (string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName) || string.IsNullOrEmpty(user.PhoneNumber))
         {
             Console.WriteLine("User has not completed additional information.");
-            return new AuthServiceResponseDto() { IsSucceed = false, Token = null };
+            return new AuthServiceResponseDto() { IsSucceed = false, Token = null, Role = null };
         }
 
         var userRoles = await _userManager.GetRolesAsync(user);

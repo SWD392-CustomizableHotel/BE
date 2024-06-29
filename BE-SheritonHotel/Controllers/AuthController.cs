@@ -199,14 +199,7 @@ public class AuthController : ControllerBase
         try
         {
             var response = await _authService.CheckUserRegistrationStatus(idToken);
-            if (response.IsSucceed)
-            {
-                return Ok(response);
-            }
-            else
-            {
-                return BadRequest(response);
-            }
+            return Ok(response);
         }
         catch (Exception ex)
         {
