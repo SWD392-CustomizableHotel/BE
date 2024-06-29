@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using OtherObjects;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Utilities;
 
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthServiceResponseDto>
