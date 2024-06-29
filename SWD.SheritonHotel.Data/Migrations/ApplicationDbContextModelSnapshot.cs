@@ -674,11 +674,11 @@ namespace SWD.SheritonHotel.Data.Migrations
 
             modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.AssignedService", b =>
                 {
-                    b.Property<int>("ServiceId")
+                    b.Property<int>("AssignedServiceId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AssignedServiceId"), 1L, 1);
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -707,10 +707,18 @@ namespace SWD.SheritonHotel.Data.Migrations
                     b.Property<DateTime?>("LastUpdatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("ServiceId", "UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AssignedServiceId");
+
+                    b.HasIndex("ServiceId");
 
                     b.HasIndex("UserId");
 
@@ -880,8 +888,7 @@ namespace SWD.SheritonHotel.Data.Migrations
                     b.HasOne("Entities.ApplicationUser", "User")
                         .WithMany("AssignedServices")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Service");
 

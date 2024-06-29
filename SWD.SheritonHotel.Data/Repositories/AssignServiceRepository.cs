@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Base;
 using SWD.SheritonHotel.Data.Context;
@@ -20,17 +21,14 @@ public class AssignServiceRepository : BaseRepository<AssignedService>, IAssignS
     {
         var serviceExists = await _context.Service.AnyAsync(s => s.Id == assignedService.ServiceId);
         var userExists = await _context.Users.AnyAsync(u => u.Id == assignedService.UserId);
-
         if (!serviceExists)
         {
             throw new KeyNotFoundException($"Service with ID {assignedService.ServiceId} not found.");
         }
-
         if (!userExists)
         {
             throw new KeyNotFoundException($"User with ID {assignedService.UserId} not found.");
         }
-        
         _context.AssignedServices.Add(assignedService);
         await _context.SaveChangesAsync();
         return assignedService;
