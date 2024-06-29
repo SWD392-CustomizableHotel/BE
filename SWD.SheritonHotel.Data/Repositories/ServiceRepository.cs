@@ -54,10 +54,15 @@ namespace SWD.SheritonHotel.Data.Repositories
             // Search
             if (!string.IsNullOrEmpty(searchTerm))
             {
+                ServiceStatus? statusSearch = null;
+                if (Enum.TryParse<ServiceStatus>(searchTerm, true, out var parsedStatus))
+                {
+                    statusSearch = parsedStatus;
+                }
+
                 query = query.Where(r => r.Code.Contains(searchTerm) ||
-                                         r.Description.Contains(searchTerm) ||
-                                         r.Status.ToString().Contains(searchTerm) ||
-                                         r.Name.Contains(searchTerm));
+                                          r.Description.Contains(searchTerm) ||
+                                          (statusSearch.HasValue && r.Status == statusSearch.Value));
             }
 
             var totalItems = await query.CountAsync();
