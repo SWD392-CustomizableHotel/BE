@@ -25,10 +25,6 @@ public class AssignServiceRepository : BaseRepository<AssignedService>, IAssignS
         {
             throw new KeyNotFoundException($"Service with ID {assignedService.ServiceId} not found.");
         }
-        if (!userExists)
-        {
-            throw new KeyNotFoundException($"User with ID {assignedService.UserId} not found.");
-        }
         _context.AssignedServices.Add(assignedService);
         await _context.SaveChangesAsync();
         return assignedService;

@@ -29,7 +29,6 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                 Status = s.Status,
                 Code = s.Code,
                 HotelId = s.HotelId,
-                UserId = s.UserId,
                 UserName = s.UserName
             }).ToList();
             var response = new PagedResponse<List<ServiceDto>>(serviceDtos, validFilter.PageNumber, validFilter.PageSize)

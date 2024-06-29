@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Base;
 using SWD.SheritonHotel.Data.Context;
@@ -28,8 +21,7 @@ namespace SWD.SheritonHotel.Data.Repositories
         {
             var query = _context.Service
                 .Include(s => s.Hotel)
-                .Include(s => s.AssignedServices)
-                    .ThenInclude(asn => asn.User)
+                .AsNoTracking() // Sử dụng AsNoTracking để không lưu các đối tượng vào bộ nhớ cache
                 .AsQueryable();
 
             // Apply filters
@@ -58,10 +50,14 @@ namespace SWD.SheritonHotel.Data.Repositories
                     Status = s.Status,
                     Code = s.Code,
                     HotelId = s.HotelId,
-                    UserId = s.AssignedServices.FirstOrDefault().UserId,
-                    UserName = s.AssignedServices.FirstOrDefault().User.UserName
+                    UserName = s.AssignedServices
+                        .OrderByDescending(asn => asn.AssignedServiceId)
+                        .Select(asn => asn.User.UserName)
+                        .FirstOrDefault()
                 })
                 .ToListAsync();
+            
+            _context.ChangeTracker.Clear();
 
             return (services, totalRecords);
         }
