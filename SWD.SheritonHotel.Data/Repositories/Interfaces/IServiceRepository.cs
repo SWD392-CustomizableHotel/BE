@@ -1,4 +1,4 @@
-﻿using Entities;
+using Entities;
 using SWD.SheritonHotel.Domain.Base;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System;

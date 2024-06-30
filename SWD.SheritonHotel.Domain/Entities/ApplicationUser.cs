@@ -12,7 +12,8 @@ namespace Entities
         public DateTime? Dob { get; set; }
         public string? VerifyToken { get; set; }
         public DateTime? VerifyTokenExpires { get; set; }
-        public bool isActived { get; set; } = false;
+        public bool isActived { get; set; }
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+        public virtual ICollection<AssignedService> AssignedServices { get; set; } = new List<AssignedService>();
     }
 }

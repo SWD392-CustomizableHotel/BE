@@ -24,6 +24,7 @@ using SWD.SheritonHotel.Validator;
 using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
+using BookingService = SWD.SheritonHotel.Services.Services.BookingService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,7 +56,7 @@ builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-
+    
 
 // Config Identity
 builder.Services.Configure<IdentityOptions>(options =>
@@ -162,6 +163,15 @@ builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IAmentiyRepository, AmenityRepository>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<EmailSender>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
+builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
+builder.Services.AddScoped<IServiceService, ServiceService>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
+
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IManageService, ManageServiceService>();
 #endregion
@@ -227,11 +237,11 @@ if (app.Environment.IsDevelopment())
 app.UseCors("corspolicy");
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);
-
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("corspolicy");
 
 app.MapControllers();
 //RUN

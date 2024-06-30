@@ -11,7 +11,7 @@ using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.Queries;
 using SWD.SheritonHotel.Domain.Utilities;
 
-namespace Controllers;
+namespace SWD.SheritonHotel.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

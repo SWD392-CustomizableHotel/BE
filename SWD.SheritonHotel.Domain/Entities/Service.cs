@@ -16,7 +16,8 @@ namespace Entities
         public int HotelId { get; set; }
         public virtual Hotel Hotel { get; set; }
 
-        public virtual ICollection<BookingService> BookingServices { get; set; } =
-            new List<BookingService>();
+        public virtual ICollection<BookingService> BookingServices { get; set; } = new List<BookingService>();
+        public virtual ICollection<AssignedService> AssignedServices { get; set; } = new List<AssignedService>();
+       
     }
 }

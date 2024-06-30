@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Base;

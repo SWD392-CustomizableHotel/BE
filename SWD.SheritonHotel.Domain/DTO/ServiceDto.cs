@@ -1,4 +1,4 @@
-﻿using SWD.SheritonHotel.Domain.OtherObjects;
+using SWD.SheritonHotel.Domain.OtherObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
