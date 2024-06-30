@@ -58,23 +58,22 @@ public class AuthController : ControllerBase
     // Route -> Register
     [HttpPost]
     [Route("register")]
-    public async Task<IActionResult> Register([FromBody][Required] RegisterDto registerDto)
+    public async Task<IActionResult> Register([FromBody] [Required] RegisterDto registerDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(new BaseResponse<object>
-            { IsSucceed = false, Message = "Invalid model state", Result = null });
+                { IsSucceed = false, Message = "Invalid model state", Result = null });
 
         var authServiceResponse = await _authService.RegisterAsync(registerDto);
 
         if (authServiceResponse.IsSucceed)
             return Ok(new BaseResponse<object>
             {
-                IsSucceed = true,
-                Message = "Account created successfully and check your email to verify account!",
+                IsSucceed = true, Message = "Account created successfully and check your email to verify account!",
                 Result = null
             });
         return BadRequest(new BaseResponse<object>
-        { IsSucceed = false, Message = authServiceResponse.Token, Result = null });
+            { IsSucceed = false, Message = authServiceResponse.Token, Result = null });
     }
 
     // Route -> Login
@@ -118,13 +117,13 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Route("forgot-password")]
-    public async Task<IActionResult> ForgotPassword([Required][FromBody] GetUserByEmailQuery query)
+    public async Task<IActionResult> ForgotPassword([Required] [FromBody] GetUserByEmailQuery query)
     {
         var user = await _mediator.Send(query);
         if (user == null)
             return Ok(new BaseResponse<ApplicationUser>
-            { IsSucceed = false, Result = null, Message = "Cannot find your email. Please input correct email" });
-
+                { IsSucceed = false, Result = null, Message = "Cannot find your email. Please input correct email" });
+                
         var token = await _mediator.Send(new GenerateResetPasswordCommand { User = user });
 
         try
@@ -135,20 +134,18 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             return Ok(new BaseResponse<ApplicationUser>
-            { IsSucceed = false, Result = null, Message = "Failed to send email or update user" });
+                { IsSucceed = false, Result = null, Message = "Failed to send email or update user" });
         }
 
         return Ok(new BaseResponse<ApplicationUser>
         {
-            IsSucceed = true,
-            Result = null,
-            Message = "Successfully request forgot password. Please check your email"
+            IsSucceed = true, Result = null, Message = "Successfully request forgot password. Please check your email"
         });
     }
 
     [HttpPost]
     [Route("reset-password")]
-    public async Task<IActionResult> ResetPassword([Required][FromBody] ResetPasswordQuery query)
+    public async Task<IActionResult> ResetPassword([Required] [FromBody] ResetPasswordQuery query)
     {
         try
         {
@@ -158,7 +155,7 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             return Ok(new BaseResponse<ApplicationUser>
-            { IsSucceed = false, Result = null, Message = "Failed to reset the password" });
+                { IsSucceed = false, Result = null, Message = "Failed to reset the password" });
         }
     }
 
@@ -173,9 +170,9 @@ public class AuthController : ControllerBase
 
             if (result)
                 return Ok(new BaseResponse<object>
-                { IsSucceed = true, Message = "Email verified successfully.", Result = null });
+                    { IsSucceed = true, Message = "Email verified successfully.", Result = null });
             return BadRequest(new BaseResponse<object>
-            { IsSucceed = false, Message = "Invalid or expired token.", Result = null });
+                { IsSucceed = false, Message = "Invalid or expired token.", Result = null });
         }
         catch (InvalidOperationException ex)
         {
