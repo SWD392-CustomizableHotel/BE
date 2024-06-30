@@ -1,4 +1,6 @@
 ﻿using Entities;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -21,16 +23,30 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         private readonly IManageService _manageService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IValidator<CreateServiceCommand> _validator;
 
-        public CreateServiceCommandHandler(IManageService manageService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public CreateServiceCommandHandler(IManageService manageService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, IValidator<CreateServiceCommand> validator)
         {
             _manageService = manageService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
+            _validator = validator;
         }
 
         public async Task<ResponseDto<Service>> Handle(CreateServiceCommand request, CancellationToken cancellationToken)
         {
+            // Validate the command
+            ValidationResult result = await _validator.ValidateAsync(request, cancellationToken);
+            if (!result.IsValid)
+            {
+                return new ResponseDto<Service>
+                {
+                    IsSucceeded = false,
+                    Message = "Validation Error",
+                    Errors = result.Errors.Select(e => e.ErrorMessage).ToArray()
+                };
+            }
+
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
             if (user == null || !(await _userManager.IsInRoleAsync(user, StaticUserRoles.ADMIN)))
             {
@@ -52,6 +68,8 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                 Code = code,
                 CreatedBy = user.UserName,
                 CreatedDate = DateTime.UtcNow,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
                 LastUpdatedBy = user.UserName,
                 HotelId = request.HotelId,
                 IsDeleted = false

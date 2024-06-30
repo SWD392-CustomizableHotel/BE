@@ -7,6 +7,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="12.0.1" />
+		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
 		<PackageReference Include="Google.Apis.Auth" Version="1.68.0" />
 		<PackageReference Include="Google.Apis.Auth.AspNetCore3" Version="1.68.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.18" />
@@ -27,6 +28,7 @@
 	  <ProjectReference Include="..\SWD.SheritonHotel.Data\SWD.SheritonHotel.Data.csproj" />
 	  <ProjectReference Include="..\SWD.SheritonHotel.Handlers\SWD.SheritonHotel.Handlers.csproj" />
 	  <ProjectReference Include="..\SWD.SheritonHotel.Services\SWD.SheritonHotel.Services.csproj" />
+	  <ProjectReference Include="..\SWD.SheritonHotel.Validator\SWD.SheritonHotel.Validator.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Content Update="appsettings.json">

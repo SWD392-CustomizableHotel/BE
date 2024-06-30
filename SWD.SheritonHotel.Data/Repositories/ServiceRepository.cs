@@ -23,7 +23,7 @@ namespace SWD.SheritonHotel.Data.Repositories
             _context = context;
             _mapper = mapper;
         }
-
+        
         public async Task<Service> GetServiceByIdAsync(int serviceId)
         {
             var service = await GetById(serviceId);
@@ -82,6 +82,8 @@ namespace SWD.SheritonHotel.Data.Repositories
             string name,
             string description,
             decimal price,
+            DateTime startDate, 
+            DateTime endDate,
             string updatedBy)
         {
             var service = await GetById(serviceId);
@@ -90,6 +92,9 @@ namespace SWD.SheritonHotel.Data.Repositories
                 service.Name = name;
                 service.Description = description;
                 service.Price = price;
+                service.StartDate = startDate.Date;
+                service.EndDate = endDate.Date;
+                service.LastUpdatedDate = DateTime.Now;
                 service.LastUpdatedBy = updatedBy;
                 Update(service);
                 await _context.SaveChangesAsync();
@@ -100,7 +105,6 @@ namespace SWD.SheritonHotel.Data.Repositories
                 throw new KeyNotFoundException($"No service found with ID {serviceId}");
             }
         }
-
 
         public async Task<Service> UpdateServiceStatus(int serviceId, string status, string updatedBy)
         {

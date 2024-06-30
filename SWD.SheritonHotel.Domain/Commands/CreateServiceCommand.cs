@@ -23,6 +23,10 @@ namespace SWD.SheritonHotel.Domain.Commands
         [DefaultValue("Closed")]
         public ServiceStatus Status { get; set; } = ServiceStatus.Closed;
         [Required]
+        public DateTime StartDate { get; set; }
+        [Required]
+        public DateTime EndDate { get; set; }
+        [Required]
         public int HotelId { get; set; }
     }
 }

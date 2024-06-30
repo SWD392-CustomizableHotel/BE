@@ -20,5 +20,9 @@ namespace SWD.SheritonHotel.Domain.Commands
         public string Description { get; set; }
         [Required]
         public decimal Price { get; set; }
+        [Required]
+        public DateTime StartDate { get; set; }
+        [Required]
+        public DateTime EndDate { get; set; }
     }
 }

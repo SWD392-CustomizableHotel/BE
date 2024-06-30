@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using SWD.SheritonHotel.Services.Interfaces;
 using OtherObjects;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
@@ -19,16 +21,30 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IManageService _manageService;
+        private readonly IValidator<UpdateServiceCommand> _validator;
 
-        public UpdateServiceCommandHandler(IManageService manageService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public UpdateServiceCommandHandler(IManageService manageService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, IValidator<UpdateServiceCommand> validator)
         {
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
             _manageService = manageService;
+            _validator = validator;
         }
 
         public async Task<ResponseDto<Service>> Handle(UpdateServiceCommand request, CancellationToken cancellationToken)
         {
+            // Validate the command 
+            ValidationResult result = await _validator.ValidateAsync(request, cancellationToken);
+            if (!result.IsValid)
+            {
+                return new ResponseDto<Service>
+                {
+                    IsSucceeded = false,
+                    Message = "Validation Error",
+                    Errors = result.Errors.Select(e => e.ErrorMessage).ToArray()
+                };
+            }
+
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
             if (user == null || !(await _userManager.IsInRoleAsync(user, StaticUserRoles.ADMIN)))
             {
@@ -42,7 +58,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             try
             {
                 var updatedService = await _manageService.UpdateServiceAsync(request.ServiceId, request.Name,
-                    request.Description, request.Price, user.UserName);
+                    request.Description, request.Price, request.StartDate.Date, request.EndDate.Date, user.UserName);
                 return new ResponseDto<Service>(updatedService);
             }
             catch (Exception ex)

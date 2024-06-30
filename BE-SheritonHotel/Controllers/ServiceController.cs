@@ -68,16 +68,8 @@ namespace SWD.SheritonHotel.API.Controllers
         [HttpPut]
         [Authorize(Roles = StaticUserRoles.ADMIN)]
         [Route("update-service")]
-        public async Task<IActionResult> UpdateAmenity(int serviceId, string name, string description, decimal price)
+        public async Task<IActionResult> UpdateService([FromBody] UpdateServiceCommand command)
         {
-            var command = new UpdateServiceCommand
-            {
-                ServiceId = serviceId,
-                Name = name,
-                Description = description,
-                Price = price
-            };
-
             var result = await _mediator.Send(command);
 
             if (result.IsSucceeded)
@@ -98,7 +90,7 @@ namespace SWD.SheritonHotel.API.Controllers
             var command = new UpdateServiceStatusCommand
             {
                 ServiceId = serviceId,
-                Status = status
+                Status = status,
             };
             var result = await _mediator.Send(command);
             return Ok(result);

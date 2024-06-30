@@ -19,6 +19,8 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
             string name,
             string description,
             decimal price,
+            DateTime startDate,
+            DateTime endDate,
             string updatedBy);
         Task<Service> UpdateServiceStatus(int serviceId, string status, string updatedBy);
         Task DeleteServiceAsync(int serviceId);

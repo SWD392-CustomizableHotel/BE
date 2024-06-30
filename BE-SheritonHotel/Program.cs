@@ -29,6 +29,9 @@ using OtherObjects;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Any;
 using Newtonsoft.Json.Converters;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using SWD.SheritonHotel.Validator;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -196,6 +199,13 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+#endregion
+
+#region FluentValidator
+builder.Services.AddFluentValidationAutoValidation()
+                .AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateServiceCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateServiceCommandValidator>();
 #endregion
 
 

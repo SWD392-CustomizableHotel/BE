@@ -40,9 +40,11 @@ namespace SWD.SheritonHotel.Services.Services
             string name,
             string description,
             decimal price,
+            DateTime startDate,
+            DateTime endDate,
             string updatedBy)
         {
-            return await _serviceRepository.UpdateServiceAsync(serviceId, name, description, price, updatedBy);
+            return await _serviceRepository.UpdateServiceAsync(serviceId, name, description, price, startDate, endDate, updatedBy);
         }
 
         public async Task<Service> UpdateServiceStatus(int serviceId, string status, string updatedBy)
