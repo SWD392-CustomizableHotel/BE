@@ -1,4 +1,6 @@
 ﻿using Entities;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -19,12 +21,15 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAmenityService _amenityService;
+        private readonly IValidator<UpdateAmenityCommand> _validator;
 
-        public UpdateAmenityCommandHandler(IAmenityService amenityService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public UpdateAmenityCommandHandler(IAmenityService amenityService, UserManager<ApplicationUser> userManager, 
+            IHttpContextAccessor httpContextAccessor, IValidator<UpdateAmenityCommand> validator)
         {
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
             _amenityService = amenityService;
+            _validator = validator;
         }
 
         public async Task<ResponseDto<Amenity>> Handle(UpdateAmenityCommand request, CancellationToken cancellationToken)
@@ -37,6 +42,16 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                     IsSucceeded = false,
                     Message = "Unauthorized",
                     Errors = new[] { "You must be an admin to perform this operation." }
+                };
+            }
+            ValidationResult result = await _validator.ValidateAsync(request, cancellationToken);
+            if(!result.IsValid)
+            {
+                return new ResponseDto<Amenity>
+                {
+                    IsSucceeded = false,
+                    Message = "Validation Error",
+                    Errors = result.Errors.Select(e => e.ErrorMessage).ToArray(),
                 };
             }
             try

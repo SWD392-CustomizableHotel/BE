@@ -18,15 +18,12 @@ using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Data.Context;
-using SWD.SheritonHotel.Domain.Commands;
-using SWD.SheritonHotel.Domain.Queries;
-using OtherObjects;
-using System.Text.Json.Serialization;
-using Microsoft.OpenApi.Any;
-using Newtonsoft.Json.Converters;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using SWD.SheritonHotel.Validator;
+using System.Reflection;
+using SWD.SheritonHotel.Domain.OtherObjects;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);

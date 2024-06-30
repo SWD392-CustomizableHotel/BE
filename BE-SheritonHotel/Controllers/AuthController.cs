@@ -6,6 +6,7 @@ using Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SWD.SheritonHotel.Data.Base;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.Queries;
 using SWD.SheritonHotel.Domain.Utilities;
