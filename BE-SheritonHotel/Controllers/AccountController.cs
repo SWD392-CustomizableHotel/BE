@@ -10,9 +10,9 @@ using SWD.SheritonHotel.Domain.Queries;
 
 namespace SWD.SheritonHotel.API.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
+[ApiController] 
 [Authorize(Roles = "ADMIN")]
+[Route("api/[controller]")]
 public class AccountController : ControllerBase
 {
     private readonly IMediator _mediator;

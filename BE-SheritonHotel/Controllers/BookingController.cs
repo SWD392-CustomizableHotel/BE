@@ -9,7 +9,7 @@ using SWD.SheritonHotel.Domain.Queries;
 namespace SWD.SheritonHotel.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+// [Authorize]
 public class BookingController : ControllerBase
 {
     private readonly IMediator _mediator;

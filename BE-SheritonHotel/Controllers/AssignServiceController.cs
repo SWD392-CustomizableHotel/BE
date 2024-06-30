@@ -20,8 +20,15 @@ public class AssignServiceController : ControllerBase
     [HttpPost("AssignServiceToStaff")]
     public async Task<IActionResult> AssignServiceToStaff([FromBody] AssignServiceDto? assignServiceDto)
     {
-        var command = new AssignServiceCommand(assignServiceDto);
-        var response = await _mediator.Send(command);
-        return Ok(response);
+        try
+        {
+            var command = new AssignServiceCommand(assignServiceDto);
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+        catch (Exception e)
+        {
+            return Ok(new BaseResponse<AssignServiceDto> { IsSucceed = false, Result = null, Message = "Assign Service Failed!" });
+        }
     }
 }
