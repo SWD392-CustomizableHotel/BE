@@ -18,6 +18,8 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
             string name,
             string description,
             decimal price,
+            int capacity,
+            int inUse,
             string updatedBy);
         Task<Amenity> UpdateAmenityStatus(int amenityId, string status, string updatedBy);
         Task DeleteAmenityAsync(int amenityId);

@@ -60,6 +60,8 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                 Price = request.Price,
                 Status = request.Status,
                 IsDeleted = false,
+                Capacity = request.Capacity,
+                InUse = request.InUse,
                 Code  = code,
                 CreatedBy = user.UserName,
                 LastUpdatedBy = user.UserName,

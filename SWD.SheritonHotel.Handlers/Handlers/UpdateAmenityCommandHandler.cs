@@ -57,7 +57,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             try
             {
                 var updatedAmenity = await _amenityService.UpdateAmenityAsync(request.AmenityId, request.Name,
-                    request.Description, request.Price, user.UserName);
+                     request.Description, request.Price, request.Capacity, request.InUse, user.UserName);
                 return new ResponseDto<Amenity>(updatedAmenity);
             }
             catch (Exception ex)

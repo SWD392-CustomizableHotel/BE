@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Domain.Queries;
@@ -63,13 +64,15 @@ namespace SWD.SheritonHotel.API.Controllers
         [HttpPut]
         [Authorize(Roles = "ADMIN")]
         [Route("update-amenity")]
-        public async Task<IActionResult> UpdateAmenity(int amenityId, string name, string description, decimal price)
+        public async Task<IActionResult> UpdateAmenity(int amenityId, string name, string description, decimal price, int capacity, int inUse)
         {
             var command = new UpdateAmenityCommand
             {
                 AmenityId = amenityId,
                 Name = name,
                 Description = description,
+                Capacity = capacity,
+                InUse = inUse,
                 Price = price
             };
 
@@ -111,6 +114,5 @@ namespace SWD.SheritonHotel.API.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
-
     }
 }

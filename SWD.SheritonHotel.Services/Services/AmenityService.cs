@@ -26,13 +26,9 @@ namespace SWD.SheritonHotel.Services.Services
             return await _amentiyRepository.GetAmenityByIdAsync(amenityId);
         }
 
-        public async Task<Amenity> UpdateAmenityAsync(int amenityId,
-            string name,
-            string description,
-            decimal price,
-            string updatedBy)
+        public async Task<Amenity> UpdateAmenityAsync(int amenityId, string name, string description, decimal price, int capacity, int inUse, string updatedBy)
         {
-            return await _amentiyRepository.UpdateAmenityAsync(amenityId, name, description, price, updatedBy);
+            return await _amentiyRepository.UpdateAmenityAsync(amenityId, name, description, price, capacity, inUse, updatedBy);
         }
 
         public async Task<Amenity> UpdateAmenityStatus(int amenityId, string status, string updatedBy)

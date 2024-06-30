@@ -17,6 +17,12 @@ namespace SWD.SheritonHotel.Domain.Commands
         public string Description { get; set; }
 
         [Required]
+        public int Capacity { get; set; }
+
+        [Required]
+        public int InUse { get; set; }
+
+        [Required]
         public decimal Price { get; set; }
 
         [DefaultValue("Normal")]

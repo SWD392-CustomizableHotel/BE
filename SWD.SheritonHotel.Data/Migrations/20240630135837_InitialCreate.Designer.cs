@@ -12,8 +12,8 @@ using SWD.SheritonHotel.Data.Context;
 namespace SWD.SheritonHotel.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240630110657_Init")]
-    partial class Init
+    [Migration("20240630135837_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -31,6 +31,9 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -51,6 +54,9 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("HotelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InUse")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")

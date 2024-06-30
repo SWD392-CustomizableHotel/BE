@@ -30,6 +30,9 @@ namespace SWD.SheritonHotel.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -49,6 +52,9 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("HotelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InUse")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")

@@ -33,11 +33,7 @@ namespace SWD.SheritonHotel.Data.Repositories
             return amenity ?? throw new KeyNotFoundException($"No amenity found with ID {amenityId}");
         }
 
-        public async Task<Amenity> UpdateAmenityAsync(int amenityId,
-            string name,
-            string description,
-            decimal price,
-            string updatedBy)
+        public async Task<Amenity> UpdateAmenityAsync(int amenityId, string name, string description, decimal price, int capacity, int inUse, string updatedBy)
         {
             var amenity = await GetById(amenityId);
             if (amenity != null)
@@ -45,6 +41,8 @@ namespace SWD.SheritonHotel.Data.Repositories
                 amenity.Name = name;
                 amenity.Description = description;
                 amenity.Price = price;
+                amenity.Capacity = capacity;
+                amenity.InUse = inUse;
                 amenity.LastUpdatedBy = updatedBy;
                 Update(amenity);
                 await _context.SaveChangesAsync();

@@ -13,11 +13,7 @@ namespace SWD.SheritonHotel.Services.Interfaces
     {
         Task<Amenity> CreateAmenityAsync(Amenity amenity);
         Task<Amenity> GetAmenityByIdAsync(int amenityId);
-        Task<Amenity> UpdateAmenityAsync(int amenityId,
-            string name,
-            string description,
-            decimal price,
-            string updatedBy);
+        Task<Amenity> UpdateAmenityAsync(int amenityId, string name, string description, decimal price, int capacity, int inUse, string updatedBy);
         Task<Amenity> UpdateAmenityStatus(int amenityId, string status, string updatedBy);
         Task DeleteAmenityAsync(int amenityId);
         Task<(List<Amenity>, int)> GetAllAmenityAsync(int pageNumber, int pageSize,
