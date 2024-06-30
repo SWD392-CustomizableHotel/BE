@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using SWD.SheritonHotel.Domain.DTO;
-using SWD.SheritonHotel.Domain.Entities;
-
 using SWD.SheritonHotel.Domain.OtherObjects;
 namespace SWD.SheritonHotel.Data.Context
 {
@@ -22,7 +19,6 @@ namespace SWD.SheritonHotel.Data.Context
         public DbSet<Service> Service { get; set; }
         public DbSet<BookingService> BookingService { get; set; }
         public DbSet<BookingAmenity> BookingAmenity { get; set; }
-        public DbSet<AssignedService> AssignedServices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -38,19 +34,8 @@ namespace SWD.SheritonHotel.Data.Context
 
             builder.Entity<BookingService>().HasKey(bs => new { bs.BookingId, bs.ServiceId });
             builder.Entity<BookingAmenity>().HasKey(ba => new { ba.BookingId, ba.AmenityId });
-            builder.Entity<AssignedService>().HasKey(be => new {be.AssignedServiceId});
 
             // Configure relationships
-            builder
-                .Entity<AssignedService>()
-                .HasOne(be => be.Service)
-                .WithMany(u => u.AssignedServices)
-                .OnDelete(DeleteBehavior.Restrict);
-            builder
-                .Entity<AssignedService>()
-                .HasOne(be => be.User)
-                .WithMany(u => u.AssignedServices)
-                .OnDelete(DeleteBehavior.Restrict);
             builder
                 .Entity<ApplicationUser>()
                 .HasMany(u => u.Bookings)

@@ -63,10 +63,5 @@ namespace SWD.SheritonHotel.Data.Repositories
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
-
-        public async Task<ApplicationUser> GetUserByIdAsync(string staffId)
-        {
-            return await _context.Users.FindAsync(staffId);
-        }
     }
 }
