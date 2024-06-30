@@ -24,13 +24,13 @@ using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Data.Context;
 using Stripe;
+using BookingService = SWD.SheritonHotel.Services.Services.BookingService;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 StripeConfiguration.ApiKey = "sk_test_51PVP1yP7srpKRMQLbK40lXh2oFtnOfJJj23asqyTupopgxdJI1110C45UyxioI9NeNqbSnHh53BLWmvZ8RxV4rCx00iho28l1j";
@@ -46,13 +46,26 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
+// #region Add Authentication Google
+//
+// builder.Services.AddAuthentication().AddGoogle(googleOptions =>
+// {
+//     //Read Authentication:Google information from appsettings.json
+//     IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("GoogleAuthSettings:Google");
+//
+//     //Setting ClientId and ClientSecret for access API Google
+//     googleOptions.ClientId = googleAuthNSection["ClientId"];
+//     googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
+// });
+// #endregion
+
 #region Add, Config Identity and Role
 // Add Identity
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-
+    
 
 // Config Identity
 builder.Services.Configure<IdentityOptions>(options =>
@@ -73,10 +86,12 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
 #region JwtBear and Authentication, Swagger API
 
 // Add Authentication and JwtBearer
+var jwtSettings = builder.Configuration.GetSection("JWT");
+
 builder.Services
     .AddAuthentication(options =>
     {
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        // options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
@@ -88,10 +103,18 @@ builder.Services
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-            ValidAudience = builder.Configuration["JWT:ValidAudience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["ValidIssuer"],
+            ValidAudience = jwtSettings["ValidAudience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"])),
         };
+    })
+    .AddGoogle(googleOptions =>
+    {
+        IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("GoogleAuthSettings:Google");
+        googleOptions.ClientId = googleAuthNSection["ClientId"];
+        googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
     });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -139,9 +162,14 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<EmailSender>();
-builder.Services.AddScoped<IBookingRoomRepository, BookingRoomRepository>();
-builder.Services.AddScoped<IBookingService, BookingRoomService>();
-
+builder.Services.AddScoped<IAccountService, SWD.SheritonHotel.Services.Services.AccountService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
+builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
+builder.Services.AddScoped<IServiceService, ServiceService>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
 #endregion
 
 #region Add MediatR
@@ -189,21 +217,18 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 var app = builder.Build();
 
 
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseCors("corspolicy");
-
 app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);
-
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("corspolicy");
 
 app.MapControllers();
 //RUN
