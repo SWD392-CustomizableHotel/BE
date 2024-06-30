@@ -2,6 +2,7 @@ using System.Linq;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OtherObjects;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.OtherObjects;
@@ -10,8 +11,8 @@ using SWD.SheritonHotel.Domain.Queries;
 
 namespace SWD.SheritonHotel.API.Controllers;
 
-[ApiController] 
-[Authorize(Roles = "ADMIN")]
+[ApiController]
+[Authorize(Roles = StaticUserRoles.ADMIN)]
 [Route("api/[controller]")]
 public class AccountController : ControllerBase
 {

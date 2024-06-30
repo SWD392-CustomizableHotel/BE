@@ -1,6 +1,8 @@
 using System.Linq.Dynamic.Core;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OtherObjects;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Domain.Queries;
@@ -18,6 +20,7 @@ public class ServiceController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = StaticUserRoles.ADMIN)]
     public async Task<IActionResult> GetAllServices([FromQuery] ServiceFilter serviceFilter, [FromQuery] string? searchTerm = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
         try
