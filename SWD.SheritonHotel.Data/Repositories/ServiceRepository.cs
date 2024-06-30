@@ -21,7 +21,6 @@ namespace SWD.SheritonHotel.Data.Repositories
         {
             var query = _context.Service
                 .Include(s => s.Hotel)
-                .AsNoTracking() // Sử dụng AsNoTracking để không lưu các đối tượng vào bộ nhớ cache
                 .AsQueryable();
 
             // Apply filters
@@ -51,13 +50,12 @@ namespace SWD.SheritonHotel.Data.Repositories
                     Code = s.Code,
                     HotelId = s.HotelId,
                     UserName = s.AssignedServices
+                        .Where(asn => asn.ServiceId == s.Id)
                         .OrderByDescending(asn => asn.AssignedServiceId)
-                        .Select(asn => asn.User.UserName)
+                        .Select(asn => asn.User != null ? asn.User.UserName : null)
                         .FirstOrDefault()
                 })
                 .ToListAsync();
-            
-            _context.ChangeTracker.Clear();
 
             return (services, totalRecords);
         }
