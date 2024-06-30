@@ -39,7 +39,6 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "ADMIN")]
         [Route("get-room-details/{roomId}")]
         public async Task<IActionResult> GetRoomDetails(int roomId)
         {

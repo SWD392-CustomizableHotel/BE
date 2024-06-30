@@ -23,6 +23,7 @@ using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Data.Context;
+using Stripe;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+StripeConfiguration.ApiKey = "sk_test_51PVP1yP7srpKRMQLbK40lXh2oFtnOfJJj23asqyTupopgxdJI1110C45UyxioI9NeNqbSnHh53BLWmvZ8RxV4rCx00iho28l1j";
+
 #region Add Dbcontext
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -136,6 +139,8 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<EmailSender>();
+builder.Services.AddScoped<IBookingRoomRepository, BookingRoomRepository>();
+builder.Services.AddScoped<IBookingService, BookingRoomService>();
 
 #endregion
 

@@ -50,9 +50,12 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                     RoomId = room.Id,
                     RoomNumber = room.Code,
                     RoomType = room.Type,
+                    RoomDescription = room.Description,
                     RoomStatus = room.Status,
                     RoomPrice = room.Price,
-                    IsDeleted = room.IsDeleted
+                    IsDeleted = room.IsDeleted,
+                    NumberOfPeople = room.NumberOfPeople,
+                    Image = room.Image
                 };
 
                 return new ResponseDto<RoomDto>
