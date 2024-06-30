@@ -1,11 +1,11 @@
-﻿using AutoMapper;
-using Entities;
+﻿using Entities;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using OtherObjects;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
-using SWD.SheritonHotel.Domain.Queries;
 using SWD.SheritonHotel.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -15,49 +15,43 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
-    public class GetRoomDetailsQueryHandler : IRequestHandler<GetRoomDetailsQuery, ResponseDto<Room>>
+    public class DeleteServiceCommandHandler : IRequestHandler<DeleteServiceCommand, ResponseDto<bool>>
     {
-        private readonly IRoomService _roomService;
+        private readonly IManageService _manageService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IMapper _mapper;
 
-        public GetRoomDetailsQueryHandler(IRoomService roomService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        public DeleteServiceCommandHandler(IManageService manageService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _roomService = roomService;
+            _manageService = manageService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
-            _mapper = mapper;
         }
 
-        public async Task<ResponseDto<Room>> Handle(GetRoomDetailsQuery request, CancellationToken cancellationToken)
+        public async Task<ResponseDto<bool>> Handle(DeleteServiceCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-            if (user == null || !(await _userManager.IsInRoleAsync(user, "Admin")))
+            if (user == null || !(await _userManager.IsInRoleAsync(user, StaticUserRoles.ADMIN)))
             {
-                return new ResponseDto<Room>
+                return new ResponseDto<bool>
                 {
                     IsSucceeded = false,
                     Message = "Unauthorized",
                     Errors = new[] { "You must be an admin to perform this operation." }
                 };
             }
+
             try
             {
-                var room = await _roomService.GetRoomByIdAsync(request.RoomId);
-                return new ResponseDto<Room>
-                {
-                    IsSucceeded = true,
-                    Message = "Room details fetched successfully",
-                    Data = room,
-                };
+                await _manageService.DeleteServiceAsync(request.ServiceId);
+                return new ResponseDto<bool>(true);
             }
             catch (Exception ex)
             {
-                return new ResponseDto<Room>
+                return new ResponseDto<bool>
                 {
                     IsSucceeded = false,
-                    Message = "An error occurred while getting room detail",
+                    Message = "An error occurred while deleting the service.",
                     Errors = new[] { ex.Message }
                 };
             }

@@ -9,16 +9,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SWD.SheritonHotel.Data.Context;
+using SWD.SheritonHotel.Data.Base;
 
 namespace SWD.SheritonHotel.Data.Repositories
 {
-    public class HotelRepository : IHotelRepository
+    public class HotelRepository : BaseRepository<Hotel>, IHotelRepository
     {
         private readonly ApplicationDbContext _context;
 
-        public HotelRepository(ApplicationDbContext context)
+        public HotelRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
+        }
+
+        public async Task<Hotel> GetByIdAsync(int id)
+        {
+            return await base.GetById(id);
         }
 
         public async Task<ResponseDto<List<Hotel>>> GetAllHotelsAsync()
@@ -31,5 +37,6 @@ namespace SWD.SheritonHotel.Data.Repositories
                 Message = "Hotels retrieved successfully"
             };
         }
+
     }
 }

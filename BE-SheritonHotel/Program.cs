@@ -18,9 +18,13 @@ using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Data.Context;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using SWD.SheritonHotel.Validator;
 using System.Reflection;
-using System.Text;
 using SWD.SheritonHotel.Domain.OtherObjects;
+using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +34,7 @@ builder.Services.AddControllers()
     {
         options.SerializerSettings.Converters.Add(new StringEnumConverter());
     });
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -61,20 +66,24 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.SignIn.RequireConfirmedEmail = false;
+    options.User.RequireUniqueEmail = true;
 });
 
 // Config Token expiration
 builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
    opt.TokenLifespan = TimeSpan.FromDays(1));
+
 #endregion
 
 #region JwtBear and Authentication, Swagger API
 
 // Add Authentication and JwtBearer
+var jwtSettings = builder.Configuration.GetSection("JWT");
+
 builder.Services
     .AddAuthentication(options =>
     {
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        // options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
@@ -86,10 +95,18 @@ builder.Services
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-            ValidAudience = builder.Configuration["JWT:ValidAudience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["ValidIssuer"],
+            ValidAudience = jwtSettings["ValidAudience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"])),
         };
+    })
+    .AddGoogle(googleOptions =>
+    {
+        IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("GoogleAuthSettings:Google");
+        googleOptions.ClientId = googleAuthNSection["ClientId"];
+        googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
     });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -120,13 +137,17 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
-
-    // Map the enum type to a string schema
+    options.MapType<ServiceStatus>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(ServiceStatus))
+                    .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
+    });
     options.MapType<AmenityStatus>(() => new OpenApiSchema
     {
         Type = "string",
         Enum = Enum.GetNames(typeof(AmenityStatus))
-                    .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
+                   .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
     });
 });
 
@@ -147,7 +168,8 @@ builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IAmentiyRepository, AmenityRepository>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<EmailSender>();
-
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IManageService, ManageServiceService>();
 #endregion
 
 #region Add MediatR
@@ -179,6 +201,13 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 #endregion
 
+#region FluentValidator
+builder.Services.AddFluentValidationAutoValidation()
+                .AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateServiceCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateServiceCommandValidator>();
+#endregion
+
 
 // #region Add MediateR
 // var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;
@@ -193,7 +222,6 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 //#endregion
 
 var app = builder.Build();
-
 
 
 if (app.Environment.IsDevelopment())

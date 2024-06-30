@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using Entities;
+﻿using Entities;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using OtherObjects;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
@@ -15,27 +15,26 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
-    public class GetRoomDetailsQueryHandler : IRequestHandler<GetRoomDetailsQuery, ResponseDto<Room>>
+    public class GetServiceByIdQueryHandler : IRequestHandler<GetServiceByIdQuery, ResponseDto<Service>>
     {
-        private readonly IRoomService _roomService;
+        private readonly IManageService _manageService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IMapper _mapper;
 
-        public GetRoomDetailsQueryHandler(IRoomService roomService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        public GetServiceByIdQueryHandler(IManageService manageService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _roomService = roomService;
+            _manageService = manageService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
-            _mapper = mapper;
         }
 
-        public async Task<ResponseDto<Room>> Handle(GetRoomDetailsQuery request, CancellationToken cancellationToken)
+        public async Task<ResponseDto<Service>> Handle(GetServiceByIdQuery request, CancellationToken cancellationToken)
         {
+
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-            if (user == null || !(await _userManager.IsInRoleAsync(user, "Admin")))
+            if (user == null || !(await _userManager.IsInRoleAsync(user, StaticUserRoles.ADMIN)))
             {
-                return new ResponseDto<Room>
+                return new ResponseDto<Service>
                 {
                     IsSucceeded = false,
                     Message = "Unauthorized",
@@ -44,20 +43,20 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             }
             try
             {
-                var room = await _roomService.GetRoomByIdAsync(request.RoomId);
-                return new ResponseDto<Room>
+                var service = await _manageService.GetServiceByIdAsync(request.ServiceId);
+                return new ResponseDto<Service>
                 {
                     IsSucceeded = true,
-                    Message = "Room details fetched successfully",
-                    Data = room,
+                    Message = "Service details fetched successfully",
+                    Data = service,
                 };
             }
             catch (Exception ex)
             {
-                return new ResponseDto<Room>
+                return new ResponseDto<Service>
                 {
                     IsSucceeded = false,
-                    Message = "An error occurred while getting room detail",
+                    Message = "An error occurred while getting service details",
                     Errors = new[] { ex.Message }
                 };
             }
