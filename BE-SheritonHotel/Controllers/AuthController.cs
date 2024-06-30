@@ -14,6 +14,8 @@ using SWD.SheritonHotel.Domain.Queries;
 using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Handlers.Handlers;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace Controllers
 {
@@ -184,6 +186,29 @@ namespace Controllers
             {
                 return BadRequest(new BaseResponse<object> { IsSucceed = false, Message = ex.Message, Result = null });
             }
+        }
+        [HttpPost]
+        [Route("update-profile")]
+        public async Task<IActionResult> UpdateUserProfile([FromForm] UpdateUserCommand command)
+        {
+            var result = await _mediator.Send(command);
+            if (result.IsSucceed)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+        
+        [HttpGet("profile/{userId}")]
+        public async Task<IActionResult> GetUserProfile(string userId)
+        {
+            var query = new GetUserProfileQuery(userId);
+            var result = await _mediator.Send(query);
+            if (result.IsSucceed)
+            {
+                return Ok(result);
+            }
+            return NotFound(result);
         }
     }
 }

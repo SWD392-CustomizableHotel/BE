@@ -1,4 +1,5 @@
 ﻿using Entities;
+using Microsoft.AspNetCore.Identity;
 using SWD.SheritonHotel.Domain.Base;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,6 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
         Task<string> GeneratePasswordResetTokenAsync(ApplicationUser user);
         Task UpdateAsync(ApplicationUser user);
         Task<ApplicationUser> GetUserByEmailAsync(string email);
-        Task UpdateUserAsync(ApplicationUser user);
+        Task<IdentityResult> UpdateUserAsync(ApplicationUser user);
     }
 }

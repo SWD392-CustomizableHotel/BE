@@ -12,7 +12,7 @@ using SWD.SheritonHotel.Data.Context;
 namespace SWD.SheritonHotel.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240617102105_InitialCreate")]
+    [Migration("20240625150330_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -92,6 +92,12 @@ namespace SWD.SheritonHotel.Data.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CertificatePath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()

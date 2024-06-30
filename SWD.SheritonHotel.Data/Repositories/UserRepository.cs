@@ -58,10 +58,9 @@ namespace SWD.SheritonHotel.Data.Repositories
             }
             return users.SingleOrDefault();
         }
-        public async Task UpdateUserAsync(ApplicationUser user)
+        public async Task<IdentityResult> UpdateUserAsync(ApplicationUser user)
         {
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
+            return await _userManager.UpdateAsync(user);
         }
     }
 }
