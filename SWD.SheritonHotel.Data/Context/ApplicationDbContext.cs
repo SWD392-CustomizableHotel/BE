@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Domain.OtherObjects;
-
 namespace SWD.SheritonHotel.Data.Context
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
@@ -144,6 +143,15 @@ namespace SWD.SheritonHotel.Data.Context
                 .HasForeignKey(p => p.BookingId);
 
             builder.Entity<Payment>().Property(p => p.Amount).HasPrecision(18, 2);
+
+            // Enum configuration
+            builder
+                .Entity<Service>()
+                .Property(a => a.Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (ServiceStatus)Enum.Parse(typeof(ServiceStatus), v))
+                .IsRequired();
 
             // Enum configuration
             builder

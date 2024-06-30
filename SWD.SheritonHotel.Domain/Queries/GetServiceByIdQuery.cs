@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Domain.Queries
 {
-    public class GetRoomDetailsQuery : IRequest<ResponseDto<Room>>
+    public class GetServiceByIdQuery : IRequest<ResponseDto<Service>>
     {
-        public int RoomId { get; set; }
+        public int ServiceId { get; set; }
 
-        public GetRoomDetailsQuery(int roomId)
+        public GetServiceByIdQuery(int serviceId)
         {
-            RoomId = roomId;
+            ServiceId = serviceId;
         }
     }
 }

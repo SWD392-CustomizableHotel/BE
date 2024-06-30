@@ -10,6 +10,7 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
 {
     public interface IHotelRepository 
     {
+        Task<Hotel> GetByIdAsync(int id);
         Task<ResponseDto<List<Hotel>>> GetAllHotelsAsync();
     }
 }

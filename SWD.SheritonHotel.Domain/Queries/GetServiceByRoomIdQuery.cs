@@ -1,19 +1,20 @@
-﻿using Entities;
-using MediatR;
+﻿using MediatR;
 using SWD.SheritonHotel.Domain.DTO;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Domain.Queries
 {
-    public class GetRoomDetailsQuery : IRequest<ResponseDto<Room>>
+    public class GetServicesByRoomIdQuery : IRequest<ResponseDto<List<ServiceDto>>>
     {
+        [Required]
         public int RoomId { get; set; }
 
-        public GetRoomDetailsQuery(int roomId)
+        public GetServicesByRoomIdQuery(int roomId)
         {
             RoomId = roomId;
         }

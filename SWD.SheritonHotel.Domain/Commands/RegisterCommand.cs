@@ -1,5 +1,6 @@
 ﻿using Dtos;
 using MediatR;
+using SWD.SheritonHotel.Domain.DTO;
 
 namespace SWD.SheritonHotel.Domain.Commands
 {
