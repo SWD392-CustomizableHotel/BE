@@ -143,6 +143,12 @@ builder.Services.AddSwaggerGen(options =>
         Enum = Enum.GetNames(typeof(ServiceStatus))
                     .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
     });
+    options.MapType<AmenityStatus>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(AmenityStatus))
+                   .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
+    });
 });
 
 
