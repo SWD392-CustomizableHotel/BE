@@ -124,6 +124,7 @@ namespace SWD.SheritonHotel.Data.Repositories
 
                 query = query.Where(r => r.Code.Contains(searchTerm) ||
                                           r.Description.Contains(searchTerm) ||
+                                          r.Name.Contains(searchTerm) ||
                                           (statusSearch.HasValue && r.Status == statusSearch.Value));
             }
 
