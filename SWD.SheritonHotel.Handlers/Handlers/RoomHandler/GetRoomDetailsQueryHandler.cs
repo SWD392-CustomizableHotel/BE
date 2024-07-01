@@ -33,7 +33,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         public async Task<ResponseDto<RoomDto>> Handle(GetRoomDetailsQuery request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-            if (user == null || !(await _userManager.IsInRoleAsync(user, "Admin")))
+/*            if (user == null || !(await _userManager.IsInRoleAsync(user, "Admin")))
             {
                 return new ResponseDto<RoomDto>
                 {
@@ -41,7 +41,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                     Message = "Unauthorized",
                     Errors = new[] { "You must be an admin to perform this operation." }
                 };
-            }
+            }*/
             try
             {
                 var room = await _roomService.GetRoomByIdAsync(request.RoomId);
