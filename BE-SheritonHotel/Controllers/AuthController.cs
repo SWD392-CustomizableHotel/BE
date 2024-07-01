@@ -230,6 +230,7 @@ public class AuthController : ControllerBase
     }
     [HttpPost]
     [Route("update-profile")]
+    [Authorize]
     public async Task<IActionResult> UpdateUserProfile([FromForm] UpdateUserCommand command)
     {
         var result = await _mediator.Send(command);
@@ -240,10 +241,12 @@ public class AuthController : ControllerBase
         return BadRequest(result);
     }
 
-    [HttpGet("profile/{userId}")]
-    public async Task<IActionResult> GetUserProfile(string userId)
+    [HttpGet]
+    [Route("profile/{email}")]
+    [Authorize]
+    public async Task<IActionResult> GetUserProfile(string email)
     {
-        var query = new GetUserProfileQuery(userId);
+        var query = new GetUserProfileByEmailQuery  (email);
         var result = await _mediator.Send(query);
         if (result.IsSucceed)
         {

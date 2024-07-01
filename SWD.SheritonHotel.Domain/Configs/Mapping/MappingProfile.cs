@@ -16,6 +16,11 @@ namespace SWD.SheritonHotel.Domain.Configs.Mapping
         {
             CreateMap<ApplicationUser, UpdateUserCommand>();
             CreateMap<Room, RoomDto>().ReverseMap();
+            CreateMap<ApplicationUser, UpdateUserCommand>()
+            .ForMember(dest => dest.Dob, opt => opt.MapFrom(src => src.Dob.HasValue ? DateOnly.FromDateTime(src.Dob.Value) : (DateOnly?)null));
+
+            CreateMap<UpdateUserCommand, ApplicationUser>()
+                .ForMember(dest => dest.Dob, opt => opt.MapFrom(src => src.Dob.HasValue ? src.Dob.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null));
         }
     }
 }

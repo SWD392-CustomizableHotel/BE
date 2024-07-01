@@ -8,7 +8,7 @@ using SWD.SheritonHotel.Domain.Queries;
 
 namespace SWD.SheritonHotel.Domain.Handlers
 {
-    public class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery, BaseResponse<ApplicationUser>>
+    public class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileByEmailQuery, BaseResponse<ApplicationUser>>
     {
         private readonly UserManager<ApplicationUser> _userManager;
 
@@ -17,9 +17,9 @@ namespace SWD.SheritonHotel.Domain.Handlers
             _userManager = userManager;
         }
 
-        public async Task<BaseResponse<ApplicationUser>> Handle(GetUserProfileQuery request, CancellationToken cancellationToken)
+        public async Task<BaseResponse<ApplicationUser>> Handle(GetUserProfileByEmailQuery request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByIdAsync(request.UserId);
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
                 return new BaseResponse<ApplicationUser>

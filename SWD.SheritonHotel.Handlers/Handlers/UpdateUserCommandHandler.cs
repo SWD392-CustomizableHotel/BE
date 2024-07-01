@@ -42,7 +42,7 @@ namespace SWD.SheritonHotel.Domain.Handlers
 
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
-            user.Dob = request.Dob;
+            user.Dob = request.Dob.HasValue ? request.Dob.Value.ToDateTime(new TimeOnly(0, 0)) : null;
             user.PhoneNumber = request.PhoneNumber;
             user.Address = request.Address;
 
