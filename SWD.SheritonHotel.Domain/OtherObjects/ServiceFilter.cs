@@ -1,6 +1,14 @@
-namespace SWD.SheritonHotel.Domain.OtherObjects;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-public class ServiceFilter
+namespace SWD.SheritonHotel.Domain.OtherObjects
 {
-    public string? ServiceName { get; set; }
+    public class ServiceFilter
+    {
+        public ServiceStatus? ServiceStatus { get; set; }
+        public int HotelId { get; set; }
+    }
 }

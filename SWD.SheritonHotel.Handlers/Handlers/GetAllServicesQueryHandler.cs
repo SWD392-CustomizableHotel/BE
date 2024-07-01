@@ -1,42 +1,54 @@
+﻿using Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using OtherObjects;
+using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
 using SWD.SheritonHotel.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
-    public class GetAllServicesQueryHandler : IRequestHandler<GetAllServicesQuery, PagedResponse<List<ServiceDto>>>
+    public class GetAllServicesQueryHandler : IRequestHandler<GetAllServicesQuery, PagedResponse<List<Service>>>
     {
-        private readonly IServiceService _serviceService;
+        private readonly IManageService _manageService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public GetAllServicesQueryHandler(IServiceService serviceService)
+        public GetAllServicesQueryHandler(IManageService serviceService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _serviceService = serviceService;
+            _manageService = serviceService;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<PagedResponse<List<ServiceDto>>> Handle(GetAllServicesQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResponse<List<Service>>> Handle(GetAllServicesQuery request, CancellationToken cancellationToken)
         {
+            var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+
+            //Check User Admin 
+            if (user == null || (await _userManager.IsInRoleAsync(user, StaticUserRoles.CUSTOMER)))
+            {
+                return new PagedResponse<List<Service>>(new List<Service>(), 0, 0);
+            }
+
+            // Apply filters and search
             var validFilter = request.PaginationFilter;
-            var (services, totalRecords) = await _serviceService.GetAllServicesAsync(validFilter.PageNumber, validFilter.PageSize, request.ServiceFilter, request.SearchTerm);
-            var totalPages = (int)Math.Ceiling(totalRecords / (double)validFilter.PageSize);
-            // Create list of ServiceDto
-            var serviceDtos = services.Select(s => new ServiceDto
+            var (filterService, totalItems) = await _manageService.GetAllServiceAsync(validFilter.PageNumber, validFilter.PageSize,
+                request.ServiceFilter, request.SearchTerm);
+
+            var totalPages = (int)Math.Ceiling(totalItems / (double)request.PaginationFilter.PageSize);
+            var response = new PagedResponse<List<Service>>(filterService, validFilter.PageNumber, validFilter.PageSize)
             {
-                Id = s.Id,
-                Name = s.Name,
-                Price = s.Price,
-                Description = s.Description,
-                Status = s.Status,
-                Code = s.Code,
-                HotelId = s.HotelId,
-                UserName = s.UserName
-            }).ToList();
-            var response = new PagedResponse<List<ServiceDto>>(serviceDtos, validFilter.PageNumber, validFilter.PageSize)
-            {
-                TotalRecords = totalRecords,
+                TotalRecords = totalItems,
                 TotalPages = totalPages,
             };
-
             return response;
         }
     }
