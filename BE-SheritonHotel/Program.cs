@@ -23,8 +23,9 @@ using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Data.Context;
-using SWD.SheritonHotel.Domain.Handlers;
+using BookingService = SWD.SheritonHotel.Services.Services.BookingService;
 using Microsoft.AspNetCore.Http.Features;
+using SWD.SheritonHotel.Domain.Handlers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -67,7 +68,7 @@ builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-
+    
 
 // Config Identity
 builder.Services.Configure<IdentityOptions>(options =>
@@ -164,6 +165,16 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<EmailSender>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
+builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
+builder.Services.AddScoped<IServiceService, ServiceService>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
+
+
 builder.Services.AddScoped<EmailVerify>();
 builder.Services.AddScoped<TokenGenerator>();
 #endregion
@@ -221,7 +232,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors("corspolicy");

@@ -19,5 +19,6 @@ namespace Entities
         public string? CertificatePath { get; set; }
         public string? Address { get; set; }
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+        public virtual ICollection<AssignedService> AssignedServices { get; set; } = new List<AssignedService>();
     }
 }

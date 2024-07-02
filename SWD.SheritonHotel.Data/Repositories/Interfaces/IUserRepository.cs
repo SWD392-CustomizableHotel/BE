@@ -17,5 +17,6 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
         Task UpdateAsync(ApplicationUser user);
         Task<ApplicationUser> GetUserByEmailAsync(string email);
         Task<IdentityResult> UpdateUserAsync(ApplicationUser user);
+        Task<ApplicationUser> GetUserByIdAsync(string staffId);
     }
 }

@@ -72,6 +72,7 @@ public class AuthService : IAuthService
             };
 
         var userRoles = await _userManager.GetRolesAsync(user);
+        var role = userRoles.FirstOrDefault() ?? StaticUserRoles.CUSTOMER;
 
         var authClaims = new List<Claim>
         {
@@ -87,7 +88,7 @@ public class AuthService : IAuthService
 
         var token = GenerateNewJsonWebToken(authClaims);
 
-        return new AuthServiceResponseDto { IsSucceed = true, Token = token };
+        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role };
     }
 
     public async Task<AuthServiceResponseDto> MakeAdminAsync(
