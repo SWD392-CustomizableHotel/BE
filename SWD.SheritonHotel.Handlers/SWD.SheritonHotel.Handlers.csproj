@@ -27,6 +27,7 @@
 	  <ProjectReference Include="..\SWD.SheritonHotel.Data\SWD.SheritonHotel.Data.csproj" />
 	  <ProjectReference Include="..\SWD.SheritonHotel.Domain\SWD.SheritonHotel.Domain.csproj" />
 	  <ProjectReference Include="..\SWD.SheritonHotel.Services\SWD.SheritonHotel.Services.csproj" />
+	  <ProjectReference Include="..\SWD.SheritonHotel.Validator\SWD.SheritonHotel.Validator.csproj" />
 	</ItemGroup>
 
 </Project>

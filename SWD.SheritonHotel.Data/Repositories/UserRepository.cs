@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Data.Repositories
@@ -62,6 +64,27 @@ namespace SWD.SheritonHotel.Data.Repositories
         {
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<ApplicationUser> GetUserFromJWTAsync(string jWTAsync)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(jWTAsync) as JwtSecurityToken;
+            if (jsonToken != null)
+            {
+                var emailClaim = jsonToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
+
+                if (!string.IsNullOrEmpty(emailClaim))
+                {
+                    return await GetUserByEmailAsync(emailClaim);
+                }
+            }
+            return null;
+        }
+
+        public async Task<ApplicationUser> GetUserDetailsByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
         }
     }
 }

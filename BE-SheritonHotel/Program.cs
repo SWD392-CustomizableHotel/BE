@@ -24,6 +24,7 @@ using SWD.SheritonHotel.Validator;
 using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
+using SWD.SheritonHotel.Validator.Interface;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -109,6 +110,20 @@ builder.Services
         googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
     });
 
+builder.Services.Configure<JwtBearerOptions>(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["ValidIssuer"],
+        ValidAudience = jwtSettings["ValidAudience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"])),
+    };
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -170,6 +185,7 @@ builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<EmailSender>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IManageService, ManageServiceService>();
+builder.Services.AddScoped<ITokenValidator, TokenValidator>();
 #endregion
 
 #region Add MediatR
