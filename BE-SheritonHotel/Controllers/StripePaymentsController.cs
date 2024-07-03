@@ -24,5 +24,22 @@ namespace SWD.SheritonHotel.API.Controllers
             var clientSecret = await _mediator.Send(command);
             return Ok(new { clientSecret });
         }
+
+        [HttpPost]
+        [Route("send-invoice-email")]
+        [Authorize]
+        public async Task<IActionResult> SendInvoiceEmail([FromBody] SendInvoiceCommand command)
+        {
+            await _mediator.Send(command);
+            return Ok("Success");
+        }
+        [HttpPost]
+        [Route("cancel-payment")]
+        [Authorize]
+        public async Task<IActionResult> CancelPayment([FromBody] CancelPaymentCommand command)
+        {
+            await _mediator.Send(command);
+            return Ok("Success");
+        }
     }
 }

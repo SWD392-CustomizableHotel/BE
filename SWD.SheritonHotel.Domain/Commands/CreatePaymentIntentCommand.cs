@@ -13,8 +13,11 @@ namespace SWD.SheritonHotel.Domain.Commands
 
         public class Item
         {
-            public string Id { get; set; }
-            public int Amount { get; set; }
+            public string RoomId { get; set; }
+            public int RoomPrice { get; set; }
+            public int NumberOfDate { get; set; }
+            public int NumberOfRoom { get; set; }
+            public string UserEmail { get; set; }
         }
     }
 }

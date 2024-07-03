@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Entities;
+using MediatR;
 using Stripe;
 using SWD.SheritonHotel.Domain.Commands;
 using System;
@@ -13,24 +14,81 @@ namespace SWD.SheritonHotel.Handlers.Handlers
     {
         public Task<string> Handle(CreatePaymentIntentCommand request, CancellationToken cancellationToken)
         {
-            var paymentIntentService = new PaymentIntentService();
+            /*var paymentIntentService = new PaymentIntentService();
             var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
             {
                 Amount = CalculateOrderAmount(request.Items),
-                Currency = "usd",
+                Currency = "VND",
                 AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
                 {
                     Enabled = true,
                 },
-            });
+            });*/
 
-            return Task.FromResult(paymentIntent.ClientSecret);
+            //Create Product
+            var roomOptions = new ProductCreateOptions { Name = request.Items[0].RoomId };
+            var roomService = new ProductService();
+            var room = roomService.Create(roomOptions);
+
+            //Create price
+            var priceOptions = new PriceCreateOptions
+            {
+                Product = room.Id,
+                UnitAmount = CalculateOrderAmount(request.Items),
+                Currency = "aud"
+            };
+            var priceService = new PriceService();
+            var price = priceService.Create(priceOptions);
+
+            //Create a customer
+            var customerOptions = new CustomerCreateOptions
+            {
+                Name = "Kiet",
+                Email = request.Items[0].UserEmail,
+                Description = "A special customer"
+            };
+            var customerService = new CustomerService();
+            var customer = customerService.Create(customerOptions);
+
+            //Create an invoice
+            var invoiceOptions = new InvoiceCreateOptions
+            {
+                Customer = customer.Id,
+                CollectionMethod = "charge_automatically",
+
+            };
+            var invoiceService = new InvoiceService();
+            var invoice = invoiceService.Create(invoiceOptions);
+
+            //Create an invoice item
+            var invoiceItemOptions = new InvoiceItemCreateOptions
+            {
+                Customer = customer.Id,
+                Price = price.Id,
+                Invoice = invoice.Id
+            };
+            var invoiceItemService = new InvoiceItemService();
+            var invoiceItem = invoiceItemService.Create(invoiceItemOptions);
+
+            //Finalize invoice
+            var finalizeOptions = new InvoiceFinalizeOptions
+            {
+                Expand = new List<string> { "payment_intent"}
+            };
+            var finalizeService = new InvoiceService();
+            var finalizeInvoice = finalizeService.FinalizeInvoice(invoice.Id, finalizeOptions);
+
+            //Client secret get
+            var clientSecret = finalizeInvoice.PaymentIntent.ClientSecret;
+
+            //Return to FE
+            return Task.FromResult(clientSecret);
         }
 
         private int CalculateOrderAmount(CreatePaymentIntentCommand.Item[] items)
         {
             // Implement your order amount calculation logic here
-            return items.Sum(item => item.Amount);
+            return items.Sum(item => (item.RoomPrice * item.NumberOfDate * item.NumberOfRoom));
         }
     }
 }
