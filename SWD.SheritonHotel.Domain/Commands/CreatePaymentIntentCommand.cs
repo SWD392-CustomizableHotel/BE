@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Domain.Commands
 {
-    public class CreatePaymentIntentCommand : IRequest<string>
+    public class CreatePaymentIntentCommand : IRequest<List<string>>
     {
         public Item[] Items { get; set; }
 

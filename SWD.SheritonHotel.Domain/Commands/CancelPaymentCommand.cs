@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Domain.Commands
 {
-    public class CancelPaymentCommand : IRequest<ResponseDto<string>>
+    public class CancelPaymentCommand : IRequest<ResponseDto<int>>
     {
-        public string PaymentIntentId { get; set; }
+        public string ClientSecret { get; set; }
     }
 }

@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
-    public class CreatePaymentIntentHandler : IRequestHandler<CreatePaymentIntentCommand, string>
+    public class CreatePaymentIntentHandler : IRequestHandler<CreatePaymentIntentCommand, List<string>>
     {
-        public Task<string> Handle(CreatePaymentIntentCommand request, CancellationToken cancellationToken)
+        public Task<List<string>> Handle(CreatePaymentIntentCommand request, CancellationToken cancellationToken)
         {
             /*var paymentIntentService = new PaymentIntentService();
             var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
@@ -80,9 +80,11 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 
             //Client secret get
             var clientSecret = finalizeInvoice.PaymentIntent.ClientSecret;
-
+            var invoiceId = invoice.Id;
+            var list = new List<string>{clientSecret, invoiceId };
             //Return to FE
-            return Task.FromResult(clientSecret);
+            
+            return Task.FromResult(list);
         }
 
         private int CalculateOrderAmount(CreatePaymentIntentCommand.Item[] items)

@@ -38,8 +38,8 @@ namespace SWD.SheritonHotel.API.Controllers
         [Authorize]
         public async Task<IActionResult> CancelPayment([FromBody] CancelPaymentCommand command)
         {
-            await _mediator.Send(command);
-            return Ok("Success");
+            var response = await _mediator.Send(command);
+            return Ok(response);
         }
     }
 }
