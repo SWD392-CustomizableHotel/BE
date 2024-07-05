@@ -30,7 +30,7 @@ namespace SWD.SheritonHotel.API.Controllers
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
         [Route("get-rooms")]
-        public async Task<IActionResult> GetAllRooms([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] RoomFilter roomFilter = null, [FromQuery] string searchTerm = null)
+        public async Task<IActionResult> GetAllRooms([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] RoomFilter roomFilter = null, [FromQuery] string? searchTerm = null)
         {
             var paginationFilter = new PaginationFilter(pageNumber, pageSize);
             var query = new GetAllRoomsQuery(paginationFilter, roomFilter, searchTerm);

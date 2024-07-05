@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Dtos;
 using Entities;
@@ -6,12 +6,12 @@ using Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SWD.SheritonHotel.Data.Base;
 using SWD.SheritonHotel.Domain.Commands;
-using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
 using SWD.SheritonHotel.Domain.Utilities;
 
-namespace SWD.SheritonHotel.API.Controllers;
+namespace Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -123,7 +123,7 @@ public class AuthController : ControllerBase
         if (user == null)
             return Ok(new BaseResponse<ApplicationUser>
                 { IsSucceed = false, Result = null, Message = "Cannot find your email. Please input correct email" });
-
+                
         var token = await _mediator.Send(new GenerateResetPasswordCommand { User = user });
 
         try
