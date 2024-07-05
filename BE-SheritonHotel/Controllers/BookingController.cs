@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +10,6 @@ using SWD.SheritonHotel.Domain.Queries;
 namespace SWD.SheritonHotel.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-// [Authorize]
 public class BookingController : ControllerBase
 {
     private readonly IMediator _mediator;

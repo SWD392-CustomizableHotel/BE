@@ -10,4 +10,3 @@ public interface IBookingService
     Task<int> CreateBookingAsync(Booking booking);
 }
 
-

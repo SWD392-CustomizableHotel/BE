@@ -33,36 +33,10 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         public async Task<ResponseDto<Room>> Handle(GetRoomDetailsQuery request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-/*            if (user == null || !(await _userManager.IsInRoleAsync(user, "Admin")))
-            {
-                return new ResponseDto<Room>
-                {
-                    IsSucceeded = false,
-                    Message = "Unauthorized",
-                    Errors = new[] { "You must be an admin to perform this operation." }
-                };
-            }*/
             try
             {
                 var room = await _roomService.GetRoomByIdAsync(request.RoomId);
-<<<<<<< HEAD:SWD.SheritonHotel.Handlers/Handlers/RoomHandler/GetRoomDetailsQueryHandler.cs
-                var roomDto = new RoomDto
-                {
-                    RoomId = room.Id,
-                    RoomNumber = room.Code,
-                    RoomType = room.Type,
-                    RoomDescription = room.Description,
-                    RoomStatus = room.Status,
-                    RoomPrice = room.Price,
-                    IsDeleted = room.IsDeleted,
-                    NumberOfPeople = room.NumberOfPeople,
-                    Image = room.Image
-                };
-
-                return new ResponseDto<RoomDto>
-=======
                 return new ResponseDto<Room>
->>>>>>> d1012a3a5dd95a2e067c0c7720f44ec3706ccc8e:SWD.SheritonHotel.Handlers/Handlers/GetRoomDetailsQueryHandler.cs
                 {
                     IsSucceeded = true,
                     Message = "Room details fetched successfully",

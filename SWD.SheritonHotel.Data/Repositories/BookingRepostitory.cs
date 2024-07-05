@@ -12,15 +12,15 @@ namespace SWD.SheritonHotel.Data.Repositories;
 
 public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
 {
-    
+
     private readonly ApplicationDbContext _context;
-    public BookingRepostitory (ApplicationDbContext context) : base(context)
+    public BookingRepostitory(ApplicationDbContext context) : base(context)
     {
         _context = context;
     }
 
     public async Task<(List<BookingHistoryDto>, int)> GetBookingHistoryAsync(string userId, int pageNumber, int pageSize, BookingFilter bookingFilter,
-        string searchTerm = null)
+        string searchTerm)
     {
         var query = _context.Booking
             .Include(b => b.Room)
@@ -34,10 +34,21 @@ public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
             if (bookingFilter.RoomId.HasValue)
             {
                 query = query.Where(b => b.RoomId == bookingFilter.RoomId.Value);
-            } if (bookingFilter.Rating.HasValue)
+            }
+            if (bookingFilter.Rating.HasValue)
             {
                 query = query.Where(b => b.Rating == bookingFilter.Rating.Value);
             }
+        }
+
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            query = query.Where(b =>
+                b.Room.Type.Contains(searchTerm) ||
+                b.Room.Description.Contains(searchTerm) ||
+                b.User.UserName.Contains(searchTerm) ||
+                b.Rating.ToString().Contains(searchTerm)
+            );
         }
         var totalRecords = await query.CountAsync();
         var bookings = await query
@@ -47,9 +58,10 @@ public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
             .Select(b => new BookingHistoryDto
             {
                 BookingId = b.Id,
-                RoomId = b.RoomId,
+                RoomType = b.Room.Type,
+                RoomDescription = b.Room.Description,
                 Rating = b.Rating,
-                UserId = b.UserId,
+                UserName = b.User.UserName,
                 Services = b.BookingServices.Select(bs => bs.Service.Name).ToList(),
                 Amenities = b.BookingAmenities.Select(ba => ba.Amenity.Name).ToList(),
                 Payments = b.Payments.Select(p => p.Amount).ToList()

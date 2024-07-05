@@ -18,17 +18,14 @@ using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Data.Context;
-<<<<<<< HEAD
 using Stripe;
-using BookingService = SWD.SheritonHotel.Services.Services.BookingService;
-=======
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using SWD.SheritonHotel.Validator;
 using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
->>>>>>> d1012a3a5dd95a2e067c0c7720f44ec3706ccc8e
+using BookingService = Entities.BookingService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -175,21 +172,17 @@ builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IAmentiyRepository, AmenityRepository>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<EmailSender>();
-<<<<<<< HEAD
+//builder.Services.AddScoped<IServiceService, ServiceService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IManageService, ManageServiceService>();
 builder.Services.AddScoped<IAccountService, SWD.SheritonHotel.Services.Services.AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
 builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
-builder.Services.AddScoped<IServiceService, ServiceService>();
-builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
-builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
-builder.Services.AddScoped<IPaymentService, PaymentService>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-=======
-builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
-builder.Services.AddScoped<IManageService, ManageServiceService>();
->>>>>>> d1012a3a5dd95a2e067c0c7720f44ec3706ccc8e
+builder.Services.AddScoped<IBookingService, BookingHistoryService>();
 #endregion
 
 #region Add MediatR

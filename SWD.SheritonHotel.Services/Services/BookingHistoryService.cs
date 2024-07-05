@@ -1,5 +1,4 @@
 using Entities;
-using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.OtherObjects;
@@ -7,11 +6,11 @@ using SWD.SheritonHotel.Services.Interfaces;
 
 namespace SWD.SheritonHotel.Services.Services;
 
-public class BookingService : IBookingService
+public class BookingHistoryService : IBookingService
 {
     private readonly IBookingRepository _bookingRepository;
 
-    public BookingService(IBookingRepository bookingRepository)
+    public BookingHistoryService(IBookingRepository bookingRepository)
     {
         _bookingRepository = bookingRepository;
     }
