@@ -24,7 +24,7 @@ using SWD.SheritonHotel.Validator;
 using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
-using SWD.SheritonHotel.Validator.Interface;
+using BookingService = Entities.BookingService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -186,6 +186,13 @@ builder.Services.AddScoped<EmailSender>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IManageService, ManageServiceService>();
 builder.Services.AddScoped<ITokenValidator, TokenValidator>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
+builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
+builder.Services.AddScoped<IBookingService, BookingHistoryService>();
+
 #endregion
 
 #region Add MediatR
