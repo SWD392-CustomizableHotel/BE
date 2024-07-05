@@ -10,6 +10,6 @@ namespace SWD.SheritonHotel.Domain.Commands
 {
     public class CancelPaymentCommand : IRequest<ResponseDto<int>>
     {
-        public string ClientSecret { get; set; }
+        public string PaymentIntentId { get; set; }
     }
 }

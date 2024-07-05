@@ -21,8 +21,8 @@ namespace SWD.SheritonHotel.API.Controllers
         [Authorize]
         public async Task<IActionResult> CreatePaymentIntent([FromBody] CreatePaymentIntentCommand command)
         {
-            var clientSecret = await _mediator.Send(command);
-            return Ok(new { clientSecret });
+            var reponse = await _mediator.Send(command);
+            return Ok(reponse);
         }
 
         [HttpPost]
@@ -30,9 +30,10 @@ namespace SWD.SheritonHotel.API.Controllers
         [Authorize]
         public async Task<IActionResult> SendInvoiceEmail([FromBody] SendInvoiceCommand command)
         {
-            await _mediator.Send(command);
-            return Ok("Success");
+            var response = await _mediator.Send(command);
+            return Ok(response);
         }
+
         [HttpPost]
         [Route("cancel-payment")]
         [Authorize]

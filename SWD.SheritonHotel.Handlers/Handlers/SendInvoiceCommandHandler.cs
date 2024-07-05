@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using Google.Apis.Auth.OAuth2;
+using MediatR;
+using Microsoft.AspNetCore.SignalR.Protocol;
 using Stripe;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
@@ -10,28 +12,19 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
-    public class SendInvoiceCommandHandler : IRequestHandler<SendInvoiceCommand, ResponseDto<string>>
+    public class SendInvoiceCommandHandler : IRequestHandler<SendInvoiceCommand, List<string>>
     {
-        public async Task<ResponseDto<string>> Handle(SendInvoiceCommand request, CancellationToken cancellationToken)
+        public Task<List<string>> Handle(SendInvoiceCommand request, CancellationToken cancellationToken)
         {
-            var paymentService = new PaymentIntentService();
-            var paymentIntent = paymentService.Get(request.PaymentIntentId);
-            var invoiceId = paymentIntent.InvoiceId;
-            var service = new InvoiceService();
-            var invoice = service.SendInvoice(invoiceId);
-            if(invoice == null)
-            {
-                return new ResponseDto<string>
-                {
-                    IsSucceeded = false,
-                    Message = "Invoice is empty"
-                };
-            }
-            return new ResponseDto<string>
-            {
-                IsSucceeded = true,
-                Message = "Success"
-            };
+            var service = new PaymentIntentService();
+            var paymentIntent = service.Get(request.PaymentIntentId);
+            var invoiceService = new InvoiceService();
+            var invoice = invoiceService.Get(paymentIntent.InvoiceId);
+            var invoiceDownloadLink = invoice.InvoicePdf;
+            var invoiceHostedPages = invoice.HostedInvoiceUrl;
+            var list = new List<string> { invoiceDownloadLink, invoiceHostedPages };
+
+            return Task.FromResult(list);
         }
     }
 }

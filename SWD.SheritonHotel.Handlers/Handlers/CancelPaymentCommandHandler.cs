@@ -15,7 +15,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         public async Task<ResponseDto<int>> Handle(CancelPaymentCommand request, CancellationToken cancellationToken)
         {
             var service = new InvoiceService();
-            service.VoidInvoice(request.ClientSecret);
+            service.VoidInvoice(request.PaymentIntentId);
             return new ResponseDto<int>
             {
                 IsSucceeded = true,

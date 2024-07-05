@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Domain.Commands
 {
-    public class SendInvoiceCommand : IRequest<ResponseDto<string>>
+    public class SendInvoiceCommand : IRequest<List<string>>
     {
         public string PaymentIntentId { get; set; }
     }
