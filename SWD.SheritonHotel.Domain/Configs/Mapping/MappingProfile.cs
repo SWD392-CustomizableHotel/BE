@@ -2,6 +2,7 @@
 using Entities;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace SWD.SheritonHotel.Domain.Configs.Mapping
         {
             CreateMap<ApplicationUser, UpdateUserCommand>();
             CreateMap<Room, RoomDto>().ReverseMap();
+
+            CreateMap<IdentityCardDto, IdentityCard>();
         }
     }
 }

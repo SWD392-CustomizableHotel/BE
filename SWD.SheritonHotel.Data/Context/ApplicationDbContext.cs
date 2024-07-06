@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Domain.OtherObjects;
 namespace SWD.SheritonHotel.Data.Context
 {
@@ -19,6 +20,7 @@ namespace SWD.SheritonHotel.Data.Context
         public DbSet<Service> Service { get; set; }
         public DbSet<BookingService> BookingService { get; set; }
         public DbSet<BookingAmenity> BookingAmenity { get; set; }
+        public DbSet<IdentityCard> IdentityCard { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -31,11 +33,18 @@ namespace SWD.SheritonHotel.Data.Context
             builder.Entity<Booking>().HasKey(b => b.Id);
             builder.Entity<Room>().HasKey(rm => rm.Id);
             builder.Entity<Hotel>().HasKey(h => h.Id);
+            builder.Entity<IdentityCard>().HasKey(ic => ic.Id);
 
             builder.Entity<BookingService>().HasKey(bs => new { bs.BookingId, bs.ServiceId });
             builder.Entity<BookingAmenity>().HasKey(ba => new { ba.BookingId, ba.AmenityId });
 
             // Configure relationships
+            builder
+                .Entity<ApplicationUser>()
+                .HasOne(u => u.IdentityCard)
+                .WithOne(ic => ic.User)
+                .HasForeignKey<IdentityCard>(ic => ic.UserId);
+
             builder
                 .Entity<ApplicationUser>()
                 .HasMany(u => u.Bookings)
@@ -138,7 +147,7 @@ namespace SWD.SheritonHotel.Data.Context
 
             builder
                 .Entity<Payment>()
-                .HasOne(p => p.Booking) 
+                .HasOne(p => p.Booking)
                 .WithMany(b => b.Payments)
                 .HasForeignKey(p => p.BookingId);
 
@@ -161,6 +170,17 @@ namespace SWD.SheritonHotel.Data.Context
                     v => v.ToString(),
                     v => (AmenityStatus)Enum.Parse(typeof(AmenityStatus), v))
                 .IsRequired();
+
+            // Configure properties with max length
+            builder.Entity<IdentityCard>()
+                .Property(b => b.Nationality)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            builder.Entity<IdentityCard>()
+                .Property(b => b.Gender)
+                .IsRequired()
+                .HasMaxLength(10);
         }
     }
 }

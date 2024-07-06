@@ -14,5 +14,6 @@ namespace Entities
         public DateTime? VerifyTokenExpires { get; set; }
         public bool isActived { get; set; } = false;
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+        public virtual IdentityCard IdentityCard { get; set; }
     }
 }

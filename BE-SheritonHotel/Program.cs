@@ -1,4 +1,4 @@
-using Entities;
+﻿using Entities;
 using Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,10 +24,12 @@ using SWD.SheritonHotel.Validator;
 using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
+using Google.Api;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"C:\VisionAI\vision-ai-428311-e8ec8670484d.json");
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
@@ -73,6 +75,9 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
    opt.TokenLifespan = TimeSpan.FromDays(1));
 
+// Config FPT AI
+builder.Services.Configure<FPTAIOptions>(builder.Configuration.GetSection("FPTAI"));
+builder.Services.AddHttpClient();
 #endregion
 
 #region JwtBear and Authentication, Swagger API
@@ -110,6 +115,7 @@ builder.Services
     });
 
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -137,6 +143,8 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+    options.OperationFilter<FileUploadOperationFilter>();
+
     options.MapType<ServiceStatus>(() => new OpenApiSchema
     {
         Type = "string",
@@ -170,6 +178,8 @@ builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<EmailSender>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IManageService, ManageServiceService>();
+builder.Services.AddScoped<IIdentityCardRepository, IdentityCardRepository>();
+builder.Services.AddScoped<IIdentityCardService, IdentityCardService>();
 #endregion
 
 #region Add MediatR
@@ -206,6 +216,7 @@ builder.Services.AddFluentValidationAutoValidation()
                 .AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateServiceCommandValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateServiceCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UploadIdentityCardCommandValidator>();
 #endregion
 
 
