@@ -21,6 +21,7 @@ namespace SWD.SheritonHotel.Data.Context
         public DbSet<BookingService> BookingService { get; set; }
         public DbSet<BookingAmenity> BookingAmenity { get; set; }
         public DbSet<IdentityCard> IdentityCard { get; set; }
+        public DbSet<AssignedService> AssignedServices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -37,8 +38,19 @@ namespace SWD.SheritonHotel.Data.Context
 
             builder.Entity<BookingService>().HasKey(bs => new { bs.BookingId, bs.ServiceId });
             builder.Entity<BookingAmenity>().HasKey(ba => new { ba.BookingId, ba.AmenityId });
+            builder.Entity<AssignedService>().HasKey(be => new {be.AssignedServiceId});
 
             // Configure relationships
+            builder
+                .Entity<AssignedService>()
+                .HasOne(be => be.Service)
+                .WithMany(u => u.AssignedServices)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder
+                .Entity<AssignedService>()
+                .HasOne(be => be.User)
+                .WithMany(u => u.AssignedServices)
+                .OnDelete(DeleteBehavior.Restrict);
             builder
                 .Entity<ApplicationUser>()
                 .HasOne(u => u.IdentityCard)

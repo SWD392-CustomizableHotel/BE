@@ -18,7 +18,7 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "ADMIN")]
+        //[Authorize(Roles = "ADMIN")]
         [Route("get-hotels")]
         public async Task<IActionResult> GetAllHotels()
         {

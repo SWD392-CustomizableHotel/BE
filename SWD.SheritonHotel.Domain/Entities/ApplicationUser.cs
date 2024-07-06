@@ -15,5 +15,6 @@ namespace Entities
         public bool isActived { get; set; } = false;
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
         public virtual IdentityCard IdentityCard { get; set; }
+        public virtual ICollection<AssignedService> AssignedServices { get; set; } = new List<AssignedService>();
     }
 }

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SWD.SheritonHotel.Domain.Entities;
 
 namespace SWD.SheritonHotel.Domain.Configs.Mapping
 {
@@ -19,6 +20,11 @@ namespace SWD.SheritonHotel.Domain.Configs.Mapping
             CreateMap<Room, RoomDto>().ReverseMap();
 
             CreateMap<IdentityCardDto, IdentityCard>();
+            CreateMap<ApplicationUser, AccountDto>()
+                .ForMember(dest => dest.Roles, opt => opt.Ignore());;
+            CreateMap<Service, AccountServiceDto>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.AssignedServices.FirstOrDefault().User.UserName));
+            CreateMap<AssignServiceDto, AssignedService>();
         }
     }
 }
