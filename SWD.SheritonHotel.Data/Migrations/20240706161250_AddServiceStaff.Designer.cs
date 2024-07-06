@@ -12,8 +12,8 @@ using SWD.SheritonHotel.Data.Context;
 namespace SWD.SheritonHotel.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240703104350_CreateInitial")]
-    partial class CreateInitial
+    [Migration("20240706161250_AddServiceStaff")]
+    partial class AddServiceStaff
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -680,6 +680,21 @@ namespace SWD.SheritonHotel.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.ServiceStaff", b =>
+                {
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ServiceId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ServiceStaff");
+                });
+
             modelBuilder.Entity("Entities.Amenity", b =>
                 {
                     b.HasOne("Entities.Hotel", "Hotel")
@@ -830,6 +845,25 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.ServiceStaff", b =>
+                {
+                    b.HasOne("Entities.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entities.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("Entities.Amenity", b =>

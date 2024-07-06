@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SWD.SheritonHotel.Data.Context;
 
@@ -11,9 +12,10 @@ using SWD.SheritonHotel.Data.Context;
 namespace SWD.SheritonHotel.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240705194241_AddServiceStaffRelation")]
+    partial class AddServiceStaffRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -678,7 +680,7 @@ namespace SWD.SheritonHotel.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.ServiceStaff", b =>
+            modelBuilder.Entity("ServiceStaff", b =>
                 {
                     b.Property<int>("ServiceId")
                         .HasColumnType("int");
@@ -845,23 +847,19 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.ServiceStaff", b =>
+            modelBuilder.Entity("ServiceStaff", b =>
                 {
-                    b.HasOne("Entities.Service", "Service")
+                    b.HasOne("Entities.Service", null)
                         .WithMany()
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Entities.ApplicationUser", "ApplicationUser")
+                    b.HasOne("Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("Entities.Amenity", b =>

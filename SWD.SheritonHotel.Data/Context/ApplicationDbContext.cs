@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Domain.OtherObjects;
+
 namespace SWD.SheritonHotel.Data.Context
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
@@ -19,6 +21,7 @@ namespace SWD.SheritonHotel.Data.Context
         public DbSet<Service> Service { get; set; }
         public DbSet<BookingService> BookingService { get; set; }
         public DbSet<BookingAmenity> BookingAmenity { get; set; }
+        public DbSet<ServiceStaff> ServiceStaff { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -34,6 +37,7 @@ namespace SWD.SheritonHotel.Data.Context
 
             builder.Entity<BookingService>().HasKey(bs => new { bs.BookingId, bs.ServiceId });
             builder.Entity<BookingAmenity>().HasKey(ba => new { ba.BookingId, ba.AmenityId });
+            builder.Entity<ServiceStaff>().HasKey(ss => new { ss.ServiceId, ss.UserId }); // Composite key for ServiceStaff
 
             // Configure relationships
             builder
@@ -108,6 +112,14 @@ namespace SWD.SheritonHotel.Data.Context
 
             builder.Entity<Service>().Property(s => s.Price).HasPrecision(18, 2);
 
+            builder.Entity<Service>()
+                .HasMany(s => s.AssignedStaff)
+                .WithMany(u => u.AssignedServices)
+                .UsingEntity<ServiceStaff>(
+                    j => j.HasOne(ss => ss.ApplicationUser).WithMany().HasForeignKey(ss => ss.UserId),
+                    j => j.HasOne(ss => ss.Service).WithMany().HasForeignKey(ss => ss.ServiceId)
+                );
+
             builder
                 .Entity<BookingService>()
                 .HasOne(bs => bs.Booking)
@@ -138,7 +150,7 @@ namespace SWD.SheritonHotel.Data.Context
 
             builder
                 .Entity<Payment>()
-                .HasOne(p => p.Booking) 
+                .HasOne(p => p.Booking)
                 .WithMany(b => b.Payments)
                 .HasForeignKey(p => p.BookingId);
 

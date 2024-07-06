@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SWD.SheritonHotel.Data.Context;
 
@@ -11,9 +12,10 @@ using SWD.SheritonHotel.Data.Context;
 namespace SWD.SheritonHotel.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240705174114_CreateInitial")]
+    partial class CreateInitial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,6 +145,9 @@ namespace SWD.SheritonHotel.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ServiceId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -168,6 +173,8 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("ServiceId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -678,21 +685,6 @@ namespace SWD.SheritonHotel.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.ServiceStaff", b =>
-                {
-                    b.Property<int>("ServiceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("ServiceId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ServiceStaff");
-                });
-
             modelBuilder.Entity("Entities.Amenity", b =>
                 {
                     b.HasOne("Entities.Hotel", "Hotel")
@@ -702,6 +694,13 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Hotel");
+                });
+
+            modelBuilder.Entity("Entities.ApplicationUser", b =>
+                {
+                    b.HasOne("Entities.Service", null)
+                        .WithMany("AssignedStaff")
+                        .HasForeignKey("ServiceId");
                 });
 
             modelBuilder.Entity("Entities.Booking", b =>
@@ -845,25 +844,6 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.ServiceStaff", b =>
-                {
-                    b.HasOne("Entities.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Service");
-                });
-
             modelBuilder.Entity("Entities.Amenity", b =>
                 {
                     b.Navigation("BookingAmenities");
@@ -899,6 +879,8 @@ namespace SWD.SheritonHotel.Data.Migrations
 
             modelBuilder.Entity("Entities.Service", b =>
                 {
+                    b.Navigation("AssignedStaff");
+
                     b.Navigation("BookingServices");
                 });
 #pragma warning restore 612, 618
