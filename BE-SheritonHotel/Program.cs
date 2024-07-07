@@ -40,7 +40,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-StripeConfiguration.ApiKey = "sk_test_51PVP1yP7srpKRMQLbK40lXh2oFtnOfJJj23asqyTupopgxdJI1110C45UyxioI9NeNqbSnHh53BLWmvZ8RxV4rCx00iho28l1j";
+StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0vPLhPNERogsVubVaRuUb2xNYC6o4r0ZZ7ZH3eXh1jd715Ft00eh5S5EDO";
 
 #region Add Dbcontext
 // Add DB
@@ -172,7 +172,6 @@ builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IAmentiyRepository, AmenityRepository>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<EmailSender>();
-//builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();

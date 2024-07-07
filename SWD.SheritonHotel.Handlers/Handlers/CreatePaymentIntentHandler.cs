@@ -35,7 +35,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             {
                 Product = room.Id,
                 UnitAmount = CalculateOrderAmount(request.Items),
-                Currency = "aud"
+                Currency = "usd"
             };
             var priceService = new PriceService();
             var price = priceService.Create(priceOptions);
@@ -90,7 +90,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         private int CalculateOrderAmount(CreatePaymentIntentCommand.Item[] items)
         {
             // Implement your order amount calculation logic here
-            return items.Sum(item => (item.RoomPrice * item.NumberOfDate * item.NumberOfRoom));
+            return items.Sum(item => (item.RoomPrice * item.NumberOfDate * item.NumberOfRoom * 100));
         }
     }
 }

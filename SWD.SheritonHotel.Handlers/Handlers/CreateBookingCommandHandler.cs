@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using OtherObjects;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Services;
@@ -29,7 +30,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         public async Task<ResponseDto<int>> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-            if (user == null || !(await _userManager.IsInRoleAsync(user, "CUSTOMER")))
+            if (user == null || !(await _userManager.IsInRoleAsync(user, StaticUserRoles.CUSTOMER)))
             {
                 return new ResponseDto<int>
                 {
