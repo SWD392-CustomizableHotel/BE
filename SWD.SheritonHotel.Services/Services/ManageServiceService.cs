@@ -1,5 +1,7 @@
-﻿using Entities;
+﻿using AutoMapper;
+using Entities;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Services.Interfaces;
 using System;
@@ -13,10 +15,12 @@ namespace SWD.SheritonHotel.Services.Services
     public class ManageServiceService : IManageService
     {
         private readonly IServiceRepository _serviceRepository;
+        protected new readonly IMapper _mapper;
 
-        public ManageServiceService(IServiceRepository serviceRepository)
+        public ManageServiceService(IServiceRepository serviceRepository, IMapper mapper)
         {
             _serviceRepository = serviceRepository;
+            _mapper = mapper;
         }
 
         public async Task<Service> GetServiceByIdAsync(int serviceId)
@@ -24,10 +28,13 @@ namespace SWD.SheritonHotel.Services.Services
             return await _serviceRepository.GetServiceByIdAsync(serviceId);
         }
 
-        public async Task<(List<Service>, int)> GetAllServiceAsync(int pageNumber, int pageSize,
-                    ServiceFilter? serviceFilter, string searchTerm = null)
+        public async Task<(List<ServiceDto>, int)> GetAllServiceAsync(int pageNumber, int pageSize, ServiceFilter? serviceFilter, string searchTerm = null)
         {
-            return await _serviceRepository.GetAllServiceAsync(pageNumber, pageSize, serviceFilter, searchTerm);
+            var (services, totalItems) = await _serviceRepository.GetAllServiceAsync(pageNumber, pageSize, serviceFilter, searchTerm);
+
+            var serviceDtos = _mapper.Map<List<ServiceDto>>(services);
+
+            return (serviceDtos, totalItems);
         }
 
         public async Task<Service> CreateServiceAsync(Service service)

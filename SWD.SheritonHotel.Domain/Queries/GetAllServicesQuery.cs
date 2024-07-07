@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Domain.Queries
 {
-    public class GetAllServicesQuery : IRequest<PagedResponse<List<Service>>> 
+    public class GetAllServicesQuery : IRequest<PagedResponse<List<ServiceDto>>> 
     {
         public PaginationFilter PaginationFilter { get; set; }
 

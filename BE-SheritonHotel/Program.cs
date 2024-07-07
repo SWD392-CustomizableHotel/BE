@@ -162,6 +162,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IViewRoomRepository, ViewRoomRepository>();
 builder.Services.AddScoped<IViewRoomService, ViewRoomService>();
 builder.Services.AddMediatR(typeof(GetAllAvailableRoomQueryHandler).Assembly);
+builder.Services.AddMediatR(typeof(GetAllServicesQueryHandler).Assembly);
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
@@ -215,7 +216,12 @@ builder.Services.AddFluentValidationAutoValidation()
 builder.Services.AddValidatorsFromAssemblyContaining<CreateServiceCommandValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateServiceCommandValidator>();
 #endregion
-
+// Add Controllers
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.MaxDepth = 32;
+});
 
 // #region Add MediateR
 // var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;

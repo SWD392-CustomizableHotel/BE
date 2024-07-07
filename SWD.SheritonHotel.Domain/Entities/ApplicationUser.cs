@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 using SWD.SheritonHotel.Domain.Entities;
 
 namespace Entities
@@ -14,6 +15,8 @@ namespace Entities
         public DateTime? VerifyTokenExpires { get; set; }
         public bool isActived { get; set; } = false;
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+        [JsonIgnore]
+        public virtual ICollection<Service> AssignedServiceS { get; set; } = new List<Service>();
         public virtual ICollection<AssignedService> AssignedServices { get; set; } = new List<AssignedService>();
     }
 }
