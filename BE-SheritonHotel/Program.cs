@@ -5,27 +5,29 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 using Services;
 using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Handlers;
-using System.Reflection;
-using System.Text;
-using MediatR;
-using Microsoft.Extensions.Options;
-using SWD.SheritonHotel.Domain.OtherObjects;
-using System.Reflection;
 using SWD.SheritonHotel.Handlers.Handlers;
 using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
-using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Data.Context;
 using BookingService = SWD.SheritonHotel.Services.Services.BookingService;
 using Microsoft.AspNetCore.Http.Features;
 using SWD.SheritonHotel.Domain.Handlers;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using SWD.SheritonHotel.Validator;
+using System.Reflection;
+using SWD.SheritonHotel.Domain.OtherObjects;
+using System.Text;
+using BookingService = Entities.BookingService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +38,13 @@ builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 20971520; // 20MB
 });
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.Converters.Add(new StringEnumConverter());
+    });
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 #region Add Dbcontext
@@ -49,26 +58,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-// #region Add Authentication Google
-//
-// builder.Services.AddAuthentication().AddGoogle(googleOptions =>
-// {
-//     //Read Authentication:Google information from appsettings.json
-//     IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("GoogleAuthSettings:Google");
-//
-//     //Setting ClientId and ClientSecret for access API Google
-//     googleOptions.ClientId = googleAuthNSection["ClientId"];
-//     googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
-// });
-// #endregion
-
 #region Add, Config Identity and Role
 // Add Identity
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-    
+
 
 // Config Identity
 builder.Services.Configure<IdentityOptions>(options =>
@@ -79,11 +75,13 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.SignIn.RequireConfirmedEmail = false;
+    options.User.RequireUniqueEmail = true;
 });
 
 // Config Token expiration
 builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
    opt.TokenLifespan = TimeSpan.FromDays(1));
+
 #endregion
 
 #region JwtBear and Authentication, Swagger API
@@ -148,12 +146,24 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+    options.MapType<ServiceStatus>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(ServiceStatus))
+                    .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
+    });
+    options.MapType<AmenityStatus>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(AmenityStatus))
+                   .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
+    });
 });
+
 
 #endregion
 
 #region Add Scoped
-
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -164,16 +174,17 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
+builder.Services.AddScoped<IAmentiyRepository, AmenityRepository>();
+builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<EmailSender>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IManageService, ManageServiceService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
 builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
-builder.Services.AddScoped<IServiceService, ServiceService>();
-builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
-builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
-
+builder.Services.AddScoped<IBookingService, BookingHistoryService>();
 
 builder.Services.AddScoped<EmailVerify>();
 builder.Services.AddScoped<TokenGenerator>();
@@ -207,6 +218,13 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 #endregion
 
+#region FluentValidator
+builder.Services.AddFluentValidationAutoValidation()
+                .AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateServiceCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateServiceCommandValidator>();
+#endregion
+
 
 // #region Add MediateR
 // var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;
@@ -229,12 +247,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("corspolicy");
+
 app.UseHttpsRedirection();
-app.UseRouting();
+
 app.UseCors(MyAllowSpecificOrigins);
+
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors("corspolicy");
 
 app.MapControllers();
 //RUN

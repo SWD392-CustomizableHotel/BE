@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -308,7 +308,7 @@ public class AuthService : IAuthService
         }
         
         var normalizedEmail = payload.Email.Trim().ToLower();
-
+        
         var user = await _userManager.Users.SingleOrDefaultAsync(u => u.NormalizedEmail.Trim().ToLower() == normalizedEmail);
         if (user == null)
         {
@@ -345,7 +345,6 @@ public class AuthService : IAuthService
 
         return new AuthServiceResponseDto() { IsSucceed = true, Token = token, Role = role };
     }
-
 
     public async Task<AuthServiceResponseDto> RegisterAdditionalInfoAsync(RegisterAdditionalInfoDto additionalInfoDto)
     {

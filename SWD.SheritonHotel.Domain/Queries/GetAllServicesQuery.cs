@@ -1,18 +1,28 @@
+﻿using Entities;
 using MediatR;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.OtherObjects;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace SWD.SheritonHotel.Domain.Queries;
-
-public class GetAllServicesQuery : IRequest<PagedResponse<List<ServiceDto>>>
+namespace SWD.SheritonHotel.Domain.Queries
 {
-    public PaginationFilter PaginationFilter { get; }
-    public string SearchTerm { get; }
-    public ServiceFilter ServiceFilter { get; }
-    public GetAllServicesQuery(PaginationFilter paginationFilter, ServiceFilter serviceFilter, string searchTerm)
+    public class GetAllServicesQuery : IRequest<PagedResponse<List<Service>>> 
     {
-        PaginationFilter = paginationFilter ?? new PaginationFilter();
-        SearchTerm = searchTerm;
-        ServiceFilter = serviceFilter ?? new ServiceFilter();
+        public PaginationFilter PaginationFilter { get; set; }
+
+        public ServiceFilter ServiceFilter { get; set; }
+
+        public string SearchTerm { get; set; }
+
+        public GetAllServicesQuery(PaginationFilter paginationFilter, ServiceFilter serviceFilter, string searchTerm)
+        {
+            PaginationFilter = paginationFilter ?? new PaginationFilter();
+            ServiceFilter = serviceFilter ?? new ServiceFilter();
+            SearchTerm = searchTerm;
+        }
     }
 }
