@@ -17,7 +17,7 @@ namespace SWD.SheritonHotel.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.19")
+                .HasAnnotation("ProductVersion", "6.0.18")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -29,6 +29,9 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -49,6 +52,9 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("HotelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InUse")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")

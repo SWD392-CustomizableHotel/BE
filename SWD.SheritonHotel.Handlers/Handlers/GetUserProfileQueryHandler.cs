@@ -5,6 +5,7 @@ using Entities;
 using System.Threading;
 using System.Threading.Tasks;
 using SWD.SheritonHotel.Domain.Queries;
+using System.Linq;
 
 namespace SWD.SheritonHotel.Domain.Handlers
 {
@@ -28,6 +29,8 @@ namespace SWD.SheritonHotel.Domain.Handlers
                     Message = "User not found"
                 };
             }
+
+            var certificatePath = user.CertificatePath;
 
             return new BaseResponse<ApplicationUser>
             {

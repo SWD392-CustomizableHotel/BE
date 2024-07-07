@@ -16,11 +16,7 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
         Task<string> GeneratePasswordResetTokenAsync(ApplicationUser user);
         Task UpdateAsync(ApplicationUser user);
         Task<ApplicationUser> GetUserByEmailAsync(string email);
-<<<<<<< HEAD
         Task<IdentityResult> UpdateUserAsync(ApplicationUser user);
         Task<ApplicationUser> GetUserByIdAsync(string staffId);
-=======
-        Task UpdateUserAsync(ApplicationUser user);
->>>>>>> b1717f068eb2b981f90e988800508f34f9e83dc5
     }
 }
