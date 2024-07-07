@@ -201,11 +201,7 @@ namespace SWD.SheritonHotel.Data.Repositories
                 {
                     staff.Add(user);
                 }
-                else
-                {
-                }
             }
-
             if (staff == null || staff.Count == 0)
             {
                 return false;
@@ -216,8 +212,6 @@ namespace SWD.SheritonHotel.Data.Repositories
             {
                 service.AssignedStaff.Add(member);
             }
-
-
             try
             {
                 await _context.SaveChangesAsync();
@@ -228,12 +222,12 @@ namespace SWD.SheritonHotel.Data.Repositories
                 return false;
             }
         }
+
         public async Task UpdateAsync(Service service)
         {
             _context.Service.Update(service);
             await _context.SaveChangesAsync();
         }
-
 
         public void RemoveStaffAssignments(int serviceId)
         {

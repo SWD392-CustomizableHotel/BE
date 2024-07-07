@@ -17,7 +17,7 @@ namespace SWD.SheritonHotel.Services.Services
         private readonly IServiceRepository _serviceRepository;
         protected new readonly IMapper _mapper;
 
-        public ManageServiceService(IServiceRepository serviceRepository,IMapper mapper)
+        public ManageServiceService(IServiceRepository serviceRepository, IMapper mapper)
         {
             _serviceRepository = serviceRepository;
             _mapper = mapper;
