@@ -8,7 +8,11 @@ public class BookingHistoryDto
     public string RoomDescription { get; set; }
     public int Rating { get; set; }
     public string UserName { get; set; }
-    public ICollection<string> Services { get; set; }
-    public ICollection<string> Amenities { get; set; }
-    public ICollection<decimal> Payments { get; set; }
+    
+    public DateTime? StartDate { get; set; }
+    
+    public DateTime? EndDate { get; set; }
+    public List<ServiceDto> Services { get; set; }
+    public List<AmenityDTO> Amenities { get; set; }
+    public List<PaymentDto> Payments { get; set; }
 }
