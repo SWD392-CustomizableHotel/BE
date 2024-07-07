@@ -1,3 +1,4 @@
+using Entities;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.OtherObjects;
@@ -18,5 +19,9 @@ public class BookingHistoryService : IBookingService
         string searchTerm = null)
     {
         return await _bookingRepository.GetBookingHistoryAsync(userId, pageNumber, pageSize, bookingFilter, searchTerm);
+    }
+    public async Task<int> CreateBookingAsync(Booking booking)
+    {
+        return await _bookingRepository.CreateBookingAsync(booking);
     }
 }

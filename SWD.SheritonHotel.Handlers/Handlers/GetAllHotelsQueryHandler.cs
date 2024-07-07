@@ -29,16 +29,16 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
             //Check User Admin 
-            if (user == null || (await _userManager.IsInRoleAsync(user, "CUSTOMER")))
+            /*if (user == null || (await _userManager.IsInRoleAsync(user, "ADMIN")))
             {
                 return new ResponseDto<List<Hotel>>
                 {
                     Data = new List<Hotel>(),
                     IsSucceeded = false,
                     Message = "Unauthorized",
-                    Errors = new[] { "You must be an admin to perform this operation." }
+                    Errors = new[] { "You must be an customer to perform this operation." }
                 };
-            }
+            }*/
             var response = await _hotelService.GetAllHotelsAsync();
             return response;
         }

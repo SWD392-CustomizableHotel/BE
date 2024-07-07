@@ -12,9 +12,9 @@ namespace SWD.SheritonHotel.Data.Repositories;
 
 public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
 {
-    
+
     private readonly ApplicationDbContext _context;
-    public BookingRepostitory (ApplicationDbContext context) : base(context)
+    public BookingRepostitory(ApplicationDbContext context) : base(context)
     {
         _context = context;
     }
@@ -34,7 +34,8 @@ public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
             if (bookingFilter.RoomId.HasValue)
             {
                 query = query.Where(b => b.RoomId == bookingFilter.RoomId.Value);
-            } if (bookingFilter.Rating.HasValue)
+            }
+            if (bookingFilter.Rating.HasValue)
             {
                 query = query.Where(b => b.Rating == bookingFilter.Rating.Value);
             }
@@ -85,5 +86,11 @@ public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
             })
             .ToListAsync();
         return (bookings, totalRecords);
+    }
+    public async Task<int> CreateBookingAsync(Booking booking)
+    {
+        Add(booking);
+        await _context.SaveChangesAsync();
+        return booking.Id;
     }
 }

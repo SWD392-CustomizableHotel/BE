@@ -9,9 +9,10 @@ namespace Entities
     {
         public decimal Amount { get; set; }
         public string Status { get; set; }
+        public string PaymentIntentId { get; set; }
 
         [ForeignKey("BookingId")]
         public int BookingId { get; set; }
-        public Booking Booking { get; set; }
+        public virtual Booking Booking { get; set; }
     }
 }
