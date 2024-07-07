@@ -26,9 +26,9 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpPost]
-        [Route("send-invoice-email")]
+        [Route("send-invoice-link")]
         [Authorize]
-        public async Task<IActionResult> SendInvoiceEmail([FromBody] SendInvoiceCommand command)
+        public async Task<IActionResult> SendInvoiceLink([FromBody] SendInvoiceCommand command)
         {
             var response = await _mediator.Send(command);
             return Ok(response);

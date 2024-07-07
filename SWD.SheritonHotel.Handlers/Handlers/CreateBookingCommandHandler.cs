@@ -47,8 +47,9 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                 UserId = request.UserId,
                 CreatedBy = user.UserName,
                 LastUpdatedBy = user.UserName,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
+                StartDate = request.StartDate.ToLocalTime(),
+                EndDate = request.EndDate.ToLocalTime(),
+                CreatedDate = DateTime.UtcNow.ToLocalTime()
             };
 
             try
