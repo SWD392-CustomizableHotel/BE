@@ -16,6 +16,7 @@ namespace Entities
         public bool isActived { get; set; } = false;
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
         [JsonIgnore]
-        public virtual ICollection<Service> AssignedServices { get; set; } = new List<Service>();
+        public virtual ICollection<Service> AssignedServiceS { get; set; } = new List<Service>();
+        public virtual ICollection<AssignedService> AssignedServices { get; set; } = new List<AssignedService>();
     }
 }

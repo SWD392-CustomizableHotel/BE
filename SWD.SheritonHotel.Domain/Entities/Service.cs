@@ -20,5 +20,6 @@ namespace Entities
         public virtual ICollection<BookingService> BookingServices { get; set; } = new List<BookingService>();
         [JsonIgnore]
         public virtual ICollection<ApplicationUser> AssignedStaff { get; set; } = new List<ApplicationUser>();
+        public virtual ICollection<AssignedService> AssignedServices { get; set; } = new List<AssignedService>();
     }
 }

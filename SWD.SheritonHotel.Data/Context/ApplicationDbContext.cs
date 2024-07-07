@@ -21,6 +21,7 @@ namespace SWD.SheritonHotel.Data.Context
         public DbSet<Service> Service { get; set; }
         public DbSet<BookingService> BookingService { get; set; }
         public DbSet<BookingAmenity> BookingAmenity { get; set; }
+        public DbSet<AssignedService> AssignedServices { get; set; }
         public DbSet<ServiceStaff> ServiceStaff { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -38,8 +39,19 @@ namespace SWD.SheritonHotel.Data.Context
             builder.Entity<BookingService>().HasKey(bs => new { bs.BookingId, bs.ServiceId });
             builder.Entity<BookingAmenity>().HasKey(ba => new { ba.BookingId, ba.AmenityId });
             builder.Entity<ServiceStaff>().HasKey(ss => new { ss.ServiceId, ss.UserId }); // Composite key for ServiceStaff
+            builder.Entity<AssignedService>().HasKey(be => new {be.AssignedServiceId});
 
             // Configure relationships
+            builder
+                .Entity<AssignedService>()
+                .HasOne(be => be.Service)
+                .WithMany(u => u.AssignedServices)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder
+                .Entity<AssignedService>()
+                .HasOne(be => be.User)
+                .WithMany(u => u.AssignedServices)
+                .OnDelete(DeleteBehavior.Restrict);
             builder
                 .Entity<ApplicationUser>()
                 .HasMany(u => u.Bookings)
@@ -114,7 +126,7 @@ namespace SWD.SheritonHotel.Data.Context
 
             builder.Entity<Service>()
                 .HasMany(s => s.AssignedStaff)
-                .WithMany(u => u.AssignedServices)
+                .WithMany(u => u.AssignedServiceS)
                 .UsingEntity<ServiceStaff>(
                     j => j.HasOne(ss => ss.ApplicationUser).WithMany().HasForeignKey(ss => ss.UserId),
                     j => j.HasOne(ss => ss.Service).WithMany().HasForeignKey(ss => ss.ServiceId)
