@@ -1,5 +1,6 @@
 ﻿using Entities;
 using SWD.SheritonHotel.Domain.Base;
+using SWD.SheritonHotel.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,6 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
         Task UpdateAsync(ApplicationUser user);
         Task<ApplicationUser> GetUserByEmailAsync(string email);
         Task UpdateUserAsync(ApplicationUser user);
+        Task<List<StaffDTO>> GetUsersByRoleAsync(string role);
     }
 }

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Entities;
+using MediatR;
 using SWD.SheritonHotel.Domain.DTO;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Domain.Queries
 {
-    public class GetRoomDetailsQuery : IRequest<ResponseDto<RoomDto>>
+    public class GetRoomDetailsQuery : IRequest<ResponseDto<Room>>
     {
         public int RoomId { get; set; }
 

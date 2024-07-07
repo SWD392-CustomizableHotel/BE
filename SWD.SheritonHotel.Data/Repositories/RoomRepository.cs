@@ -4,21 +4,25 @@ using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Data.Context;
+using SWD.SheritonHotel.Data.Base;
+using AutoMapper;
 
 namespace SWD.SheritonHotel.Data.Repositories
 {
-    public class RoomRepository : IRoomRepository
+    public class RoomRepository : BaseRepository<Room>, IRoomRepository
     {
         private readonly ApplicationDbContext _context;
+        protected readonly IMapper _mapper;
 
-        public RoomRepository(ApplicationDbContext context)
+        public RoomRepository(ApplicationDbContext context, IMapper mapper) : base(context)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<int> CreateRoomAsync(Room room)
         {
-            _context.Room.Add(room);
+            Add(room);
             await _context.SaveChangesAsync();
             return room.Id;
         }
@@ -102,15 +106,10 @@ namespace SWD.SheritonHotel.Data.Repositories
 
         public async Task<Room> GetRoomByIdAsync(int roomId)
         {
-            var room = await _context.Room.FindAsync(roomId);
-            if (room != null)
-            {
-                return room;
-            }
-            else
-            {
-                throw new KeyNotFoundException($"No room found with ID {roomId}");
-            }
+            //var room = await _context.Room.FindAsync(roomId);
+            var room = await _context.Room
+                .FirstOrDefaultAsync(r => r.Id == roomId && !r.IsDeleted);
+            return room ?? throw new KeyNotFoundException($"No room found with ID {roomId}");
         }
 
         public async Task<Room> UpdateRoomAsync(int roomId, string type, decimal price)

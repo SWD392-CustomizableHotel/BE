@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SWD.SheritonHotel.Domain.Entities;
+using SWD.SheritonHotel.Domain.OtherObjects;
 
 namespace SWD.SheritonHotel.Data.Context
 {
@@ -19,6 +21,8 @@ namespace SWD.SheritonHotel.Data.Context
         public DbSet<Service> Service { get; set; }
         public DbSet<BookingService> BookingService { get; set; }
         public DbSet<BookingAmenity> BookingAmenity { get; set; }
+        public DbSet<AssignedService> AssignedServices { get; set; }
+        public DbSet<ServiceStaff> ServiceStaff { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -34,8 +38,20 @@ namespace SWD.SheritonHotel.Data.Context
 
             builder.Entity<BookingService>().HasKey(bs => new { bs.BookingId, bs.ServiceId });
             builder.Entity<BookingAmenity>().HasKey(ba => new { ba.BookingId, ba.AmenityId });
+            builder.Entity<ServiceStaff>().HasKey(ss => new { ss.ServiceId, ss.UserId }); // Composite key for ServiceStaff
+            builder.Entity<AssignedService>().HasKey(be => new {be.AssignedServiceId});
 
             // Configure relationships
+            builder
+                .Entity<AssignedService>()
+                .HasOne(be => be.Service)
+                .WithMany(u => u.AssignedServices)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder
+                .Entity<AssignedService>()
+                .HasOne(be => be.User)
+                .WithMany(u => u.AssignedServices)
+                .OnDelete(DeleteBehavior.Restrict);
             builder
                 .Entity<ApplicationUser>()
                 .HasMany(u => u.Bookings)
@@ -108,6 +124,14 @@ namespace SWD.SheritonHotel.Data.Context
 
             builder.Entity<Service>().Property(s => s.Price).HasPrecision(18, 2);
 
+            builder.Entity<Service>()
+                .HasMany(s => s.AssignedStaff)
+                .WithMany(u => u.AssignedServiceS)
+                .UsingEntity<ServiceStaff>(
+                    j => j.HasOne(ss => ss.ApplicationUser).WithMany().HasForeignKey(ss => ss.UserId),
+                    j => j.HasOne(ss => ss.Service).WithMany().HasForeignKey(ss => ss.ServiceId)
+                );
+
             builder
                 .Entity<BookingService>()
                 .HasOne(bs => bs.Booking)
@@ -143,6 +167,24 @@ namespace SWD.SheritonHotel.Data.Context
                 .HasForeignKey(p => p.BookingId);
 
             builder.Entity<Payment>().Property(p => p.Amount).HasPrecision(18, 2);
+
+            // Enum configuration
+            builder
+                .Entity<Service>()
+                .Property(a => a.Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (ServiceStatus)Enum.Parse(typeof(ServiceStatus), v))
+                .IsRequired();
+
+            // Enum configuration
+            builder
+                .Entity<Amenity>()
+                .Property(a => a.Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (AmenityStatus)Enum.Parse(typeof(AmenityStatus), v))
+                .IsRequired();
         }
     }
 }

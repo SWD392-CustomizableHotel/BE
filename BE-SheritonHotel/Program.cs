@@ -5,33 +5,43 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 using Services;
 using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Handlers;
-using System.Reflection;
-using System.Text;
-using MediatR;
-using Microsoft.Extensions.Options;
-using SWD.SheritonHotel.Domain.OtherObjects;
-using System.Reflection;
 using SWD.SheritonHotel.Handlers.Handlers;
 using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
-using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Data.Context;
+using Stripe;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using SWD.SheritonHotel.Validator;
+using System.Reflection;
+using SWD.SheritonHotel.Domain.OtherObjects;
+using System.Text;
+using BookingService = Entities.BookingService;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.Converters.Add(new StringEnumConverter());
+    });
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0vPLhPNERogsVubVaRuUb2xNYC6o4r0ZZ7ZH3eXh1jd715Ft00eh5S5EDO";
+
 #region Add Dbcontext
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -60,20 +70,24 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.SignIn.RequireConfirmedEmail = false;
+    options.User.RequireUniqueEmail = true;
 });
 
 // Config Token expiration
 builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
    opt.TokenLifespan = TimeSpan.FromDays(1));
+
 #endregion
 
 #region JwtBear and Authentication, Swagger API
 
 // Add Authentication and JwtBearer
+var jwtSettings = builder.Configuration.GetSection("JWT");
+
 builder.Services
     .AddAuthentication(options =>
     {
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        // options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
@@ -85,10 +99,18 @@ builder.Services
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-            ValidAudience = builder.Configuration["JWT:ValidAudience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["ValidIssuer"],
+            ValidAudience = jwtSettings["ValidAudience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"])),
         };
+    })
+    .AddGoogle(googleOptions =>
+    {
+        IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("GoogleAuthSettings:Google");
+        googleOptions.ClientId = googleAuthNSection["ClientId"];
+        googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
     });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -119,24 +141,48 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+    options.MapType<ServiceStatus>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(ServiceStatus))
+                    .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
+    });
+    options.MapType<AmenityStatus>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(AmenityStatus))
+                   .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
+    });
 });
+
 
 #endregion
 
 #region Add Scoped
-
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IViewRoomRepository, ViewRoomRepository>();
 builder.Services.AddScoped<IViewRoomService, ViewRoomService>();
 builder.Services.AddMediatR(typeof(GetAllAvailableRoomQueryHandler).Assembly);
+builder.Services.AddMediatR(typeof(GetAllServicesQueryHandler).Assembly);
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
+builder.Services.AddScoped<IAmentiyRepository, AmenityRepository>();
+builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<EmailSender>();
-
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IManageService, ManageServiceService>();
+builder.Services.AddScoped<IAccountService, SWD.SheritonHotel.Services.Services.AccountService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
+builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
+builder.Services.AddScoped<IBookingService, BookingHistoryService>();
 #endregion
 
 #region Add MediatR
@@ -168,6 +214,18 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 #endregion
 
+#region FluentValidator
+builder.Services.AddFluentValidationAutoValidation()
+                .AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateServiceCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateServiceCommandValidator>();
+#endregion
+// Add Controllers
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.MaxDepth = 32;
+});
 
 // #region Add MediateR
 // var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;
@@ -182,7 +240,6 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 //#endregion
 
 var app = builder.Build();
-
 
 
 if (app.Environment.IsDevelopment())

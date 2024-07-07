@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
-    public class GetRoomDetailsQueryHandler : IRequestHandler<GetRoomDetailsQuery, ResponseDto<RoomDto>>
+    public class GetRoomDetailsQueryHandler : IRequestHandler<GetRoomDetailsQuery, ResponseDto<Room>>
     {
         private readonly IRoomService _roomService;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -30,48 +30,28 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             _mapper = mapper;
         }
 
-        public async Task<ResponseDto<RoomDto>> Handle(GetRoomDetailsQuery request, CancellationToken cancellationToken)
+        public async Task<ResponseDto<Room>> Handle(GetRoomDetailsQuery request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-            if (user == null || !(await _userManager.IsInRoleAsync(user, "Admin")))
-            {
-                return new ResponseDto<RoomDto>
-                {
-                    IsSucceeded = false,
-                    Message = "Unauthorized",
-                    Errors = new[] { "You must be an admin to perform this operation." }
-                };
-            }
             try
             {
                 var room = await _roomService.GetRoomByIdAsync(request.RoomId);
-                var roomDto = new RoomDto
-                {
-                    RoomId = room.Id,
-                    RoomNumber = room.Code,
-                    RoomType = room.Type,
-                    RoomStatus = room.Status,
-                    RoomPrice = room.Price,
-                    IsDeleted = room.IsDeleted
-                };
-
-                return new ResponseDto<RoomDto>
+                return new ResponseDto<Room>
                 {
                     IsSucceeded = true,
                     Message = "Room details fetched successfully",
-                    Data = roomDto,
+                    Data = room,
                 };
             }
             catch (Exception ex)
             {
-                return new ResponseDto<RoomDto>
+                return new ResponseDto<Room>
                 {
                     IsSucceeded = false,
                     Message = "An error occurred while getting room detail",
                     Errors = new[] { ex.Message }
                 };
             }
-            throw new NotImplementedException();
         }
     }
 }
