@@ -18,6 +18,7 @@ namespace SWD.SheritonHotel.Domain.Commands
             public int NumberOfDate { get; set; }
             public int NumberOfRoom { get; set; }
             public string UserEmail { get; set; }
+            public string UserName { get; set; }
         }
     }
 }

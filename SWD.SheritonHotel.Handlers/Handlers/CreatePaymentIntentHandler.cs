@@ -43,7 +43,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             //Create a customer
             var customerOptions = new CustomerCreateOptions
             {
-                Name = "Kiet",
+                Name = request.Items[0].UserName,
                 Email = request.Items[0].UserEmail,
                 Description = "A special customer"
             };
