@@ -1,7 +1,7 @@
 ﻿using Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SWD.SheritonHotel.Data.Base;
+using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
 
 namespace SWD.SheritonHotel.API.Controllers

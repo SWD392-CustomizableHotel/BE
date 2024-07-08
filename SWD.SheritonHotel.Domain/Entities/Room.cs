@@ -7,6 +7,8 @@ namespace Entities
     public class Room : BaseEntity
     {
         public string Type { get; set; }
+        // Bao gom: Small, Medium, Large
+        public string? RoomSize { get; set; }
         public decimal Price { get; set; }
         public string Description { get; set; }
         public string Status { get; set; }
