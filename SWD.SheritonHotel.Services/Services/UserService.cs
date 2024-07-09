@@ -36,7 +36,7 @@ namespace Services
                 user.isActived = true;
                 user.VerifyToken = null; 
                 user.VerifyTokenExpires = DateTime.MinValue;
-                await _userRepo.UpdateUserAsync(user);
+                await _userRepo.UpdateAsync(user);
                 return true;
             }
             return false;

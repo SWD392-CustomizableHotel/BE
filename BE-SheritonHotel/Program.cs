@@ -195,7 +195,6 @@ builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
 builder.Services.AddScoped<IBookingService, BookingHistoryService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
-
 builder.Services.AddScoped<EmailVerify>();
 builder.Services.AddScoped<TokenGenerator>();
 #endregion
