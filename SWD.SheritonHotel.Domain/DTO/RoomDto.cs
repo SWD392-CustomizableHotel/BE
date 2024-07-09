@@ -14,6 +14,7 @@ namespace SWD.SheritonHotel.Domain.DTO
         public string RoomStatus { get; set; }
         public decimal RoomPrice { get; set; }
         public bool IsDeleted { get; set; }
+        public string ImagePath { get; set; }
         //public bool IsOccupied { get; set; }
     }
 }

@@ -13,6 +13,7 @@ namespace SWD.SheritonHotel.Domain.DTO
         public decimal Price { get; set; }
         public string Description { get; set; }
         public string Status { get; set; }
+        public string ImagePath { get; set; }
         public int HotelId { get; set; }
         public string HotelAddress { get; set; }
         public string Code { get; set; }
@@ -22,5 +23,6 @@ namespace SWD.SheritonHotel.Domain.DTO
         public string LastUpdatedBy { get; set; }
         public DateTime? LastUpdatedDate { get; set; }
         public bool IsDeleted { get; set; }
+
     }
 }

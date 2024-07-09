@@ -25,6 +25,8 @@ using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
 using BookingService = Entities.BookingService;
+using SWD.SheritonHotel.Validator.Interface;
+using SWD.SheritonHotel.Domain.Configs.Firebase;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -218,12 +220,6 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 #endregion
 
-#region Mapping Profile
-
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-#endregion
-
 #region FluentValidator
 builder.Services.AddFluentValidationAutoValidation()
                 .AddFluentValidationClientsideAdapters();
@@ -231,7 +227,12 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateServiceCommandValidat
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateServiceCommandValidator>();
 #endregion
 
-
+#region FireBase
+builder.Services.Configure<FirebaseConfig>(builder.Configuration.GetSection("FirebaseConfig"));
+// Set the environment variable for Google credentials
+var firebaseConfig = builder.Configuration.GetSection("FirebaseConfig").Get<FirebaseConfig>();
+Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", Path.Combine(builder.Environment.ContentRootPath, firebaseConfig.KeyFilePath));
+#endregion
 // #region Add MediateR
 // var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;
 // builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);

@@ -10,11 +10,13 @@ namespace Entities
         public decimal Price { get; set; }
         public string Description { get; set; }
         public string Status { get; set; }
+        public string ImagePath { get; set; }
 
         [ForeignKey("HotelId")]
         public int HotelId { get; set; }
         public virtual Hotel Hotel { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
     }
 }

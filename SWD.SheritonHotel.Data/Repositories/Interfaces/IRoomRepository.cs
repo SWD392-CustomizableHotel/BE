@@ -1,4 +1,5 @@
 ﻿using Entities;
+using Microsoft.AspNetCore.Http;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
 {
     public interface IRoomRepository
     {
-        Task<int> CreateRoomAsync(Room room);
+        Task<int> CreateRoomAsync(Room room, IFormFile imageFile);
 
         Task<int> GetTotalRoomsCountAsync();
         Task<(List<Room>, int)> GetRoomsAsync(int pageNumber, int pageSize,

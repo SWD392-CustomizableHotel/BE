@@ -1,5 +1,6 @@
 
 using Entities;
+using Microsoft.AspNetCore.Http;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Services.Interfaces;
@@ -14,9 +15,9 @@ namespace SWD.SheritonHotel.Services
             _roomRepository = roomRepository;
         }
 
-        public async Task<int> CreateRoomAsync(Room room)
+        public async Task<int> CreateRoomAsync(Room room, IFormFile imageFile)
         {
-            return await _roomRepository.CreateRoomAsync(room);
+            return await _roomRepository.CreateRoomAsync(room, imageFile);
         }
 
         public async Task<int> GetTotalRoomsCountAsync()
