@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Data.Repositories.Interfaces
 {
-    public interface IAmentiyRepository
+    public interface IAmentiyRepository : IBaseRepository<Amenity>
     {
         Task<Amenity> CreateAmentiyAsync(Amenity amenity);
         Task<Amenity> GetAmenityByIdAsync(int amenityId);
@@ -26,5 +26,6 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
         Task<(List<Amenity>, int)> GetAllAmenityAsync(int pageNumber, int pageSize,
                     AmenityFilter? amenityFilter, string searchTerm = null);
         Task<List<Amenity>> GetAmenitiesByRoomIdAsync(int roomId);
+        Task<List<Amenity>> GetAmenitiesByTypeAsync(string type);
     }
 }

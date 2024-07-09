@@ -36,8 +36,14 @@ namespace SWD.SheritonHotel.API.Controllers
 
 
         /*
-         * Update lại phòng trống có khách đã đặt
-         * Tính toán số tiền mà amenities, services đã chọn
+         * @params Amenities Package, Room Id
+         * Update lại phòng trống có khách đã đặt (In Booking)
+         * Tính toán số tiền mà amenities, room size đã chọn
+         *  Basic = $39
+         *  Advanced = $59
+         *  Family = $69
+         * Đặt ảnh custom vào Booking
+         * Di chuyển tới thanh toán
         */
 
 
@@ -50,6 +56,26 @@ namespace SWD.SheritonHotel.API.Controllers
             {
                 IsSucceed = true,
                 Message = "false"
+            });
+        }
+
+        /*
+         * Lấy amenities dựa trên Amenities Type (Basic, Advanced, Family)
+         */
+        [HttpGet]
+        [Route("get-amenity/{type}")]
+        public async Task<IActionResult> GetAmenityByType(string type)
+        {
+            var query = new GetAmenityByTypeQuery()
+            {
+                AmenityType = type
+            };
+            var results = await _mediator.Send(query);
+            return Ok(new BaseResponse<Amenity>
+            {
+                IsSucceed = true,
+                Results = results,
+                Message = "Retrieved amenity successfully"
             });
         }
     }
