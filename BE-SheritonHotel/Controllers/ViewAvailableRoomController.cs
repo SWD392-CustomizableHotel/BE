@@ -25,11 +25,10 @@ namespace SWD.SheritonHotel.API.Controllers
             try
             {
                 var result = await _mediator.Send(new GetAllAvailableRoomQuery(), cancellationToken);
-                var response = new BaseResponse<List<Room>>
+                var response = new BaseResponse<Room>
                 {
                     IsSucceed = true,
-                    Result = result,
-                    Results = null,
+                    Results = result,
                     Message = "Rooms retrieved successfully."
                 };
                 return Ok(response);

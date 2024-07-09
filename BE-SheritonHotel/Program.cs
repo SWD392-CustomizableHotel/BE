@@ -26,6 +26,7 @@ using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
 using BookingService = Entities.BookingService;
+using Newtonsoft.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,12 +36,14 @@ builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.Converters.Add(new StringEnumConverter());
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
     });
 
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0vPLhPNERogsVubVaRuUb2xNYC6o4r0ZZ7ZH3eXh1jd715Ft00eh5S5EDO";
+
 
 #region Add Dbcontext
 // Add DB
