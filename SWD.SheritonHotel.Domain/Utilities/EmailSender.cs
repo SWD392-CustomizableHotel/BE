@@ -19,7 +19,7 @@ namespace SWD.SheritonHotel.Domain.Utilities
         public bool SendForgotPasswordEmail(string email, string token)
         {
             var subject = "[Sheriton Hotel] Reset password request";
-            var baseUrl = _config["Environment"] == "Release"
+            var baseUrl = _config["Environment"] == "Production"
                 ? "https://fe-customizablehotel.vercel.app"
                 : "http://localhost:4200";
             var verifyUrl = $"{baseUrl}/reset-password?email={email}&token={token}";
