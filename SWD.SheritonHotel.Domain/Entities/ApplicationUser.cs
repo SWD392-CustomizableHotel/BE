@@ -14,8 +14,6 @@ namespace Entities
         public string? VerifyToken { get; set; }
         public DateTime? VerifyTokenExpires { get; set; }
         public bool isActived { get; set; } = false;
-        [NotMapped]
-        public IFormFile? Certificate { get; set; }
         public string? CertificatePath { get; set; }
         public string? Address { get; set; }
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();

@@ -12,7 +12,7 @@ using SWD.SheritonHotel.Data.Context;
 namespace SWD.SheritonHotel.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240707094538_CreateInitial")]
+    [Migration("20240707165153_CreateInitial")]
     partial class CreateInitial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
