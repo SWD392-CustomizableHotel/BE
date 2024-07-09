@@ -8,4 +8,5 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces;
 public interface IBookingRepository : IBaseRepository<Booking>
 {
     Task<(List<BookingHistoryDto>, int)> GetBookingHistoryAsync(string userId, int pageNumber, int pageSize, BookingFilter bookingFilter, string searchTerm = null);
+    Task<int> CreateBookingAsync(Booking booking);
 }

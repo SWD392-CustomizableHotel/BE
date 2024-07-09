@@ -20,6 +20,7 @@ using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Data.Context;
 using Microsoft.AspNetCore.Http.Features;
 using SWD.SheritonHotel.Domain.Handlers;
+using Stripe;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using SWD.SheritonHotel.Validator;
@@ -50,11 +51,13 @@ builder.Services.AddScoped(_ =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0vPLhPNERogsVubVaRuUb2xNYC6o4r0ZZ7ZH3eXh1jd715Ft00eh5S5EDO";
+
 #region Add Dbcontext
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("local");
+    var connectionString = builder.Configuration.GetConnectionString("serverDatabase");
     options.UseSqlServer(connectionString);
 });
 #endregion
@@ -173,6 +176,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IViewRoomRepository, ViewRoomRepository>();
 builder.Services.AddScoped<IViewRoomService, ViewRoomService>();
 builder.Services.AddMediatR(typeof(GetAllAvailableRoomQueryHandler).Assembly);
+builder.Services.AddMediatR(typeof(GetAllServicesQueryHandler).Assembly);
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
@@ -180,9 +184,11 @@ builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IAmentiyRepository, AmenityRepository>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<EmailSender>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IManageService, ManageServiceService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountService, SWD.SheritonHotel.Services.Services.AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
 builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
@@ -228,7 +234,12 @@ builder.Services.AddFluentValidationAutoValidation()
 builder.Services.AddValidatorsFromAssemblyContaining<CreateServiceCommandValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateServiceCommandValidator>();
 #endregion
-
+// Add Controllers
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.MaxDepth = 32;
+});
 
 // #region Add MediateR
 // var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;

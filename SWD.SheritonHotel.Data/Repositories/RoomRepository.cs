@@ -107,7 +107,7 @@ namespace SWD.SheritonHotel.Data.Repositories
         public async Task<Room> GetRoomByIdAsync(int roomId)
         {
             //var room = await _context.Room.FindAsync(roomId);
-            var room = await _context.Room.Include(r => r.Bookings)
+            var room = await _context.Room
                 .FirstOrDefaultAsync(r => r.Id == roomId && !r.IsDeleted);
             return room ?? throw new KeyNotFoundException($"No room found with ID {roomId}");
         }

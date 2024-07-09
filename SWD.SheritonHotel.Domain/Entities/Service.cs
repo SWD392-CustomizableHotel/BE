@@ -2,6 +2,7 @@
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace Entities
 {
@@ -17,6 +18,8 @@ namespace Entities
         public virtual Hotel Hotel { get; set; }
 
         public virtual ICollection<BookingService> BookingServices { get; set; } = new List<BookingService>();
+        [JsonIgnore]
+        public virtual ICollection<ApplicationUser> AssignedStaff { get; set; } = new List<ApplicationUser>();
         public virtual ICollection<AssignedService> AssignedServices { get; set; } = new List<AssignedService>();
     }
 }

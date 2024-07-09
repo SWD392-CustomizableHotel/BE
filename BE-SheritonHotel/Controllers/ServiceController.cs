@@ -26,7 +26,7 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = StaticUserRoles.ADMIN)]
+        [Authorize(Roles = "ADMIN")]
         [Route("get-all-services")]
         public async Task<IActionResult> GetAllServices([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] ServiceFilter serviceFilter = null, [FromQuery] string? searchTerm = null)
         {
@@ -36,8 +36,9 @@ namespace SWD.SheritonHotel.API.Controllers
             return Ok(services);
         }
 
+
         [HttpGet]
-        [Authorize(Roles = StaticUserRoles.ADMIN)]
+        [Authorize(Roles = "ADMIN")]
         [Route("get-service-by-id/{serviceId}")]
         public async Task<IActionResult> GetServiceById(int serviceId)
         {
@@ -47,8 +48,8 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = StaticUserRoles.ADMIN)]
-        [Route("get-room-amenity/{roomId}")]
+        [Authorize(Roles = "ADMIN")]
+        [Route("get-room-service/{roomId}")]
         public async Task<IActionResult> GetAmenitiesByRoomId(int roomId)
         {
             var query = new GetServicesByRoomIdQuery(roomId);
@@ -57,7 +58,7 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = StaticUserRoles.ADMIN)]
+        [Authorize(Roles = "ADMIN")]
         [Route("create-service")]
         public async Task<IActionResult> CreateService(CreateServiceCommand command)
         {
@@ -66,7 +67,7 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = StaticUserRoles.ADMIN)]
+        [Authorize(Roles = "ADMIN")]
         [Route("update-service")]
         public async Task<IActionResult> UpdateService([FromBody] UpdateServiceCommand command)
         {
@@ -83,7 +84,7 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = StaticUserRoles.ADMIN)]
+        [Authorize(Roles = "ADMIN")]
         [Route("update-service-status")]
         public async Task<IActionResult> UpdateServiceStatus(int serviceId, ServiceStatus status)
         {
@@ -97,7 +98,7 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Roles = StaticUserRoles.ADMIN)]
+        [Authorize(Roles = "ADMIN")]
         [Route("delete-service/{serviceId}")]
         public async Task<IActionResult> DeleteService(int serviceId)
         {
@@ -108,5 +109,38 @@ namespace SWD.SheritonHotel.API.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        [Route("assign-staff")]
+        public async Task<IActionResult> AssignStaffToService(AssignStaffToServiceCommand command)
+        {
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok();
+            return BadRequest();
+        }
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
+        [Route("get-staff")]
+        public async Task<IActionResult> GetStaff()
+        {
+            var query = new GetStaffQuery();
+            var staff = await _mediator.Send(query);
+            return Ok(staff);   
+        }
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        [Route("remove-staff-assignments")]
+        public async Task<IActionResult> RemoveStaffAssignments([FromBody] RemoveStaffAssignmentsCommand command)
+        {
+            var result = await _mediator.Send(command);
+            if (!result)
+            {
+                return NotFound("Service not found");
+            }
+            return Ok("Staff assignments removed successfully");
+        }
+
     }
 }

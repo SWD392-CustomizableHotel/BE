@@ -87,8 +87,9 @@ public class AuthService : IAuthService
         foreach (var userRole in userRoles) authClaims.Add(new Claim(ClaimTypes.Role, userRole));
 
         var token = GenerateNewJsonWebToken(authClaims);
+        var userId = user.Id;
 
-        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role };
+        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role , UserId = userId};
     }
 
     public async Task<AuthServiceResponseDto> MakeAdminAsync(

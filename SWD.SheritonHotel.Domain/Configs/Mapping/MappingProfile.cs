@@ -16,6 +16,12 @@ namespace SWD.SheritonHotel.Domain.Configs.Mapping
                 .ForMember(dest => dest.Dob, opt => opt.MapFrom(src => src.Dob));
 
             CreateMap<Room, RoomDto>().ReverseMap();
+            CreateMap<ApplicationUser, StaffDTO>();
+            CreateMap<Service, ServiceDto>()
+                    .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                    .ForMember(dest => dest.AssignedStaff, opt => opt.MapFrom(src => src.AssignedStaff));
+
+            CreateMap<ApplicationUser, StaffDto>();
             CreateMap<ApplicationUser, AccountDto>()
                 .ForMember(dest => dest.Roles, opt => opt.Ignore());
 
