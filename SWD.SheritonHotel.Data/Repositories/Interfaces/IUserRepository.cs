@@ -17,6 +17,8 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
         Task UpdateAsync(ApplicationUser user);
         Task<ApplicationUser> GetUserByEmailAsync(string email);
         Task UpdateUserAsync(ApplicationUser user);
+        Task<ApplicationUser> GetUserFromJWTAsync(string jWTAsync);
+        Task<ApplicationUser> GetUserDetailsByIdAsync(string userId);
         Task<List<StaffDTO>> GetUsersByRoleAsync(string role);
     }
 }

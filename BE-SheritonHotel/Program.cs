@@ -26,6 +26,8 @@ using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
 using BookingService = Entities.BookingService;
+using SWD.SheritonHotel.Validator.Interface;
+using SWD.SheritonHotel.Domain.Configs.Firebase;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -113,6 +115,20 @@ builder.Services
         googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
     });
 
+builder.Services.Configure<JwtBearerOptions>(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["ValidIssuer"],
+        ValidAudience = jwtSettings["ValidAudience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"])),
+    };
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -177,7 +193,8 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IManageService, ManageServiceService>();
-builder.Services.AddScoped<IAccountService, SWD.SheritonHotel.Services.Services.AccountService>();
+builder.Services.AddScoped<ITokenValidator, TokenValidator>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
 builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
@@ -208,12 +225,6 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 #endregion
 
-#region Mapping Profile
-
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-#endregion
-
 #region FluentValidator
 builder.Services.AddFluentValidationAutoValidation()
                 .AddFluentValidationClientsideAdapters();
@@ -226,7 +237,12 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.MaxDepth = 32;
 });
-
+#region FireBase
+builder.Services.Configure<FirebaseConfig>(builder.Configuration.GetSection("FirebaseConfig"));
+// Set the environment variable for Google credentials
+var firebaseConfig = builder.Configuration.GetSection("FirebaseConfig").Get<FirebaseConfig>();
+Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", Path.Combine(builder.Environment.ContentRootPath, firebaseConfig.KeyFilePath));
+#endregion
 // #region Add MediateR
 // var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;
 // builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);

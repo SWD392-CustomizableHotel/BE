@@ -21,10 +21,15 @@ namespace SWD.SheritonHotel.API.Controllers
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
         [Route("create-room")]
-        public async Task<IActionResult> CreateRoom(CreateRoomCommand command)
+        public async Task<IActionResult> CreateRoom([FromForm]CreateRoomCommand command)
         {
-            var roomId = await _mediator.Send(command);
-            return Ok(roomId);
+            var result = await _mediator.Send(command);
+            if (result.IsSucceeded)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
         }
 
         [HttpGet]

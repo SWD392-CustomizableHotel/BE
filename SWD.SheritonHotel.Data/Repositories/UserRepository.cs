@@ -6,6 +6,8 @@ using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Data.Repositories
@@ -67,20 +69,26 @@ namespace SWD.SheritonHotel.Data.Repositories
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
-        public async Task<List<StaffDTO>> GetUsersByRoleAsync(string role)
-        {
-            var users = await _userManager.Users.ToListAsync();
-            var staff = new List<ApplicationUser>();
 
-            foreach (var user in users)
+        public async Task<ApplicationUser> GetUserFromJWTAsync(string jWTAsync)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(jWTAsync) as JwtSecurityToken;
+            if (jsonToken != null)
             {
-                if (await _userManager.IsInRoleAsync(user, role))
+                var emailClaim = jsonToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
+
+                if (!string.IsNullOrEmpty(emailClaim))
                 {
-                    staff.Add(user);
+                    return await GetUserByEmailAsync(emailClaim);
                 }
             }
+            return null;
+        }
 
-            return _mapper.Map<List<StaffDTO>>(staff);
+        public async Task<ApplicationUser> GetUserDetailsByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
         }
     }
 }

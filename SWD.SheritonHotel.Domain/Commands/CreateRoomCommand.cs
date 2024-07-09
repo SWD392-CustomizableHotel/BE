@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using SWD.SheritonHotel.Domain.DTO;
 
 namespace SWD.SheritonHotel.Domain.Commands
@@ -11,5 +13,6 @@ namespace SWD.SheritonHotel.Domain.Commands
         public string Status { get; set; }
         public string RoomNumber { get; set; }
         public int HotelId { get; set; }
+        public IFormFile ImageUpload { get; set; }
     }
 }

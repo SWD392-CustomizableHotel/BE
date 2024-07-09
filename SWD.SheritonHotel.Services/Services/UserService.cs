@@ -46,5 +46,10 @@ namespace Services
         {
             await _userRepo.UpdateAsync(user);
         }
+
+        public async Task<ApplicationUser> GetUserFromJWTAsync(string jWTAsync) 
+            => await _userRepo.GetUserFromJWTAsync(jWTAsync);
+        public async Task<ApplicationUser> GetUserDetailsByIdAsync(string userId)
+            => await _userRepo.GetUserDetailsByIdAsync(userId);
     }
 }

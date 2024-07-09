@@ -223,4 +223,36 @@ public class AuthController : ControllerBase
         var token = await _authService.GenerateToken(user);
         return Ok(new AuthServiceResponseDto { Token = token, IsSucceed = true });
     }
+
+    [HttpGet]
+    [Authorize]
+    [Route("GetUserFromJwt")]
+    public async Task<IActionResult> GetUserFromJwt([FromQuery] string jwt)
+    {
+        var query = new GetUserFromJwtQuery(jwt);
+        var response = await _mediator.Send(query);
+
+        if (response.IsSucceeded)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("GetUserDetailsByID")]
+    public async Task<IActionResult> GetUserDetailsById([FromQuery] string userId)
+    {
+        var query = new GetUserByIdQuery(userId);
+        var response = await _mediator.Send(query);
+
+        if (response.IsSucceeded)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
+    }
 }
