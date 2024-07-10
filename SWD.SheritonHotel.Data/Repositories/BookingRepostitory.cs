@@ -69,10 +69,25 @@ public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
             .ToListAsync();
         return (bookings, totalRecords);
     }
+
     public async Task<int> CreateBookingAsync(Booking booking)
     {
         Add(booking);
         await _context.SaveChangesAsync();
         return booking.Id;
+    }
+
+    public async Task<List<BookingDatesDto>> GetBookingDatesAsync(string userId)
+    {
+        var bookings = await _context.Booking
+            .Where(b => b.UserId == userId)
+            .Select(b => new BookingDatesDto
+            {
+                StartDate = b.StartDate,
+                EndDate = b.EndDate
+            })
+            .ToListAsync();
+
+        return bookings;
     }
 }
