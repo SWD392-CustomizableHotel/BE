@@ -48,7 +48,6 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "ADMIN")]
         [Route("update-room-status")]
         public async Task<IActionResult> UpdateRoomStatus(int roomId, string status)
         {

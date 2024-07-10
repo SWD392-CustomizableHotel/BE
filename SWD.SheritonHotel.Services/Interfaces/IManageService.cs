@@ -1,5 +1,6 @@
 ﻿using Entities;
 using MediatR;
+using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,7 @@ namespace SWD.SheritonHotel.Services.Interfaces
     public interface IManageService
     {
         Task<Service> GetServiceByIdAsync(int serviceId);
-        Task<(List<Service>, int)> GetAllServiceAsync(int pageNumber, int pageSize,
-                    ServiceFilter? serviceFilter, string searchTerm = null);
+        Task<(List<ServiceDto>, int)> GetAllServiceAsync(int pageNumber, int pageSize, ServiceFilter? serviceFilter, string searchTerm = null);
         Task<Service> CreateServiceAsync(Service service);
         Task<Service> UpdateServiceAsync(int serviceId,
             string name,

@@ -26,16 +26,6 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
 
-            if (user == null || !(await _userManager.IsInRoleAsync(user, "ADMIN")))
-            {
-                return new ResponseDto<Room>
-                {
-                    IsSucceeded = false,
-                    Message = "Unauthorized",
-                    Errors = new[] { "You must be an admin to perform this operation." }
-                };
-            }
-
             try
             {
                 var updatedRoom = await _roomService.UpdateRoomStatusAsync(request.RoomId,

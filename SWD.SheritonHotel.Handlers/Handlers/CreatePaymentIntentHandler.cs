@@ -35,7 +35,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             {
                 Product = room.Id,
                 UnitAmount = CalculateOrderAmount(request.Items),
-                Currency = "aud"
+                Currency = "usd"
             };
             var priceService = new PriceService();
             var price = priceService.Create(priceOptions);
@@ -43,7 +43,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             //Create a customer
             var customerOptions = new CustomerCreateOptions
             {
-                Name = "Kiet",
+                Name = request.Items[0].UserName,
                 Email = request.Items[0].UserEmail,
                 Description = "A special customer"
             };
@@ -55,7 +55,6 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             {
                 Customer = customer.Id,
                 CollectionMethod = "charge_automatically",
-
             };
             var invoiceService = new InvoiceService();
             var invoice = invoiceService.Create(invoiceOptions);
@@ -83,14 +82,13 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             var invoiceId = invoice.Id;
             var list = new List<string>{clientSecret, invoiceId };
             //Return to FE
-            
             return Task.FromResult(list);
         }
 
         private int CalculateOrderAmount(CreatePaymentIntentCommand.Item[] items)
         {
             // Implement your order amount calculation logic here
-            return items.Sum(item => (item.RoomPrice * item.NumberOfDate * item.NumberOfRoom));
+            return items.Sum(item => (item.RoomPrice * item.NumberOfDate * item.NumberOfRoom * 100));
         }
     }
 }

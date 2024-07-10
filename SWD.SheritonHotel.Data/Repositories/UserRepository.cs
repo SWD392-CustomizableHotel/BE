@@ -1,8 +1,10 @@
-﻿using Entities;
+﻿using AutoMapper;
+using Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.DTO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,11 +14,13 @@ namespace SWD.SheritonHotel.Data.Repositories
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public UserRepository(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        public UserRepository(UserManager<ApplicationUser> userManager, ApplicationDbContext context, IMapper mapper)
         {
             _userManager = userManager;
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<ApplicationUser> FindUserByEmail(string email)
@@ -58,10 +62,29 @@ namespace SWD.SheritonHotel.Data.Repositories
             }
             return users.SingleOrDefault();
         }
-        public async Task UpdateUserAsync(ApplicationUser user)
+        public async Task<IdentityResult> UpdateUserAsync(ApplicationUser user)
         {
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
+            return await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<ApplicationUser> GetUserByIdAsync(string staffId)
+        {
+            return await _context.Users.FindAsync(staffId);
+        }
+        public async Task<List<StaffDTO>> GetUsersByRoleAsync(string role)
+        {
+            var users = await _userManager.Users.ToListAsync();
+            var staff = new List<ApplicationUser>();
+
+            foreach (var user in users)
+            {
+                if (await _userManager.IsInRoleAsync(user, role))
+                {
+                    staff.Add(user);
+                }
+            }
+
+            return _mapper.Map<List<StaffDTO>>(staff);
         }
     }
 }

@@ -1,19 +1,20 @@
-﻿using Entities;
+﻿using System;
+using Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.Entities;
 
 namespace SWD.SheritonHotel.Domain.Commands
 {
-    public class UpdateUserCommand : IRequest<ApplicationUser>
+    public class UpdateUserCommand : IRequest<BaseResponse<ApplicationUser>>
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public string? Email { get; set; }
         public DateTime? Dob { get; set; }
-        public string? PhoneNumber { get; set; } = null!;
+        public string? PhoneNumber { get; set; }
+        public string? Address { get; set; }
+        public string? Email { get; set; }
+        public IFormFile? Certificate { get; set; }
     }
 }

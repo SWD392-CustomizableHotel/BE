@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Domain.OtherObjects;
+
 namespace SWD.SheritonHotel.Data.Context
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
@@ -22,6 +23,7 @@ namespace SWD.SheritonHotel.Data.Context
         public DbSet<BookingAmenity> BookingAmenity { get; set; }
         public DbSet<IdentityCard> IdentityCard { get; set; }
         public DbSet<AssignedService> AssignedServices { get; set; }
+        public DbSet<ServiceStaff> ServiceStaff { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -38,6 +40,7 @@ namespace SWD.SheritonHotel.Data.Context
 
             builder.Entity<BookingService>().HasKey(bs => new { bs.BookingId, bs.ServiceId });
             builder.Entity<BookingAmenity>().HasKey(ba => new { ba.BookingId, ba.AmenityId });
+            builder.Entity<ServiceStaff>().HasKey(ss => new { ss.ServiceId, ss.UserId }); // Composite key for ServiceStaff
             builder.Entity<AssignedService>().HasKey(be => new {be.AssignedServiceId});
 
             // Configure relationships
@@ -128,6 +131,14 @@ namespace SWD.SheritonHotel.Data.Context
                 .HasForeignKey(s => s.HotelId);
 
             builder.Entity<Service>().Property(s => s.Price).HasPrecision(18, 2);
+
+            builder.Entity<Service>()
+                .HasMany(s => s.AssignedStaff)
+                .WithMany(u => u.AssignedServiceS)
+                .UsingEntity<ServiceStaff>(
+                    j => j.HasOne(ss => ss.ApplicationUser).WithMany().HasForeignKey(ss => ss.UserId),
+                    j => j.HasOne(ss => ss.Service).WithMany().HasForeignKey(ss => ss.ServiceId)
+                );
 
             builder
                 .Entity<BookingService>()

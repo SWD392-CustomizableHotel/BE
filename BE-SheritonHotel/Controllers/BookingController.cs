@@ -45,7 +45,7 @@ public class BookingController : ControllerBase
         }
     }
     [HttpPost]
-    [Authorize(Roles = "CUSTOMER")]
+    //[Authorize(Roles = "CUSTOMER")]
     [Route("create-booking")]
     public async Task<IActionResult> CreateBooking(CreateBookingCommand command)
     {
