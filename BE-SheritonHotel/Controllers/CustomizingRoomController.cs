@@ -47,6 +47,17 @@ namespace SWD.SheritonHotel.API.Controllers
         */
 
 
+        /*
+         * Create payment intent riêng cho customizing
+         * 
+         */
+
+        /*
+         *  Tạo booking, bookingAmenity cùng lúc
+         * 
+         */
+
+
         // Check phòng ID có đang trống không
         [HttpGet]
         [Route("check-room/{roomId}")]
