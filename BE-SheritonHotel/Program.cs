@@ -18,6 +18,8 @@ using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Data.Context;
+using Microsoft.AspNetCore.Http.Features;
+using SWD.SheritonHotel.Domain.Handlers;
 using Stripe;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -26,19 +28,26 @@ using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
 using BookingService = Entities.BookingService;
-using Newtonsoft.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
+builder.Services.AddControllers();
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 20971520; // 20MB
+});
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.Converters.Add(new StringEnumConverter());
         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
     });
-
+builder.Services.AddScoped(_ =>
+{
+    return new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage"));
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -49,7 +58,7 @@ StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("local");
+    var connectionString = builder.Configuration.GetConnectionString("SheritonDB_D");
     options.UseSqlServer(connectionString);
 });
 #endregion
@@ -186,15 +195,17 @@ builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
 builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
 builder.Services.AddScoped<IBookingService, BookingHistoryService>();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<EmailVerify>();
+builder.Services.AddScoped<TokenGenerator>();
 #endregion
 
 #region Add MediatR
 
 var handler = typeof(AppHandler).GetTypeInfo().Assembly;
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
+builder.Services.AddMediatR(typeof(UpdateUserCommandHandler).Assembly);
 
-builder.Services.AddScoped<EmailVerify>();
-builder.Services.AddScoped<TokenGenerator>();
 #endregion
 
 #region Add CORS
