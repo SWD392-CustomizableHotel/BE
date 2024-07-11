@@ -135,7 +135,8 @@ namespace SWD.SheritonHotel.Data.Repositories
                 .Where(entity => !entity.IsDeleted && 
                                 entity.RoomSize.ToLower().Equals(roomSize.ToLower()) &&
                                 entity.Type.ToLower().Equals("customizable") &&
-                                entity.NumberOfPeople >= numberOfPeople)
+                                entity.NumberOfPeople >= numberOfPeople &&
+                                entity.Status == "Available")
                 .Include(entity => entity.Hotel)
                 .ToListAsync();
             return results;

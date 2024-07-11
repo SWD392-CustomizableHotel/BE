@@ -9,6 +9,6 @@ namespace SWD.SheritonHotel.Services.Interfaces
 {
     public interface IPaymentIntentCustomizeService
     {
-        List<string> CreatePaymentIntent(CreatePaymentIntentDTO paymentIntentDto);
+        Task<List<string>> CreatePaymentIntent(CreatePaymentIntentDTO paymentIntentDto);
     }
 }

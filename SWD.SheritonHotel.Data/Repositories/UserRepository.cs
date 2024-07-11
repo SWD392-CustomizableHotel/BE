@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Context;
@@ -15,12 +16,14 @@ namespace SWD.SheritonHotel.Data.Repositories
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserRepository(UserManager<ApplicationUser> userManager, ApplicationDbContext context, IMapper mapper)
+        public UserRepository(UserManager<ApplicationUser> userManager, ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _context = context;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ApplicationUser> FindUserByEmail(string email)
@@ -85,6 +88,15 @@ namespace SWD.SheritonHotel.Data.Repositories
             }
 
             return _mapper.Map<List<StaffDTO>>(staff);
+        }
+
+        public async Task<ApplicationUser> GetUserAsync()
+        {
+            if (_httpContextAccessor.HttpContext == null || _httpContextAccessor.HttpContext.User == null)
+            {
+                throw new Exception("You are not logged in");
+            }
+            return await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
         }
     }
 }

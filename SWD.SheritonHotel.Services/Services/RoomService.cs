@@ -55,5 +55,12 @@ namespace SWD.SheritonHotel.Services
             var results = await _roomRepository.GetAllQueryableWithInclude(cancellationToken, roomSize, numberOfPeople);
             return results;
         }
+
+        public Room UpdateRoom(Room room)
+        {
+            _roomRepository.Update(room);
+            _roomRepository.SaveChanges();
+            return room;
+        }
     }
 }

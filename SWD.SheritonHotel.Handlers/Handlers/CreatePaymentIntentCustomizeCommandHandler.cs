@@ -24,7 +24,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         public async Task<List<string>> Handle(CreatePaymentIntentCustomizableCommand request, CancellationToken cancellationToken)
         {
             var customizeRequest = _mapper.Map<CreatePaymentIntentDTO>(request);
-            return _service.CreatePaymentIntent(customizeRequest);
+            return await _service.CreatePaymentIntent(customizeRequest);
         }
     }
 }

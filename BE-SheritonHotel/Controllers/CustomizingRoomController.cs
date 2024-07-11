@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
 
@@ -36,38 +37,68 @@ namespace SWD.SheritonHotel.API.Controllers
 
 
         /*
-         * @params Amenities Package, Room Id
-         * Update lại phòng trống có khách đã đặt (In Booking)
-         * Tính toán số tiền mà amenities, room size đã chọn
-         *  Basic = $39
-         *  Advanced = $59
-         *  Family = $69
-         * Đặt ảnh custom vào Booking
-         * Di chuyển tới thanh toán
+         * @params Amenity ID, Room ID
+         * Tạo Booking: Room 
+         * Tạo Amenity Booking
         */
-
+        [HttpPost]
+        [Route("booking")]
+        public async Task<IActionResult> CreateBookRoomAndAmenity([FromBody] CreateBookRoomAndAmenityCommand command)
+        {
+            try
+            {
+                var result = await _mediator.Send(command);
+                if (result == null)
+                {
+                    return Ok(new BaseResponse<string>
+                    {
+                        IsSucceed = false,
+                        Message = "Cannot create booking room and amenity",
+                    });
+                }
+                return Ok(new BaseResponse<string>
+                {
+                    IsSucceed = true,
+                    Result = result, // trả về bookingId
+                    Message = "Create customization type booking successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new BaseResponse<string>
+                {
+                    IsSucceed = false,
+                    Message = "Error: " + ex.Message,
+                });
+            }
+        }
 
         /*
          * Create payment intent riêng cho customizing
          * 
          */
-
-        /*
-         *  Tạo booking, bookingAmenity cùng lúc
-         * 
-         */
-
-
-        // Check phòng ID có đang trống không
-        [HttpGet]
-        [Route("check-room/{roomId}")]
-        public async Task<IActionResult> CheckRoomStatus()
+        [HttpPost]
+        [Route("create-payment-intent")]
+        public async Task<IActionResult> CreatePaymentIntent([FromBody] CreatePaymentIntentCustomizableCommand command)
         {
-            return Ok(new BaseResponse<string>
+            try
             {
-                IsSucceed = true,
-                Message = "false"
-            });
+                var results = await _mediator.Send(command);
+                return Ok(new BaseResponse<string>
+                {
+                    Results = results,
+                    IsSucceed = true,
+                    Message = "Create payment intent successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new BaseResponse<string>
+                {
+                    IsSucceed = false,
+                    Message = "Error: " + ex.Message,
+                });
+            }
         }
 
         /*
@@ -88,6 +119,48 @@ namespace SWD.SheritonHotel.API.Controllers
                 Results = results,
                 Message = "Retrieved amenity successfully"
             });
+        }
+
+        /*
+         * Upload ảnh blob lên azure và update vào entity Room
+         * Update lại status room = "Booked"
+         */
+        [HttpPost]
+        [Route("update-room")]
+        public async Task<IActionResult> UploadCanvasAndUpdateStatusRoom([FromForm] IFormFile canvasImage, [FromForm] int roomId)
+        {
+            try
+            {
+                if (canvasImage == null || canvasImage.Length == 0)
+                {
+                    return Ok(new BaseResponse<string>
+                    {
+                        IsSucceed = false,
+                        Message = "Invalid image file"
+                    });
+                }
+
+                var command = new UploadCanvasAndUpdateRoomStatusCommand()
+                {
+                    RoomId = roomId,
+                    canvasImage = canvasImage
+                };
+                var result = await _mediator.Send(command);
+                return Ok(new BaseResponse<string>
+                {
+                    IsSucceed = true,
+                    Message = "Room updated successfully",
+                    Result = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new BaseResponse<string>
+                {
+                    IsSucceed = false,
+                    Message = "Error: " + ex.Message
+                });
+            }
         }
     }
 }

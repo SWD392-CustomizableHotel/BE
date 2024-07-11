@@ -31,6 +31,7 @@ namespace SWD.SheritonHotel.Domain.Configs.Mapping
             CreateMap<AssignServiceDto, AssignedService>();
 
             CreateMap<CreatePaymentIntentCustomizableCommand, CreatePaymentIntentDTO>().ReverseMap();
+            CreateMap<CreatePaymentIntentCustomizableCommand.Item, CreatePaymentIntentDTO.Item>().ReverseMap();
         }
     }
 }

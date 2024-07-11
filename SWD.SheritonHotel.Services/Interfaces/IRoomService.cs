@@ -19,5 +19,6 @@ namespace SWD.SheritonHotel.Services.Interfaces
         Task<Room> GetRoomByIdAsync(int roomId);
         Task<Room> UpdateRoomAsync(int roomId, string type, decimal price);
         Task<List<Room>> GetAllCustomizableRoomsAsync(CancellationToken cancellationToken, string? roomSize, int? numberOfPeople);
+        Room UpdateRoom(Room room);
     }
 }

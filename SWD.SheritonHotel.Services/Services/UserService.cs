@@ -46,5 +46,10 @@ namespace Services
         {
             await _userRepo.UpdateAsync(user);
         }
+
+        public async Task<ApplicationUser> GetUserAsync()
+        {
+            return await _userRepo.GetUserAsync();
+        }
     }
 }

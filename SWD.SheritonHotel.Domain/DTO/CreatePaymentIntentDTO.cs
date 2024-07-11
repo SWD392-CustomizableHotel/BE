@@ -12,12 +12,12 @@ namespace SWD.SheritonHotel.Domain.DTO
 
         public class Item
         {
-            public string RoomId { get; set; }
-            public int RoomPrice { get; set; }
-            public int NumberOfDate { get; set; }
-            public int NumberOfRoom { get; set; }
-            public int UserEmail { get; set; }
-            public it UserName { get; set; }
+            public string roomId { get; set; }
+            public int roomPrice { get; set; }
+            public int amenityId { get; set; }
+            public int amenityPrice { get; set; }
+            public int numberOfDay { get; set; }
+            public int numberOfRoom { get; set; }
         }
     }
 }
