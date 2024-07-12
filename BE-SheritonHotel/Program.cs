@@ -18,6 +18,8 @@ using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Data.Context;
+using Microsoft.AspNetCore.Http.Features;
+using SWD.SheritonHotel.Domain.Handlers;
 using Stripe;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -28,27 +30,50 @@ using System.Text;
 using BookingService = Entities.BookingService;
 using SWD.SheritonHotel.Validator.Interface;
 using SWD.SheritonHotel.Domain.Configs.Firebase;
+using Newtonsoft.Json;
+using Azure.Storage.Blobs;
+using SWD.SheritonHotel.Domain.Commands;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 
+builder.Services.AddControllers();
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 20971520; // 20MB
+});
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.Converters.Add(new StringEnumConverter());
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
     });
-
+builder.Services.AddScoped(_ =>
+{
+    return new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage"));
+});
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.CustomSchemaIds(type =>
+    {
+        if (type == typeof(CreatePaymentIntentCommand.Item))
+            return "CreatePaymentIntentCommand_Item";
+        if (type == typeof(CreatePaymentIntentCustomizableCommand.Item))
+            return "CreatePaymentIntentCustomizableCommand_Item";
+        return type.FullName;
+    });
+});
 StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0vPLhPNERogsVubVaRuUb2xNYC6o4r0ZZ7ZH3eXh1jd715Ft00eh5S5EDO";
+
 
 #region Add Dbcontext
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("local");
+    var connectionString = builder.Configuration.GetConnectionString("SheritonDB");
     options.UseSqlServer(connectionString);
 });
 #endregion
@@ -188,6 +213,7 @@ builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IAmentiyRepository, AmenityRepository>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
+builder.Services.AddScoped<IBookingAmenityRepository, BookingAmenityRepository>();
 builder.Services.AddScoped<EmailSender>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
@@ -200,15 +226,21 @@ builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
 builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
 builder.Services.AddScoped<IBookingService, BookingHistoryService>();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<EmailVerify>();
+builder.Services.AddScoped<IPaymentIntentCustomizeService, PaymentIntentCustomizeService>();
+builder.Services.AddScoped<TokenGenerator>();
 #endregion
 
 #region Add MediatR
 
 var handler = typeof(AppHandler).GetTypeInfo().Assembly;
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
+builder.Services.AddMediatR(typeof(UpdateUserCommandHandler).Assembly);
 
-builder.Services.AddScoped<EmailVerify>();
-builder.Services.AddScoped<TokenGenerator>();
+builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCommand, List<string>>, CreatePaymentIntentHandler>();
+builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCustomizableCommand, List<string>>, CreatePaymentIntentCustomizeCommandHandler>();
+
 #endregion
 
 #region Add CORS

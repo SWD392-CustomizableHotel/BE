@@ -220,5 +220,19 @@ namespace SWD.SheritonHotel.Data.Repositories
                 throw new KeyNotFoundException($"No room found with ID {roomId}");
             }
         }
+
+        public async Task<List<Room>> GetAllQueryableWithInclude(CancellationToken cancellationToken, string? roomSize, int? numberOfPeople)
+        {
+            var queryable = base.GetQueryable();
+            var results = await queryable
+                .Where(entity => !entity.IsDeleted && 
+                                entity.RoomSize.ToLower().Equals(roomSize.ToLower()) &&
+                                entity.Type.ToLower().Equals("customizable") &&
+                                entity.NumberOfPeople >= numberOfPeople &&
+                                entity.Status == "Available")
+                .Include(entity => entity.Hotel)
+                .ToListAsync();
+            return results;
+        }
     }
 }

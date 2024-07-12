@@ -12,5 +12,6 @@ namespace Interfaces
         Task<bool> VerifyEmailTokenAsync(string email, string token);
         Task<ApplicationUser> GetUserFromJWTAsync(string jWTAsync);
         Task<ApplicationUser> GetUserDetailsByIdAsync(string userId);
+        Task<ApplicationUser> GetUserAsync();
     }
 }

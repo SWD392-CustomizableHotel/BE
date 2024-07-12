@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Context;
@@ -17,12 +18,14 @@ namespace SWD.SheritonHotel.Data.Repositories
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserRepository(UserManager<ApplicationUser> userManager, ApplicationDbContext context, IMapper mapper)
+        public UserRepository(UserManager<ApplicationUser> userManager, ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _context = context;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ApplicationUser> FindUserByEmail(string email)
@@ -64,10 +67,14 @@ namespace SWD.SheritonHotel.Data.Repositories
             }
             return users.SingleOrDefault();
         }
-        public async Task UpdateUserAsync(ApplicationUser user)
+        public async Task<IdentityResult> UpdateUserAsync(ApplicationUser user)
         {
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
+            return await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<ApplicationUser> GetUserByIdAsync(string staffId)
+        {
+            return await _context.Users.FindAsync(staffId);
         }
 
         public async Task<ApplicationUser> GetUserFromJWTAsync(string jWTAsync)
@@ -89,6 +96,20 @@ namespace SWD.SheritonHotel.Data.Repositories
         public async Task<ApplicationUser> GetUserDetailsByIdAsync(string userId)
         {
             return await _userManager.FindByIdAsync(userId);
+        }
+
+        public async Task<ApplicationUser> GetUserAsync()
+        {
+            if (_httpContextAccessor.HttpContext == null || _httpContextAccessor.HttpContext.User == null)
+            {
+                throw new Exception("You are not logged in");
+            }
+            var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+            if (user == null)
+            {
+                throw new Exception("Need logged in");
+            }
+            return user;
         }
     }
 }

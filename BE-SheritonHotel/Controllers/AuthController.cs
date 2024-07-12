@@ -8,8 +8,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SWD.SheritonHotel.Data.Base;
 using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
 using SWD.SheritonHotel.Domain.Utilities;
+using SWD.SheritonHotel.Handlers.Handlers;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace Controllers;
 
@@ -157,6 +162,7 @@ public class AuthController : ControllerBase
             return Ok(new BaseResponse<ApplicationUser>
                 { IsSucceed = false, Result = null, Message = "Failed to reset the password" });
         }
+        
     }
 
     //verify
@@ -254,5 +260,31 @@ public class AuthController : ControllerBase
         }
 
         return BadRequest(response);
+    }
+    [HttpPost]
+    [Route("update-profile")]
+    [Authorize]
+    public async Task<IActionResult> UpdateUserProfile([FromForm] UpdateUserCommand command)
+    {
+        var result = await _mediator.Send(command);
+        if (result.IsSucceed)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result);
+    }
+
+    [HttpGet]
+    [Route("profile/{email}")]
+    [Authorize]
+    public async Task<IActionResult> GetUserProfile(string email)
+    {
+        var query = new GetUserProfileByEmailQuery  (email);
+        var result = await _mediator.Send(query);
+        if (result.IsSucceed)
+        {
+            return Ok(result);
+        }
+        return NotFound(result);
     }
 }

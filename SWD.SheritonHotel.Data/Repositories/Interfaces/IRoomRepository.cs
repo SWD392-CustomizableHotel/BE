@@ -1,5 +1,6 @@
 ﻿using Entities;
 using Microsoft.AspNetCore.Http;
+using SWD.SheritonHotel.Domain.Base;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Data.Repositories.Interfaces
 {
-    public interface IRoomRepository
+    public interface IRoomRepository : IBaseRepository<Room>
     {
         Task<int> CreateRoomAsync(Room room, IFormFile imageFile);
 
@@ -23,5 +24,6 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
         Task<Room> GetRoomByIdAsync(int roomId);
 
         Task<Room> UpdateRoomAsync(int roomId, string type, decimal price);
+        Task<List<Room>> GetAllQueryableWithInclude(CancellationToken cancellationToken, string? roomSize, int? numberOfPeople);
     }
 }

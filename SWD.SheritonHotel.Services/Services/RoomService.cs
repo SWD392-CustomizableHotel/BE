@@ -50,5 +50,18 @@ namespace SWD.SheritonHotel.Services
         {
             return await _roomRepository.UpdateRoomAsync(roomId, type, price);
         }
+
+        public async Task<List<Room>> GetAllCustomizableRoomsAsync(CancellationToken cancellationToken = default, string? roomSize = null, int? numberOfPeople = 1)
+        {
+            var results = await _roomRepository.GetAllQueryableWithInclude(cancellationToken, roomSize, numberOfPeople);
+            return results;
+        }
+
+        public Room UpdateRoom(Room room)
+        {
+            _roomRepository.Update(room);
+            _roomRepository.SaveChanges();
+            return room;
+        }
     }
 }
