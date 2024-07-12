@@ -32,6 +32,11 @@ namespace SWD.SheritonHotel.Services.Services
             }
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
 
+            if (user == null)
+            {
+                throw new Exception("Needed login");
+            }
+
             //Create Product
             var roomOptions = new ProductCreateOptions { Name = request.Items[0].roomId };
             var roomService = new ProductService();
