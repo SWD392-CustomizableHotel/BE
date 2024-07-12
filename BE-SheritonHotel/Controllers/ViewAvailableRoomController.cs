@@ -1,7 +1,7 @@
 ﻿using Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SWD.SheritonHotel.Data.Base;
+using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
 
 namespace SWD.SheritonHotel.API.Controllers
@@ -25,11 +25,10 @@ namespace SWD.SheritonHotel.API.Controllers
             try
             {
                 var result = await _mediator.Send(new GetAllAvailableRoomQuery(), cancellationToken);
-                var response = new BaseResponse<List<Room>>
+                var response = new BaseResponse<Room>
                 {
                     IsSucceed = true,
-                    Result = result,
-                    Results = null,
+                    Results = result,
                     Message = "Rooms retrieved successfully."
                 };
                 return Ok(response);

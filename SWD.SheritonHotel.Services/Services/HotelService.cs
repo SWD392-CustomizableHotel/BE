@@ -23,5 +23,41 @@ namespace SWD.SheritonHotel.Services.Services
         {
             return await _hotelRepository.GetAllHotelsAsync();
         }
+
+        public BaseResponse<Hotel> SeedHotelsAsync(List<Hotel> hotels)
+        {
+            _hotelRepository.AddRange(hotels);
+            _hotelRepository.SaveChanges();
+
+            return new BaseResponse<Hotel>
+            {
+                Results = hotels,
+                IsSucceed = true,
+                Message = "Hotels seeded successfully"
+            };
+        }
+
+        public BaseResponse<Hotel> SeedDefaultHotels()
+        {
+            var hotels = new List<Hotel>
+            {
+                new Hotel
+                {
+                    Code = "Hotel 1",
+                    Address = "123 Main St",
+                    Phone = "123-456-7890",
+                    Description = "A lovely hotel in the heart of the city",
+                },
+                new Hotel
+                {
+                    Code = "Hotel 2",
+                    Address = "456 Elm St",
+                    Phone = "987-654-3210",
+                    Description = "A cozy hotel near the park",
+                }
+            };
+
+            return SeedHotelsAsync(hotels);
+        }
     }
 }

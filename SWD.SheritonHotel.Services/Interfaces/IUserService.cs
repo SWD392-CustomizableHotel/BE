@@ -10,5 +10,6 @@ namespace Interfaces
         Task UpdateAsync(ApplicationUser user);
         
         Task<bool> VerifyEmailTokenAsync(string email, string token);
+        Task<ApplicationUser> GetUserAsync();
     }
 }
