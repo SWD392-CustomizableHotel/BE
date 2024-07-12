@@ -28,7 +28,9 @@ using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
 using BookingService = Entities.BookingService;
+using Newtonsoft.Json;
 using Azure.Storage.Blobs;
+using SWD.SheritonHotel.Domain.Commands;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +45,7 @@ builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.Converters.Add(new StringEnumConverter());
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
     });
 builder.Services.AddScoped(_ =>
 {
@@ -50,8 +53,19 @@ builder.Services.AddScoped(_ =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.CustomSchemaIds(type =>
+    {
+        if (type == typeof(CreatePaymentIntentCommand.Item))
+            return "CreatePaymentIntentCommand_Item";
+        if (type == typeof(CreatePaymentIntentCustomizableCommand.Item))
+            return "CreatePaymentIntentCustomizableCommand_Item";
+        return type.FullName;
+    });
+});
 StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0vPLhPNERogsVubVaRuUb2xNYC6o4r0ZZ7ZH3eXh1jd715Ft00eh5S5EDO";
+
 
 #region Add Dbcontext
 // Add DB
@@ -183,6 +197,7 @@ builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IAmentiyRepository, AmenityRepository>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
+builder.Services.AddScoped<IBookingAmenityRepository, BookingAmenityRepository>();
 builder.Services.AddScoped<EmailSender>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
@@ -196,6 +211,7 @@ builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
 builder.Services.AddScoped<IBookingService, BookingHistoryService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<EmailVerify>();
+builder.Services.AddScoped<IPaymentIntentCustomizeService, PaymentIntentCustomizeService>();
 builder.Services.AddScoped<TokenGenerator>();
 #endregion
 
@@ -204,6 +220,9 @@ builder.Services.AddScoped<TokenGenerator>();
 var handler = typeof(AppHandler).GetTypeInfo().Assembly;
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
 builder.Services.AddMediatR(typeof(UpdateUserCommandHandler).Assembly);
+
+builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCommand, List<string>>, CreatePaymentIntentHandler>();
+builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCustomizableCommand, List<string>>, CreatePaymentIntentCustomizeCommandHandler>();
 
 #endregion
 

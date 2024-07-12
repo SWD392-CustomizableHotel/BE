@@ -37,6 +37,5 @@ namespace SWD.SheritonHotel.Data.Repositories
                 Message = "Hotels retrieved successfully"
             };
         }
-
     }
 }

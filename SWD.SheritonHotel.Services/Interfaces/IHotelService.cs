@@ -11,5 +11,6 @@ namespace SWD.SheritonHotel.Services.Interfaces
     public interface IHotelService
     {
         Task<ResponseDto<List<Hotel>>> GetAllHotelsAsync();
+        BaseResponse<Hotel> SeedHotelsAsync(List<Hotel> hotels);
     }
 }
