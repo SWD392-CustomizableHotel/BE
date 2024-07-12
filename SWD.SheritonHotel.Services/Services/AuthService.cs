@@ -175,7 +175,8 @@ public class AuthService : IAuthService
             Email = registerDto.Email,
             UserName = registerDto.UserName,
             SecurityStamp = Guid.NewGuid().ToString(),
-            VerifyTokenExpires = DateTime.Now.AddHours(24)
+            VerifyTokenExpires = DateTime.Now.AddHours(24),
+            CreatedDate = DateTime.UtcNow,
         };
 
         var createUserResult = await _userManager.CreateAsync(newUser, registerDto.Password);
@@ -365,7 +366,8 @@ public class AuthService : IAuthService
                 FirstName = additionalInfoDto.FirstName,
                 LastName = additionalInfoDto.LastName,
                 PhoneNumber = additionalInfoDto.PhoneNumber,
-                isActived = true
+                isActived = true,
+                CreatedDate = DateTime.UtcNow,
             };
 
             var createUserResult = await _userManager.CreateAsync(user);

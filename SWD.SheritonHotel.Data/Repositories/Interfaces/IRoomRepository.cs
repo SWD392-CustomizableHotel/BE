@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SWD.SheritonHotel.Domain.Base;
 
 namespace SWD.SheritonHotel.Data.Repositories.Interfaces
 {
-    public interface IRoomRepository
+    public interface IRoomRepository : IBaseRepository<Room>
     {
         Task<int> CreateRoomAsync(Room room);
 
