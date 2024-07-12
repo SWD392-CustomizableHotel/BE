@@ -96,7 +96,12 @@ namespace SWD.SheritonHotel.Data.Repositories
             {
                 throw new Exception("You are not logged in");
             }
-            return await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+            var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+            if (user == null)
+            {
+                throw new Exception("Need logged in");
+            }
+            return user;
         }
     }
 }
