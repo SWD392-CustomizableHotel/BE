@@ -338,7 +338,8 @@ public class AuthService : IAuthService
             new("JWTID", Guid.NewGuid().ToString()),
             new("FirstName", user.FirstName),
             new("LastName", user.LastName),
-            new(ClaimTypes.Role, role)
+            new(ClaimTypes.Role, role),
+            new("email",user.Email)
         };
 
         foreach (var userRole in userRoles) authClaims.Add(new Claim(ClaimTypes.Role, userRole));
