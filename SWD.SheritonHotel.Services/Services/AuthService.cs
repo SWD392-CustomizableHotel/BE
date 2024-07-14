@@ -87,9 +87,8 @@ public class AuthService : IAuthService
         foreach (var userRole in userRoles) authClaims.Add(new Claim(ClaimTypes.Role, userRole));
 
         var token = GenerateNewJsonWebToken(authClaims);
-        var userId = user.Id;
 
-        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role , UserId = userId};
+        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role , UserId = user.Id, Email = user.Email };
     }
 
     public async Task<AuthServiceResponseDto> MakeAdminAsync(
@@ -346,7 +345,7 @@ public class AuthService : IAuthService
 
         var token = GenerateNewJsonWebToken(authClaims);
 
-        return new AuthServiceResponseDto() { IsSucceed = true, Token = token, Role = role };
+        return new AuthServiceResponseDto() { IsSucceed = true, Token = token, Role = role, UserId = user.Id, Email = user.Email };
     }
 
     public async Task<AuthServiceResponseDto> RegisterAdditionalInfoAsync(RegisterAdditionalInfoDto additionalInfoDto)
@@ -398,7 +397,7 @@ public class AuthService : IAuthService
         var userRoles = await _userManager.GetRolesAsync(user);
         var role = userRoles.FirstOrDefault() ?? StaticUserRoles.CUSTOMER;
 
-        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role };
+        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role, UserId = user.Id, Email = user.Email };
     }
 
     public async Task<ApplicationUser> FindByLoginOrEmailAsync(string loginProvider, string providerKey, string email)
