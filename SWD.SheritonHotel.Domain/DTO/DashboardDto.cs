@@ -17,10 +17,3 @@
         public IEnumerable<decimal> MonthlyRevenue { get; set; } = new List<decimal>();
     }
 }
-public class NotificationDto
-{
-    public string UserName { get; set; }
-    public string RoomType { get; set; }
-    public decimal Amount { get; set; }
-    public DateTime BookingDate { get; set; }
-}
