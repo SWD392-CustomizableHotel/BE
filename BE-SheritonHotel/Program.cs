@@ -210,6 +210,7 @@ builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
 builder.Services.AddScoped<IBookingService, BookingHistoryService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<EmailVerify>();
 builder.Services.AddScoped<IPaymentIntentCustomizeService, PaymentIntentCustomizeService>();
 builder.Services.AddScoped<TokenGenerator>();
