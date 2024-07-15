@@ -14,6 +14,8 @@ namespace SWD.SheritonHotel.Domain.Commands
     {
         [Required]
         public IFormFile FrontFile { get; set; }
-        public string UserId { get; set; }
+
+        [Required]
+        public int PaymentId { get; set; }
     }
 }

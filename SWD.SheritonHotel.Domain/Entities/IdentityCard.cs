@@ -34,9 +34,8 @@ namespace SWD.SheritonHotel.Domain.Entities
         [MaxLength(50)]
         public string Nationality { get; set; }
 
-        [ForeignKey("User")]
-        public string UserId { get; set; }
-
-        public virtual ApplicationUser User { get; set; }
+        [ForeignKey("PaymentId")]
+        public int? PaymentId { get; set; }
+        public virtual Payment Payment { get; set; }
     }
 }

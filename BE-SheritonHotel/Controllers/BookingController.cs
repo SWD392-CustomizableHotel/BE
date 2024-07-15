@@ -52,4 +52,27 @@ public class BookingController : ControllerBase
         var bookingId = await _mediator.Send(command);
         return Ok(bookingId);
     }
+	[HttpGet]
+	[Authorize(Roles = "STAFF")]
+	[Route("check-in")]
+	public async Task<IActionResult> GetBookingByStartDate([FromQuery] CombineBookingFilter combineBookingFilter,
+		[FromQuery] string? searchTerm = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+	{
+		try
+		{
+			var paginationFilter = new PaginationFilter(pageNumber, pageSize);
+			var query = new GetAllBookingHistoryByStartDateQuery(paginationFilter, combineBookingFilter, searchTerm);
+			var response = await _mediator.Send(query);
+			return Ok(response);
+		}
+		catch (Exception e)
+		{
+			return Ok(new BaseResponse<BookingHistoryDto>
+			{
+				IsSucceed = false,
+				Result = null,
+				Message = "Booking history not found!"
+			});
+		}
+	}
 }

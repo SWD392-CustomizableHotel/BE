@@ -14,6 +14,6 @@ namespace SWD.SheritonHotel.Domain.DTO
         public string Gender { get; set; }
         public string Address { get; set; }
         public string Nationality { get; set; }
-        public string UserId { get; set; }
+        public int? PaymentId { get; set; }
     }
 }

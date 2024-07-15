@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Entities;
+using FluentValidation;
 using SWD.SheritonHotel.Domain.Commands;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace SWD.SheritonHotel.Validator
         public UploadIdentityCardCommandValidator()
         {
             RuleFor(x => x.FrontFile).NotNull().WithMessage("Front side must be provided.");
-            RuleFor(x => x.UserId).NotEmpty().WithMessage("User ID must be provided.");
+            RuleFor(x => x.PaymentId).NotEmpty().WithMessage("Payment ID must be provided.");
         }
     }
 }

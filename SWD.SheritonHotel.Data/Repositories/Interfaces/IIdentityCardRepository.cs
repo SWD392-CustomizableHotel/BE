@@ -12,6 +12,7 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
 {
     public interface IIdentityCardRepository
     {
-        Task<IdentityCardDto> UploadIdentityCardAsync(IFormFile frontFile, string userId, CancellationToken cancellationToken);
+        Task<IdentityCardDto> UploadIdentityCardAsync(IFormFile frontFile, int paymentId, CancellationToken cancellationToken);
+        Task<List<IdentityCardDto>> GetAllIdentityCardsAsync(CancellationToken cancellationToken);
     }
 }

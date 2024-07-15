@@ -10,4 +10,5 @@ public interface IBookingRepository : IBaseRepository<Booking>
     Task<(List<BookingHistoryDto>, int)> GetBookingHistoryAsync(string userId, int pageNumber, int pageSize, BookingFilter bookingFilter, string searchTerm = null);
     Task<int> CreateBookingAsync(Booking booking);
     Task<List<BookingDatesDto>> GetBookingDatesAsync(string userId);
+    Task<(List<CombinedBookingHistoryDto>, int)> GetAllBookingHistoryByStartDateAsync(int pageNumber, int pageSize, CombineBookingFilter combineBookingFilter, string searchTerm);
 }

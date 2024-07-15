@@ -12,7 +12,7 @@ using SWD.SheritonHotel.Data.Context;
 namespace SWD.SheritonHotel.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240706160820_InitialCreate")]
+    [Migration("20240714131938_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -98,6 +98,12 @@ namespace SWD.SheritonHotel.Data.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CertificatePath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -804,19 +810,34 @@ namespace SWD.SheritonHotel.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("PaymentId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
+                    b.HasIndex("PaymentId")
                         .IsUnique();
 
                     b.ToTable("IdentityCard");
+                });
+
+            modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.ServiceStaff", b =>
+                {
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ServiceId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ServiceStaff");
                 });
 
             modelBuilder.Entity("Entities.Amenity", b =>
@@ -992,13 +1013,32 @@ namespace SWD.SheritonHotel.Data.Migrations
 
             modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.IdentityCard", b =>
                 {
-                    b.HasOne("Entities.ApplicationUser", "User")
+                    b.HasOne("Entities.Payment", "Payment")
                         .WithOne("IdentityCard")
-                        .HasForeignKey("SWD.SheritonHotel.Domain.Entities.IdentityCard", "UserId")
+                        .HasForeignKey("SWD.SheritonHotel.Domain.Entities.IdentityCard", "PaymentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+                });
+
+            modelBuilder.Entity("SWD.SheritonHotel.Domain.Entities.ServiceStaff", b =>
+                {
+                    b.HasOne("Entities.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("Entities.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("Entities.Amenity", b =>
@@ -1011,9 +1051,6 @@ namespace SWD.SheritonHotel.Data.Migrations
                     b.Navigation("AssignedServices");
 
                     b.Navigation("Bookings");
-
-                    b.Navigation("IdentityCard")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Entities.Booking", b =>
@@ -1032,6 +1069,12 @@ namespace SWD.SheritonHotel.Data.Migrations
                     b.Navigation("Rooms");
 
                     b.Navigation("Services");
+                });
+
+            modelBuilder.Entity("Entities.Payment", b =>
+                {
+                    b.Navigation("IdentityCard")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Entities.Room", b =>

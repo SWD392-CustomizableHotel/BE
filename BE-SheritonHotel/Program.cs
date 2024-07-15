@@ -33,7 +33,7 @@ using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"C:\VisionAI\vision-ai-428311-e8ec8670484d.json");
+//Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"C:\VisionAI\vision-ai-428311-e8ec8670484d.json");
 
 builder.Services.AddControllers();
 builder.Services.Configure<FormOptions>(options =>
@@ -58,7 +58,7 @@ StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("SheritonDB_D");
+    var connectionString = builder.Configuration.GetConnectionString("SheritonDB");
     options.UseSqlServer(connectionString);
 });
 #endregion

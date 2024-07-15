@@ -28,4 +28,8 @@ public class BookingHistoryService : IBookingService
     {
         return await _bookingRepository.GetBookingDatesAsync(userId);
     }
+	public async Task<(List<CombinedBookingHistoryDto>, int)> GetAllBookingHistoryByStartDateAsync(int pageNumber, int pageSize, CombineBookingFilter combineBookingFilter, string searchTerm)
+	{
+        return await _bookingRepository.GetAllBookingHistoryByStartDateAsync(pageNumber, pageSize, combineBookingFilter, searchTerm);
+    }
 }

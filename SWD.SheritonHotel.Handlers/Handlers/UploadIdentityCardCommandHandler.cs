@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -60,19 +61,41 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 
             try
             {
-                var identityCardDto = await _identityCardService.UploadIdentityCardAsync(request.FrontFile, request.UserId, cancellationToken);
+                var identityCardDto = await _identityCardService.UploadIdentityCardAsync(request.FrontFile, request.PaymentId, cancellationToken);
 
-                return new ResponseDto<IdentityCardDto>(identityCardDto);
+                if (identityCardDto != null)
+                {
+                    return new ResponseDto<IdentityCardDto>
+                    {
+                        IsSucceeded = true,
+                        Message = "Upload Identity Card Successfully",
+                        Data = identityCardDto
+                    };
+                }
+                else
+                {
+                    return new ResponseDto<IdentityCardDto>
+                    {
+                        IsSucceeded = false,
+                        Message = "Upload Identity Card Failed"
+                    };
+                }
             }
             catch (Exception ex)
             {
+                var innerException = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 return new ResponseDto<IdentityCardDto>
                 {
                     IsSucceeded = false,
                     Message = "An error occurred while uploading the identity card.",
-                    Errors = new[] { ex.Message }
+                    Errors = new[] { innerException }
                 };
             }
+        }
+
+        private string GenerateRandomCode()
+        {
+            return Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
         }
     }
 }

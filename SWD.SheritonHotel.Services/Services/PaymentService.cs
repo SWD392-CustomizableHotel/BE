@@ -1,5 +1,6 @@
 ﻿using Entities;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,11 @@ namespace SWD.SheritonHotel.Services.Services
         public async Task<int> CreatePaymentAsync(Payment payment)
         {
             return await _paymentRepository.CreatePaymentAsync(payment);
+        }
+
+        public async Task<PaymentDto> GetPaymentByBookingIdAsync(int bookingId)
+        {
+            return await _paymentRepository.GetPaymentByBookingIdAsync(bookingId);
         }
     }
 }

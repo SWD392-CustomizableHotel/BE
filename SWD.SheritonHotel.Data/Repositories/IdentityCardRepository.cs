@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Entities;
 using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SWD.SheritonHotel.Data.Base;
@@ -26,18 +29,24 @@ namespace SWD.SheritonHotel.Data.Repositories
         private readonly IMapper _mapper;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _apiKey;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public IdentityCardRepository(ApplicationDbContext context, IMapper mapper, IHttpClientFactory httpClientFactory, IConfiguration configuration, IOptions<FPTAIOptions> options) : base(context, mapper)
+        public IdentityCardRepository(ApplicationDbContext context, IMapper mapper, IHttpClientFactory httpClientFactory, IConfiguration configuration, IOptions<FPTAIOptions> options, UserManager<ApplicationUser> userManager,
+            IHttpContextAccessor httpContextAccessor) : base(context, mapper)
         {
             _context = context;
             _mapper = mapper;
             _httpClientFactory = httpClientFactory;
             _apiKey = options.Value.ApiKey;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<IdentityCardDto> UploadIdentityCardAsync(IFormFile frontFile, string userId, CancellationToken cancellationToken)
+        public async Task<IdentityCardDto> UploadIdentityCardAsync(IFormFile frontFile, int paymentId, CancellationToken cancellationToken)
         {
-            var tempDirectory = Path.Combine(Path.GetTempPath(), "UploadIdentityCard");
+
+            var tempDirectory = Path.Combine(Path.GetTempPath(), "/");
             Directory.CreateDirectory(tempDirectory);
 
             var frontFilePath = Path.Combine(tempDirectory, $"{Guid.NewGuid()}_front.tmp");
@@ -46,12 +55,12 @@ namespace SWD.SheritonHotel.Data.Repositories
                 await frontFile.CopyToAsync(stream, cancellationToken);
             }
 
-            var frontDetails = await ExtractIdentityCardDetailsAsync(frontFilePath, userId);
+            var frontDetails = await ExtractIdentityCardDetailsAsync(frontFilePath, paymentId);
 
             if (frontDetails == null)
                 throw new Exception("Unable to extract information from Identity ID card.");
 
-            frontDetails.UserId = userId;
+            frontDetails.PaymentId = paymentId;
 
             await AddAsync(frontDetails, cancellationToken);
 
@@ -61,12 +70,12 @@ namespace SWD.SheritonHotel.Data.Repositories
         private async Task AddAsync(IdentityCardDto identityCardDto, CancellationToken cancellationToken)
         {
             var identityCard = _mapper.Map<IdentityCard>(identityCardDto);
-            identityCard.UserId = identityCardDto.UserId;
+            var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
 
             identityCard.Code = GenerateRandomCode();
-            identityCard.CreatedBy = identityCardDto.UserId;
+            identityCard.CreatedBy = user.UserName;
             identityCard.CreatedDate = DateTime.UtcNow;
-            identityCard.LastUpdatedBy = identityCardDto.UserId;
+            identityCard.LastUpdatedBy = user.UserName;
             identityCard.LastUpdatedDate = DateTime.UtcNow;
 
             Add(identityCard);
@@ -78,7 +87,7 @@ namespace SWD.SheritonHotel.Data.Repositories
             return Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
         }
 
-        private async Task<IdentityCardDto> ExtractIdentityCardDetailsAsync(string filePath, string userId)
+        private async Task<IdentityCardDto> ExtractIdentityCardDetailsAsync(string filePath, int paymentId)
         {
             // Create HttpClient by using HttpClientFactory and add api key 
             using var client = _httpClientFactory.CreateClient();
@@ -113,10 +122,16 @@ namespace SWD.SheritonHotel.Data.Repositories
                 Gender = cardData.Sex,
                 Nationality = cardData.Nationality,
                 Address = cardData.Address,
-                UserId = userId
+                PaymentId = paymentId
             };
 
             return identityCardDto;
+        }
+
+        public async Task<List<IdentityCardDto>> GetAllIdentityCardsAsync(CancellationToken cancellationToken)
+        {
+            var identityCards = await _context.IdentityCard.ToListAsync(cancellationToken);
+            return _mapper.Map<List<IdentityCardDto>>(identityCards);
         }
     }
 }

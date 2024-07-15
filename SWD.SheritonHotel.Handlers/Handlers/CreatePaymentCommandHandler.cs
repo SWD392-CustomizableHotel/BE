@@ -30,15 +30,15 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         public async Task<ResponseDto<int>> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-            if (user == null || !(await _userManager.IsInRoleAsync(user, "CUSTOMER")))
-            {
-                return new ResponseDto<int>
-                {
-                    IsSucceeded = false,
-                    Message = "Unauthorized",
-                    Errors = new[] { "You must be an customer to perform this operation." }
-                };
-            }
+            //if (user == null || !(await _userManager.IsInRoleAsync(user, "CUSTOMER")))
+            //{
+            //    return new ResponseDto<int>
+            //    {
+            //        IsSucceeded = false,
+            //        Message = "Unauthorized",
+            //        Errors = new[] { "You must be an customer to perform this operation." }
+            //    };
+            //}
             var newPayment = new Payment
             {
                 Code = request.Code,
@@ -60,11 +60,12 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             }
             catch (Exception ex)
             {
+                var innerException = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 return new ResponseDto<int>
                 {
                     IsSucceeded = false,
                     Message = "An error occurred while creating the payment.",
-                    Errors = new[] { ex.Message }
+                    Errors = new[] { innerException }
                 };
             }
         }
