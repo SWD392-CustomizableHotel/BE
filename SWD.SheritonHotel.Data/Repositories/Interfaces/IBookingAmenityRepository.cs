@@ -1,6 +1,5 @@
 ﻿using Entities;
 using SWD.SheritonHotel.Domain.Base;
-using SWD.SheritonHotel.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +8,7 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Data.Repositories.Interfaces
 {
-    public interface IHotelRepository : IBaseRepository<Hotel>
+    public interface IBookingAmenityRepository : IBaseRepository<BookingAmenity>
     {
-        Task<Hotel> GetByIdAsync(int id);
-        Task<ResponseDto<List<Hotel>>> GetAllHotelsAsync();
     }
 }

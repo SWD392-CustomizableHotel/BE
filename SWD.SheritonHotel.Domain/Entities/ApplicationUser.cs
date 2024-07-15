@@ -17,6 +17,7 @@ namespace Entities
         public bool isActived { get; set; } = false;
         public string? CertificatePath { get; set; }
         public string? Address { get; set; }
+        public DateTime? CreatedDate { get; set; }
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
         [JsonIgnore]
         public virtual ICollection<Service> AssignedServiceS { get; set; } = new List<Service>();

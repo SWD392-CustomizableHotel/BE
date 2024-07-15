@@ -19,5 +19,6 @@ namespace SWD.SheritonHotel.Services.Interfaces
         Task<(List<Amenity>, int)> GetAllAmenityAsync(int pageNumber, int pageSize,
                     AmenityFilter? amenityFilter, string searchTerm = null);
         Task<List<Amenity>> GetAmenitiesByRoomIdAsync(int roomId);
+        Task<List<Amenity>> GetAmenitiesByTypeAsync(string type);
     }
 }

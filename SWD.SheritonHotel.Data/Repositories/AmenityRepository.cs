@@ -147,5 +147,13 @@ namespace SWD.SheritonHotel.Data.Repositories
                             .ToListAsync();
             return amenities;
         }
+
+        public async Task<List<Amenity>> GetAmenitiesByTypeAsync(string type)
+        {
+            var amenities = await GetQueryable<Amenity>()
+                            .Where(entity => entity.AmenityType.ToLower().Equals(type.ToLower()))
+                            .ToListAsync();
+            return amenities;
+        }
     }
 }

@@ -35,6 +35,9 @@ namespace SWD.SheritonHotel.Domain.Configs.Mapping
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.AssignedServices.FirstOrDefault().User.UserName));
 
             CreateMap<AssignServiceDto, AssignedService>();
+
+            CreateMap<CreatePaymentIntentCustomizableCommand, CreatePaymentIntentDTO>().ReverseMap();
+            CreateMap<CreatePaymentIntentCustomizableCommand.Item, CreatePaymentIntentDTO.Item>().ReverseMap();
         }
     }
 }
