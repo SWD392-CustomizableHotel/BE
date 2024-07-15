@@ -24,4 +24,15 @@ public class BookingHistoryService : IBookingService
     {
         return await _bookingRepository.CreateBookingAsync(booking);
     }
+
+    public async Task<(List<BookingHistoryDto>, int)> GetAllBookingHistoryByEndDateAsync(int pageNumber, int pageSize, BookingFilter bookingFilter, string searchTerm)
+    {
+        return await _bookingRepository.GetAllBookingHistoryByEndDateAsync(pageNumber, pageSize, bookingFilter,
+            searchTerm);
+    }
+
+    public async Task<Booking> GetBookingDetails(int BookingId)
+    {
+        return await _bookingRepository.GetByIdAsync(BookingId);
+    }
 }
