@@ -13,5 +13,6 @@ public interface IBookingService
         BookingFilter bookingFilter, string searchTerm);
 
     Task<Booking> GetBookingDetails(int BookingId);
+    Task<int> CreateBookingAmenityAsync(BookingAmenity bookingAmenity);
 }
 

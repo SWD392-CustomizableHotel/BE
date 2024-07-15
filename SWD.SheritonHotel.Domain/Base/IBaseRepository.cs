@@ -26,5 +26,7 @@ namespace SWD.SheritonHotel.Domain.Base
         void Delete(TEntity entity);
         void DeleteRange(IEnumerable<TEntity> entities);
         void CheckCancellationToken(CancellationToken cancellationToken = default);
+        int SaveChanges();
+        Task<int> SaveChangesAsync();
     }
 }

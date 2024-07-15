@@ -9,10 +9,12 @@ namespace SWD.SheritonHotel.Services.Services;
 public class BookingHistoryService : IBookingService
 {
     private readonly IBookingRepository _bookingRepository;
+    private readonly IBookingAmenityRepository _bookingAmenityRepository;
 
-    public BookingHistoryService(IBookingRepository bookingRepository)
+    public BookingHistoryService(IBookingRepository bookingRepository, IBookingAmenityRepository bookingAmenityRepository)
     {
         _bookingRepository = bookingRepository;
+        _bookingAmenityRepository = bookingAmenityRepository;
     }
     
     public async Task<(List<BookingHistoryDto>, int)> GetBookingHistoryAsync(string userId, int pageNumber, int pageSize, BookingFilter bookingFilter,
@@ -34,5 +36,11 @@ public class BookingHistoryService : IBookingService
     public async Task<Booking> GetBookingDetails(int BookingId)
     {
         return await _bookingRepository.GetByIdAsync(BookingId);
+    }
+
+    public async Task<int> CreateBookingAmenityAsync(BookingAmenity bookingAmenity)
+    {
+        _bookingAmenityRepository.Add(bookingAmenity);
+        return await _bookingAmenityRepository.SaveChangesAsync();
     }
 }
