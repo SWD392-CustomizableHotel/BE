@@ -87,9 +87,8 @@ public class AuthService : IAuthService
         foreach (var userRole in userRoles) authClaims.Add(new Claim(ClaimTypes.Role, userRole));
 
         var token = GenerateNewJsonWebToken(authClaims);
-        var userId = user.Id;
 
-        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role , UserId = userId};
+        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role , UserId = user.Id, Email = user.Email };
     }
 
     public async Task<AuthServiceResponseDto> MakeAdminAsync(
@@ -175,7 +174,8 @@ public class AuthService : IAuthService
             Email = registerDto.Email,
             UserName = registerDto.UserName,
             SecurityStamp = Guid.NewGuid().ToString(),
-            VerifyTokenExpires = DateTime.Now.AddHours(24)
+            VerifyTokenExpires = DateTime.Now.AddHours(24),
+            CreatedDate = DateTime.UtcNow,
         };
 
         var createUserResult = await _userManager.CreateAsync(newUser, registerDto.Password);
@@ -337,14 +337,15 @@ public class AuthService : IAuthService
             new("JWTID", Guid.NewGuid().ToString()),
             new("FirstName", user.FirstName),
             new("LastName", user.LastName),
-            new(ClaimTypes.Role, role)
+            new(ClaimTypes.Role, role),
+            new("email",user.Email)
         };
 
         foreach (var userRole in userRoles) authClaims.Add(new Claim(ClaimTypes.Role, userRole));
 
         var token = GenerateNewJsonWebToken(authClaims);
 
-        return new AuthServiceResponseDto() { IsSucceed = true, Token = token, Role = role };
+        return new AuthServiceResponseDto() { IsSucceed = true, Token = token, Role = role, UserId = user.Id, Email = user.Email };
     }
 
     public async Task<AuthServiceResponseDto> RegisterAdditionalInfoAsync(RegisterAdditionalInfoDto additionalInfoDto)
@@ -365,7 +366,8 @@ public class AuthService : IAuthService
                 FirstName = additionalInfoDto.FirstName,
                 LastName = additionalInfoDto.LastName,
                 PhoneNumber = additionalInfoDto.PhoneNumber,
-                isActived = true
+                isActived = true,
+                CreatedDate = DateTime.UtcNow,
             };
 
             var createUserResult = await _userManager.CreateAsync(user);
@@ -395,7 +397,7 @@ public class AuthService : IAuthService
         var userRoles = await _userManager.GetRolesAsync(user);
         var role = userRoles.FirstOrDefault() ?? StaticUserRoles.CUSTOMER;
 
-        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role };
+        return new AuthServiceResponseDto { IsSucceed = true, Token = token, Role = role, UserId = user.Id, Email = user.Email };
     }
 
     public async Task<ApplicationUser> FindByLoginOrEmailAsync(string loginProvider, string providerKey, string email)
