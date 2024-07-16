@@ -21,9 +21,7 @@ namespace SWD.SheritonHotel.Domain.Utilities
         public bool SendVerifyAccountEmail(string email, string token)
         {
             var subject = "[Sheriton Hotel] Verify account request";
-            var baseUrl = _config["Environment"] == "Production"
-                ? "https://fe-customizablehotel.vercel.app"
-                : "http://localhost:4200";
+            var baseUrl = "https://fe-customizablehotel.vercel.app";
             var verifyUrl = $"{baseUrl}/verify-email?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
             var message = @"
 <!DOCTYPE html>
