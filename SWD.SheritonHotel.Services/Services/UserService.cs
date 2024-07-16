@@ -36,7 +36,7 @@ namespace Services
                 user.isActived = true;
                 user.VerifyToken = null; 
                 user.VerifyTokenExpires = DateTime.MinValue;
-                await _userRepo.UpdateUserAsync(user);
+                await _userRepo.UpdateAsync(user);
                 return true;
             }
             return false;
@@ -45,6 +45,16 @@ namespace Services
         public async Task UpdateAsync(ApplicationUser user)
         {
             await _userRepo.UpdateAsync(user);
+        }
+
+        public async Task<ApplicationUser> GetUserFromJWTAsync(string jWTAsync) 
+            => await _userRepo.GetUserFromJWTAsync(jWTAsync);
+        public async Task<ApplicationUser> GetUserDetailsByIdAsync(string userId)
+            => await _userRepo.GetUserDetailsByIdAsync(userId);
+
+        public async Task<ApplicationUser> GetUserAsync()
+        {
+            return await _userRepo.GetUserAsync();
         }
     }
 }

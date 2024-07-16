@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Domain.Queries
 {
-    public class GetRoomDetailsQuery : IRequest<ResponseDto<Room>>
+    public class GetRoomDetailsQuery : IRequest<ResponseDto<RoomDetailsDTO>>
     {
         public int RoomId { get; set; }
 
