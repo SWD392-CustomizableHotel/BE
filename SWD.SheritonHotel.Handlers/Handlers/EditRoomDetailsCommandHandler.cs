@@ -43,7 +43,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
 
             try
             {
-                var room = await _roomService.UpdateRoomAsync(request.RoomId, request.RoomType, request.RoomPrice);
+                var room = await _roomService.UpdateRoomAsync(request.RoomId, request.RoomType, request.RoomPrice, request.ImageFile, user.UserName);
                 return new ResponseDto<Room>(room); 
             }
             catch (Exception ex)

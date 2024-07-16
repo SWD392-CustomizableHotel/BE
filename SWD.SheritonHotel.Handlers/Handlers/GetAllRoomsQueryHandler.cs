@@ -47,7 +47,9 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                 RoomType = room.Type,
                 RoomStatus = room.Status,
                 RoomPrice = room.Price,
-                IsDeleted = room.IsDeleted
+                IsDeleted = room.IsDeleted,
+                ImagePath = room.ImagePath,
+                NumberOfPeople = room.NumberOfPeople,
             }).ToList();
 
             var totalPages = (int)Math.Ceiling(totalRecords / (double)request.PaginationFilter.PageSize);
