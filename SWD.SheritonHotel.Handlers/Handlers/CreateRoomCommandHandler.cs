@@ -51,9 +51,10 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                     Errors = new[] { "You must be an admin to perform this operation." }
                 };
             }
+            var generateCode = GenerateAmenityCode();
             var newRoom = new Room
             {
-                Code = request.RoomNumber,
+                Code = generateCode,
                 Type = request.Type,
                 Status = request.Status,
                 Price = request.Price,
@@ -62,8 +63,10 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                 CreatedBy = user.UserName,
                 LastUpdatedBy = user.UserName,
                 CreatedDate = DateTime.UtcNow,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                NumberOfPeople = request.NumberOfPeople,         
             };
-
             try
             {
                 var newRoomId = await _roomService.CreateRoomAsync(newRoom, request.ImageUpload);
@@ -78,6 +81,11 @@ namespace SWD.SheritonHotel.Handlers.Handlers
                     Errors = new[] { ex.Message }
                 };
             }
+        }
+
+        private string GenerateAmenityCode()
+        {
+            return Guid.NewGuid().ToString().Replace("-", "").Substring(0, 6).ToUpper();
         }
     }
 }

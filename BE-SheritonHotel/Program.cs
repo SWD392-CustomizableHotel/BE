@@ -220,7 +220,7 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IManageService, ManageServiceService>();
 builder.Services.AddScoped<ITokenValidator, TokenValidator>();
-builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountService, SWD.SheritonHotel.Services.Services.AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
 builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();

@@ -111,5 +111,21 @@ namespace SWD.SheritonHotel.Data.Repositories
             }
             return user;
         }
+
+        public async Task<List<StaffDTO>> GetUsersByRoleAsync(string role)
+        {
+            var users = await _userManager.Users.ToListAsync();
+            var staff = new List<ApplicationUser>();
+
+            foreach (var user in users)
+            {
+                if (await _userManager.IsInRoleAsync(user, role))
+                {
+                    staff.Add(user);
+                }
+            }
+
+            return _mapper.Map<List<StaffDTO>>(staff);
+        }
     }
 }

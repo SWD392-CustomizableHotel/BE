@@ -23,7 +23,7 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
 
         Task<Room> GetRoomByIdAsync(int roomId);
 
-        Task<Room> UpdateRoomAsync(int roomId, string type, decimal price);
+        Task<Room> UpdateRoomAsync(int roomId, string type, decimal price, IFormFile imageFile = null, string updatedBy = null);
         Task<List<Room>> GetAllQueryableWithInclude(CancellationToken cancellationToken, string? roomSize, int? numberOfPeople);
     }
 }

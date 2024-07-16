@@ -29,9 +29,9 @@ namespace SWD.SheritonHotel.Validator
                 .Must(status => status == "Available" || status == "Occupied" || status == "Maintenance")
                 .WithMessage("Status must be either 'Available' or 'Occupied' or 'Maintenance'.");
 
-            RuleFor(x => x.RoomNumber)
-                .NotEmpty().WithMessage("Room number is required.")
-                .MaximumLength(50).WithMessage("Room number cannot exceed 50 characters.");
+            RuleFor(x => x.RoomSize)
+                .NotEmpty().WithMessage("RoomSize is required.")
+                .MaximumLength(50).WithMessage("Test Room Size");
 
             RuleFor(x => x.HotelId)
                 .GreaterThan(0).WithMessage("Hotel ID must be greater than zero.");

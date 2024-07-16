@@ -25,8 +25,8 @@ namespace SWD.SheritonHotel.Data.Repositories
         private readonly StorageClient _storageClient;
         private readonly string _bucketName;
         private const long MaxFileSizeInBytes = 8 * 1024 * 1024;
-        private const int MaxImageWidth = 800; 
-        private const int MaxImageHeight = 800; 
+        private const int MaxImageWidth = 800;
+        private const int MaxImageHeight = 800;
 
         public RoomRepository(ApplicationDbContext context, IMapper mapper, IOptions<FirebaseConfig> firebaseConfigOptions) : base(context)
         {
@@ -127,7 +127,7 @@ namespace SWD.SheritonHotel.Data.Repositories
         {
             return await _context.Room.Where(r => !r.IsDeleted).CountAsync();
         }
-        public async Task<(List<Room>, int)> GetRoomsAsync(int pageNumber, int pageSize, 
+        public async Task<(List<Room>, int)> GetRoomsAsync(int pageNumber, int pageSize,
                     RoomFilter? roomFilter, string searchTerm = null)
         {
             var rooms = _context.Room.AsQueryable().AsNoTracking();
@@ -169,6 +169,7 @@ namespace SWD.SheritonHotel.Data.Repositories
             {
                 room.Status = status;
                 room.LastUpdatedBy = updatedBy;
+                room.LastUpdatedDate = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
                 return room;
             }
@@ -205,13 +206,38 @@ namespace SWD.SheritonHotel.Data.Repositories
             return room ?? throw new KeyNotFoundException($"No room found with ID {roomId}");
         }
 
-        public async Task<Room> UpdateRoomAsync(int roomId, string type, decimal price)
+        public async Task<Room> UpdateRoomAsync(int roomId, string type, decimal price, IFormFile imageFile = null, string updatedBy = null)
         {
             var room = await _context.Room.FindAsync(roomId);
             if (room != null)
             {
                 room.Type = type;
                 room.Price = price;
+                room.LastUpdatedDate = DateTime.UtcNow;
+                room.LastUpdatedBy = updatedBy;
+
+                if (imageFile != null)
+                {
+                    if (imageFile.Length > MaxFileSizeInBytes)
+                    {
+                        throw new InvalidOperationException("The file size exceeds the 8 MB limit.");
+                    }
+                    var extension = Path.GetExtension(imageFile.FileName).ToLower();
+                    if (extension != ".jpg" && extension != ".jpeg" && extension != ".png")
+                    {
+                        throw new InvalidOperationException("Unsupported image format. Only JPG and PNG are allowed.");
+                    }
+                    
+                    //Delete Old Image
+                    if (!string.IsNullOrEmpty(room.ImagePath))
+                    {
+                        var oldFileName = Path.GetFileName(new Uri(room.ImagePath).LocalPath);
+                        await DeleteImageFromFirebaseAsync(oldFileName);
+                    }
+
+                    var imagePath = await SaveImageAsync(imageFile);
+                    room.ImagePath = imagePath;
+                }
                 await _context.SaveChangesAsync();
                 return room;
             }
@@ -221,11 +247,26 @@ namespace SWD.SheritonHotel.Data.Repositories
             }
         }
 
+        private async Task DeleteImageFromFirebaseAsync(string fileName)
+        {
+            try
+            {
+                await _storageClient.DeleteObjectAsync(_bucketName, fileName);
+            }
+            catch (Google.GoogleApiException ex)
+            {
+                if (ex.Error.Code != 404)
+                {
+                    throw;
+                }
+            }
+
+        }
         public async Task<List<Room>> GetAllQueryableWithInclude(CancellationToken cancellationToken, string? roomSize, int? numberOfPeople)
         {
             var queryable = base.GetQueryable();
             var results = await queryable
-                .Where(entity => !entity.IsDeleted && 
+                .Where(entity => !entity.IsDeleted &&
                                 entity.RoomSize.ToLower().Equals(roomSize.ToLower()) &&
                                 entity.Type.ToLower().Equals("customizable") &&
                                 entity.NumberOfPeople >= numberOfPeople &&

@@ -18,7 +18,7 @@ namespace SWD.SheritonHotel.Services.Interfaces
         Task<Room> UpdateRoomStatusAsync(int roomId, string status, string updatedBy);
         Task DeleteRoomAsync(int roomId);
         Task<Room> GetRoomByIdAsync(int roomId);
-        Task<Room> UpdateRoomAsync(int roomId, string type, decimal price);
+        Task<Room> UpdateRoomAsync(int roomId, string type, decimal price, IFormFile imageFile = null, string updatedBy = null);
         Task<List<Room>> GetAllCustomizableRoomsAsync(CancellationToken cancellationToken, string? roomSize, int? numberOfPeople);
         Room UpdateRoom(Room room);
     }

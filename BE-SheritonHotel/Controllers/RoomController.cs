@@ -81,9 +81,9 @@ namespace SWD.SheritonHotel.API.Controllers
         [HttpPut]
         [Authorize(Roles = "ADMIN")]
         [Route("edit-room-details/{roomId}")]
-        public async Task<IActionResult> EditRoomDetails(int roomId, string type, decimal price)
+        public async Task<IActionResult> EditRoomDetails(int roomId, string type, decimal price, IFormFile ImageFile)
         {
-            var command = new EditRoomDetailsCommand(roomId, type, price);
+            var command = new EditRoomDetailsCommand(roomId, type, price, ImageFile);
             var result = await _mediator.Send(command);
             return Ok(result);
         }
