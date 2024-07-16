@@ -10,6 +10,8 @@ namespace Entities
         public decimal Amount { get; set; }
         public string Status { get; set; }
         public string PaymentIntentId { get; set; }
+        
+        public string PaymentMethod { get; set; }
 
         [ForeignKey("BookingId")]
         public int BookingId { get; set; }

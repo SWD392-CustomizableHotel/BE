@@ -25,5 +25,6 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
 
         Task<Room> UpdateRoomAsync(int roomId, string type, decimal price);
         Task<List<Room>> GetAllQueryableWithInclude(CancellationToken cancellationToken, string? roomSize, int? numberOfPeople);
+        Task Update(Room room);
     }
 }

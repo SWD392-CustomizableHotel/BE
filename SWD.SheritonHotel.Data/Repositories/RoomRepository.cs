@@ -141,5 +141,11 @@ namespace SWD.SheritonHotel.Data.Repositories
                 .ToListAsync();
             return results;
         }
+
+        public async Task Update(Room room)
+        {
+            _context.Room.Update(room); 
+            await _context.SaveChangesAsync();
+        }
     }
 }

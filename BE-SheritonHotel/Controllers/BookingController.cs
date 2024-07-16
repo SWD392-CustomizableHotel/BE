@@ -111,4 +111,80 @@ public class BookingController : ControllerBase
             });
         }
     }
+    [HttpPost]
+    [Route("check-out")]
+    public async Task<IActionResult> CheckOut([FromBody] CheckOutCommand command)
+    {
+        try
+        {
+            await _mediator.Send(command);
+            return Ok(new BaseResponse<string>
+            {
+                IsSucceed = true,
+                Result = null,
+                Message = "Check Out Successful!",
+            });
+        }
+        catch (Exception e)
+        {
+            return Ok(new BaseResponse<string>
+            {
+                IsSucceed = false,
+                Result = null,
+                Message = e.Message,
+            });
+        }
+    }
+    [HttpPost]
+    [Route("payment")]
+    public async Task<IActionResult> Payment([FromBody] PaymentCommand command)
+    {
+        try
+        {
+            await _mediator.Send(command);
+            return Ok(new BaseResponse<string>
+            {
+                IsSucceed = true,
+                Result = null,
+                Message = "Payment Successfull!",
+            });
+        }
+        catch (Exception e)
+        {
+            return Ok(new BaseResponse<string>
+            {
+                IsSucceed = false,
+                Result = null,
+                Message = e.Message,
+            });
+        }
+    }
+    
+    [HttpGet("history-by-email")]
+    public async Task<IActionResult> GetBookingHistoryByEmail([FromQuery] BookingFilter bookingFilter,
+        [FromQuery] string? searchTerm = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        try
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value; // Get email from claims
+            if (email == null)
+            {
+                return Unauthorized();
+            }
+
+            var paginationFilter = new PaginationFilter(pageNumber, pageSize);
+            var query = new GetBookingHistoryByEmailQuery(email, paginationFilter, bookingFilter, searchTerm);
+            var response = await _mediator.Send(query);
+            return Ok(response);
+        }
+        catch (Exception e)
+        {
+            return Ok(new BaseResponse<BookingHistoryDto>
+            {
+                IsSucceed = false,
+                Result = null,
+                Message = "Booking history not found!"
+            });
+        }
+    }
 }

@@ -167,6 +167,7 @@ namespace SWD.SheritonHotel.Data.Context
                 .HasForeignKey(p => p.BookingId);
 
             builder.Entity<Payment>().Property(p => p.Amount).HasPrecision(18, 2);
+            builder.Entity<Payment>().Property(p => p.PaymentMethod).IsRequired(false);
 
             // Enum configuration
             builder

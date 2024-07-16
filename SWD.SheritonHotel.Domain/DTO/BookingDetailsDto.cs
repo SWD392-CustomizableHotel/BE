@@ -3,6 +3,7 @@ namespace SWD.SheritonHotel.Domain.DTO;
 public class BookingDetailsDto
 {
     public int BookingId { get; set; }
+    public int RoomId { get; set; }
     public string RoomType { get; set; }
     public string RoomDescription { get; set; }
     public int Rating { get; set; }

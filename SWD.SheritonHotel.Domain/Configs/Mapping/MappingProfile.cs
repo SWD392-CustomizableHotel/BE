@@ -36,24 +36,18 @@ namespace SWD.SheritonHotel.Domain.Configs.Mapping
                 .ForMember(dest => dest.RoomType, opt => opt.MapFrom(src => src.Room.Type))
                 .ForMember(dest => dest.RoomDescription, opt => opt.MapFrom(src => src.Room.Description))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
-                .ForMember(dest => dest.Services, opt => opt.MapFrom(src => src.BookingServices.Select(bs => new ServiceDto
-                {
-                    Name = bs.Service.Name,
-                    Code = bs.Service.Code,
-                    Description = bs.Service.Description,
-                    Price = bs.Service.Price
-                })))
                 .ForMember(dest => dest.Amenities, opt => opt.MapFrom(src => src.BookingAmenities.Select(ba => new AmenityDTO
                 {
                     Name = ba.Amenity.Name,
                     Code = ba.Amenity.Code,
                     Description = ba.Amenity.Description,
-                    Price = ba.Amenity.Price
+                    Price = ba.Amenity.Price,
                 })))
                 .ForMember(dest => dest.Payments, opt => opt.MapFrom(src => src.Payments.Select(p => new PaymentDto
                 {
                     Amount = p.Amount,
-                    Status = p.Status
+                    Status = p.Status,
+                    PaymentMethod = p.PaymentMethod,
                 })))
                 .ForMember(dest => dest.TotalPrice, opt => opt.Ignore());
         }
