@@ -12,5 +12,6 @@
         public string ImagePath { get; set; }
         public string? Image { get; set; }
         public int NumberOfPeople { get; set; }
+        public string? CanvasImage { get; set; } // Customizing Request
     }
 }
