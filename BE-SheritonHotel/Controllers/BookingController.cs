@@ -78,6 +78,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "STAFF")]
     public async Task<IActionResult> ViewBookingDetails(int id)
     {
         try
@@ -112,6 +113,7 @@ public class BookingController : ControllerBase
         }
     }
     [HttpPost]
+    [Authorize(Roles = "STAFF")]
     [Route("check-out")]
     public async Task<IActionResult> CheckOut([FromBody] CheckOutCommand command)
     {
@@ -136,6 +138,7 @@ public class BookingController : ControllerBase
         }
     }
     [HttpPost]
+    [Authorize(Roles = "STAFF")]
     [Route("payment")]
     public async Task<IActionResult> Payment([FromBody] PaymentCommand command)
     {
