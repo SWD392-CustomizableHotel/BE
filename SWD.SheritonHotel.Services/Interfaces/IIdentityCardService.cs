@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
 using System.Collections.Generic;
 using System.Threading;
@@ -10,5 +11,6 @@ namespace SWD.SheritonHotel.Services.Interfaces
     {
         Task<IdentityCardDto> UploadIdentityCardAsync(IFormFile frontFile, int paymentId, CancellationToken cancellationToken);
         Task<List<IdentityCardDto>> GetAllIdentityCardsAsync(CancellationToken cancellationToken);
+        Task<ResponseDto<IdentityCardDto>> UploadIdentityCardWithValidationAsync(UploadIdentityCardCommand request, CancellationToken cancellationToken);
     }
 }

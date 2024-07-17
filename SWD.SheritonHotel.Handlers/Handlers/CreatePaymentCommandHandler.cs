@@ -14,50 +14,18 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
-    public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, ResponseDto<int>>
+    public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentForLaterCommand, ResponseDto<int>>
     {
         private readonly IPaymentService _paymentService;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CreatePaymentCommandHandler(IPaymentService paymentService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public CreatePaymentCommandHandler(IPaymentService paymentService)
         {
             _paymentService = paymentService;
-            _userManager = userManager;
-            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ResponseDto<int>> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseDto<int>> Handle(CreatePaymentForLaterCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-            var newPayment = new Payment
-            {
-                Code = request.Code,
-                Amount = request.Amount,
-                BookingId = request.BookingId,
-                PaymentIntentId = request.PaymentIntentId,
-                Status = request.Status,
-                CreatedBy = user.UserName,
-                LastUpdatedBy = user.UserName,
-                StartDate = request.StartDate.ToLocalTime(),
-                EndDate = request.EndDate.ToLocalTime(),
-                CreatedDate = DateTime.UtcNow.ToLocalTime(),
-            };
-
-            try
-            {
-                var newPaymentId = await _paymentService.CreatePaymentAsync(newPayment);
-                return new ResponseDto<int>(newPaymentId);
-            }
-            catch (Exception ex)
-            {
-                return new ResponseDto<int>
-                {
-                    IsSucceeded = false,
-                    Message = "An error occurred while creating the payment.",
-                    Errors = new[] { ex.Message }
-                };
-            }
+            return await _paymentService.CreatePaymentForLaterAsync(request);
         }
     }
 }

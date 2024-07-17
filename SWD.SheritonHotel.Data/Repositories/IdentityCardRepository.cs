@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Entities;
-using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
