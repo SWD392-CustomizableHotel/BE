@@ -15,8 +15,5 @@ public interface IBookingService
     Task<int> CreateBookingAmenityAsync(BookingAmenity bookingAmenity);
     Task<bool> CheckOut(int bookingId);
     Task<bool> Payment(int bookingId, string paymentMethod);
-
-    Task<(List<BookingHistoryDto>, int)> GetBookingHistoryByEmailAsync(string email, int pageNumber, int pageSize,
-        BookingFilter bookingFilter, string searchTerm = null);
 }
 
