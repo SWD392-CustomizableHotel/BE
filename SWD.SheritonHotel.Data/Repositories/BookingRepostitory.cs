@@ -192,65 +192,65 @@ public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
         .Where(b => b.User.Email == email)
         .AsQueryable();
 
-    if (bookingFilter != null)
-    {
-        if (bookingFilter.RoomId.HasValue)
+        if (bookingFilter != null)
         {
-            query = query.Where(b => b.RoomId == bookingFilter.RoomId.Value);
+            if (bookingFilter.RoomId.HasValue)
+            {
+                query = query.Where(b => b.RoomId == bookingFilter.RoomId.Value);
+            }
+            if (bookingFilter.Rating.HasValue)
+            {
+                query = query.Where(b => b.Rating == bookingFilter.Rating.Value);
+            }
         }
-        if (bookingFilter.Rating.HasValue)
+
+        if (!string.IsNullOrEmpty(searchTerm))
         {
-            query = query.Where(b => b.Rating == bookingFilter.Rating.Value);
+            query = query.Where(b =>
+                b.Room.Type.Contains(searchTerm) ||
+                b.Room.Description.Contains(searchTerm) ||
+                b.User.UserName.Contains(searchTerm) ||
+                b.Rating.ToString().Contains(searchTerm)
+            );
         }
-    }
 
-    if (!string.IsNullOrEmpty(searchTerm))
-    {
-        query = query.Where(b =>
-            b.Room.Type.Contains(searchTerm) ||
-            b.Room.Description.Contains(searchTerm) ||
-            b.User.UserName.Contains(searchTerm) ||
-            b.Rating.ToString().Contains(searchTerm)
-        );
-    }
+        var totalRecords = await query.CountAsync();
+        var bookings = await query
+            .OrderBy(b => b.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(b => new BookingHistoryDto
+            {
+                BookingId = b.Id,
+                RoomType = b.Room.Type,
+                RoomDescription = b.Room.Description,
+                Rating = b.Rating,
+                UserName = b.User.UserName,
+                StartDate = b.StartDate,
+                EndDate = b.EndDate,
+                Services = b.BookingServices.Select(bs => new ServiceDto
+                {
+                    Name = bs.Service.Name,
+                    Code = bs.Service.Code,
+                    Description = bs.Service.Description,
+                    Price = bs.Service.Price
+                }).ToList(),
+                Amenities = b.BookingAmenities.Select(ba => new AmenityDTO
+                {
+                    Name = ba.Amenity.Name,
+                    Code = ba.Amenity.Code,
+                    Description = ba.Amenity.Description,
+                    Price = ba.Amenity.Price
+                }).ToList(),
+                Payments = b.Payments.Select(p => new PaymentDto
+                {
+                    Amount = p.Amount,
+                    Status = p.Status
+                }).ToList()
+            })
+            .ToListAsync();
 
-    var totalRecords = await query.CountAsync();
-    var bookings = await query
-        .OrderBy(b => b.Id)
-        .Skip((pageNumber - 1) * pageSize)
-        .Take(pageSize)
-        .Select(b => new BookingHistoryDto
-        {
-            BookingId = b.Id,
-            RoomType = b.Room.Type,
-            RoomDescription = b.Room.Description,
-            Rating = b.Rating,
-            UserName = b.User.UserName,
-            StartDate = b.StartDate,
-            EndDate = b.EndDate,
-            Services = b.BookingServices.Select(bs => new ServiceDto
-            {
-                Name = bs.Service.Name,
-                Code = bs.Service.Code,
-                Description = bs.Service.Description,
-                Price = bs.Service.Price
-            }).ToList(),
-            Amenities = b.BookingAmenities.Select(ba => new AmenityDTO
-            {
-                Name = ba.Amenity.Name,
-                Code = ba.Amenity.Code,
-                Description = ba.Amenity.Description,
-                Price = ba.Amenity.Price
-            }).ToList(),
-            Payments = b.Payments.Select(p => new PaymentDto
-            {
-                Amount = p.Amount,
-                Status = p.Status
-            }).ToList()
-        })
-        .ToListAsync();
-
-    return (bookings, totalRecords);
+        return (bookings, totalRecords);
     }
 
     public async Task<List<BookingDatesDto>> GetBookingDatesAsync(string userId)
@@ -284,9 +284,10 @@ public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
             {
                 query = query.Where(b => b.RoomId == combineBookingFilter.RoomId.Value);
             }
-            if (!string.IsNullOrEmpty(combineBookingFilter.FullName))
+            if (combineBookingFilter.Rating.HasValue)
             {
-                query = query.Where(b => b.Payments.Any(p => p.IdentityCard.FullName.Contains(combineBookingFilter.FullName)));
+                query = query.Where(b => b.RoomId == combineBookingFilter.Rating.Value);
+
             }
         }
 
@@ -296,6 +297,7 @@ public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
                 b.Room.Type.Contains(searchTerm) ||
                 b.Room.Description.Contains(searchTerm) ||
                 b.User.UserName.Contains(searchTerm) ||
+                b.Rating.ToString().Contains(searchTerm) ||
                 b.Payments.Any(p => p.IdentityCard.FullName.Contains(searchTerm))
             );
         }

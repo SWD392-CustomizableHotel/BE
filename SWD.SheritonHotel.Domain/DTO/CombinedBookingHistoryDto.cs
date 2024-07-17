@@ -15,8 +15,8 @@ namespace SWD.SheritonHotel.Domain.DTO
         public string UserName { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        //public List<ServiceDto> Services { get; set; }
-        //public List<AmenityDTO> Amenities { get; set; }
+        public List<ServiceDto> Services { get; set; }
+        public List<AmenityDTO> Amenities { get; set; }
         public List<PaymentDto> Payments { get; set; }
         public IdentityCardDto IdentityCard { get; set; } 
     }
