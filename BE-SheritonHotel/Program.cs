@@ -54,7 +54,7 @@ builder.Services.AddControllers()
     });
 builder.Services.AddScoped(_ =>
 {
-    return new BlobServiceClient(builder.Configuration.GetConnectionString("SheritonDB"));
+    return new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage"));
 });
 
 builder.Services.AddEndpointsApiExplorer();
