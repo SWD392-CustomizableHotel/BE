@@ -17,7 +17,7 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "CUSTOMER")]
+        [Authorize]
         [Route("create-payment")]
         public async Task<IActionResult> CreatePayment(CreatePaymentCommand command)
         {

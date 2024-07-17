@@ -30,15 +30,6 @@ namespace SWD.SheritonHotel.Handlers.Handlers
         public async Task<ResponseDto<int>> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-            if (user == null || !(await _userManager.IsInRoleAsync(user, StaticUserRoles.CUSTOMER)))
-            {
-                return new ResponseDto<int>
-                {
-                    IsSucceeded = false,
-                    Message = "Unauthorized",
-                    Errors = new[] { "You must be an customer to perform this operation." }
-                };
-            }
             var newBooking = new Booking
             {
                 Code = request.Code,
