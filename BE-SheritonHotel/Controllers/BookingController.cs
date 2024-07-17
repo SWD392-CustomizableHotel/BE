@@ -162,32 +162,4 @@ public class BookingController : ControllerBase
             });
         }
     }
-    
-    [HttpGet("history-by-email")]
-    public async Task<IActionResult> GetBookingHistoryByEmail([FromQuery] BookingFilter bookingFilter,
-        [FromQuery] string? searchTerm = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
-    {
-        try
-        {
-            var email = User.FindFirst(ClaimTypes.Email)?.Value; // Get email from claims
-            if (email == null)
-            {
-                return Unauthorized();
-            }
-
-            var paginationFilter = new PaginationFilter(pageNumber, pageSize);
-            var query = new GetBookingHistoryByEmailQuery(email, paginationFilter, bookingFilter, searchTerm);
-            var response = await _mediator.Send(query);
-            return Ok(response);
-        }
-        catch (Exception e)
-        {
-            return Ok(new BaseResponse<BookingHistoryDto>
-            {
-                IsSucceed = false,
-                Result = null,
-                Message = "Booking history not found!"
-            });
-        }
-    }
 }
