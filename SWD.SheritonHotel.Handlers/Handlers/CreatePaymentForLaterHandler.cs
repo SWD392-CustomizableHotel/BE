@@ -1,7 +1,8 @@
 ﻿using Entities;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using Stripe;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Services.Interfaces;
@@ -11,43 +12,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SWD.SheritonHotel.Services.Services
+namespace SWD.SheritonHotel.Handlers.Handlers
 {
-    public class PaymentService : IPaymentService
+    public class CreatePaymentForLaterHandler : IRequestHandler<CreatePaymentForLaterCommand, ResponseDto<int>>
     {
-        private readonly IPaymentRepository _paymentRepository;
+        private readonly IPaymentService _paymentService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PaymentService(IPaymentRepository paymentRepository, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public CreatePaymentForLaterHandler(IPaymentService paymentService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
-            _paymentRepository = paymentRepository;
+            _paymentService = paymentService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<int> CreatePaymentAsync(Payment payment)
-        {
-            return await _paymentRepository.CreatePaymentAsync(payment);
-        }
-
-        public async Task<PaymentDto> GetPaymentByBookingIdAsync(int bookingId)
-        {
-            return await _paymentRepository.GetPaymentByBookingIdAsync(bookingId);
-        }
-
-        public async Task<Payment> UpdatePaymentStatusAsync(string paymentIntentId, string status)
-        {
-            var payment = await _paymentRepository.GetPaymentByPaymentIntentIdAsync(paymentIntentId);
-            if (payment != null)
-            {
-                payment.Status = status;
-                await _paymentRepository.UpdatePaymentAsync(payment);
-            }
-            return payment;
-        }
-
-        public async Task<ResponseDto<int>> CreatePaymentForLaterAsync(CreatePaymentForLaterCommand request)
+        public async Task<ResponseDto<int>> Handle(CreatePaymentForLaterCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
 
@@ -67,7 +47,7 @@ namespace SWD.SheritonHotel.Services.Services
 
             try
             {
-                var newPaymentId = await CreatePaymentAsync(newPayment);
+                var newPaymentId = await _paymentService.CreatePaymentAsync(newPayment);
                 return new ResponseDto<int>(newPaymentId);
             }
             catch (Exception ex)

@@ -38,6 +38,14 @@ public class BookingHistoryService : IBookingService
     {
         return await _bookingRepository.CreateBookingAsync(booking);
     }
+    public async Task<List<BookingDatesDto>> GetBookingDatesAsync(string userId)
+    {
+        return await _bookingRepository.GetBookingDatesAsync(userId);
+    }
+	public async Task<(List<CombinedBookingHistoryDto>, int)> GetAllBookingHistoryByStartDateAsync(int pageNumber, int pageSize, CombineBookingFilter combineBookingFilter, string searchTerm)
+	{
+        return await _bookingRepository.GetAllBookingHistoryByStartDateAsync(pageNumber, pageSize, combineBookingFilter, searchTerm);
+    }
 
     public async Task<(List<BookingHistoryDto>, int)> GetAllBookingHistoryByEndDateAsync(int pageNumber, int pageSize, BookingFilter bookingFilter, string searchTerm)
     {
@@ -72,6 +80,11 @@ public class BookingHistoryService : IBookingService
     {
         _bookingAmenityRepository.Add(bookingAmenity);
         return await _bookingAmenityRepository.SaveChangesAsync();
+    }
+
+    public async Task<Booking> GetBookingByIdAsync(int bookingId)
+    {
+        return await _bookingRepository.GetBookingByIdAsync(bookingId);
     }
 
     public async Task<bool> CheckOut(int bookingId)

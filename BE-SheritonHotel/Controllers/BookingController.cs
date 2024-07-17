@@ -45,7 +45,7 @@ public class BookingController : ControllerBase
         }
     }
     [HttpPost]
-    //[Authorize(Roles = "CUSTOMER")]
+    [Authorize(Roles = "STAFF")]
     [Route("create-booking")]
     public async Task<IActionResult> CreateBooking(CreateBookingCommand command)
     {
@@ -162,4 +162,56 @@ public class BookingController : ControllerBase
             });
         }
     }
+    
+    [HttpGet("history-by-email")]
+    public async Task<IActionResult> GetBookingHistoryByEmail([FromQuery] BookingFilter bookingFilter,
+        [FromQuery] string? searchTerm = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        try
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value; // Get email from claims
+            if (email == null)
+            {
+                return Unauthorized();
+            }
+
+            var paginationFilter = new PaginationFilter(pageNumber, pageSize);
+            var query = new GetBookingHistoryByEmailQuery(email, paginationFilter, bookingFilter, searchTerm);
+            var response = await _mediator.Send(query);
+            return Ok(response);
+        }
+        catch (Exception e)
+        {
+            return Ok(new BaseResponse<BookingHistoryDto>
+            {
+                IsSucceed = false,
+                Result = null,
+                Message = "Booking history not found!"
+            });
+        }
+    }
+
+	[HttpGet]
+	[Authorize(Roles = "STAFF")]
+	[Route("check-in")]
+	public async Task<IActionResult> GetBookingByStartDate([FromQuery] CombineBookingFilter combineBookingFilter,
+		[FromQuery] string? searchTerm = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+	{
+		try
+		{
+			var paginationFilter = new PaginationFilter(pageNumber, pageSize);
+			var query = new GetAllBookingHistoryByStartDateQuery(paginationFilter, combineBookingFilter, searchTerm);
+			var response = await _mediator.Send(query);
+			return Ok(response);
+		}
+		catch (Exception e)
+		{
+			return Ok(new BaseResponse<BookingHistoryDto>
+			{
+				IsSucceed = false,
+				Result = null,
+				Message = "Booking history not found!"
+			});
+		}
+	}
 }

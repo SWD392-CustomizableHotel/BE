@@ -1,4 +1,4 @@
-using Entities;
+﻿using Entities;
 using Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -34,10 +34,12 @@ using Newtonsoft.Json;
 using Azure.Storage.Blobs;
 using SWD.SheritonHotel.API.WebSocket;
 using SWD.SheritonHotel.Domain.Commands;
+using Google.Api;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"C:\VisionAI\vision-ai-428311-e8ec8670484d.json");
 
 builder.Services.AddControllers();
 builder.Services.Configure<FormOptions>(options =>
@@ -105,6 +107,9 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
    opt.TokenLifespan = TimeSpan.FromDays(1));
 
+// Config FPT AI
+builder.Services.Configure<FPTAIOptions>(builder.Configuration.GetSection("FPTAI"));
+builder.Services.AddHttpClient();
 #endregion
 
 #region JwtBear and Authentication, Swagger API
@@ -156,6 +161,7 @@ builder.Services.Configure<JwtBearerOptions>(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -183,6 +189,8 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+    options.OperationFilter<FileUploadOperationFilter>();
+
     options.MapType<ServiceStatus>(() => new OpenApiSchema
     {
         Type = "string",
@@ -221,6 +229,8 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IManageService, ManageServiceService>();
 builder.Services.AddScoped<ITokenValidator, TokenValidator>();
+builder.Services.AddScoped<IIdentityCardRepository, IdentityCardRepository>();
+builder.Services.AddScoped<IIdentityCardService, IdentityCardService>();
 builder.Services.AddScoped<IAccountService, SWD.SheritonHotel.Services.Services.AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
@@ -241,6 +251,7 @@ builder.Services.AddHostedService<ApplicationWorker>();
 var handler = typeof(AppHandler).GetTypeInfo().Assembly;
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
 builder.Services.AddMediatR(typeof(UpdateUserCommandHandler).Assembly);
+builder.Services.AddMediatR(typeof(CreatePaymentForLaterHandler).Assembly);
 
 builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCommand, List<string>>, CreatePaymentIntentHandler>();
 builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCustomizableCommand, List<string>>, CreatePaymentIntentCustomizeCommandHandler>();
@@ -266,6 +277,7 @@ builder.Services.AddFluentValidationAutoValidation()
                 .AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateServiceCommandValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateServiceCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UploadIdentityCardCommandValidator>();
 #endregion
 // Add Controllers
 builder.Services.AddControllers().AddJsonOptions(options =>

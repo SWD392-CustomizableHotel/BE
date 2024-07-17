@@ -23,5 +23,5 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
         Task<ApplicationUser> GetUserByIdAsync(string staffId);
         Task<List<StaffDTO>> GetUsersByRoleAsync(string role);
         Task<ApplicationUser> GetUserAsync();
-    }
+	}
 }
