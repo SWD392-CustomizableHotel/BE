@@ -32,6 +32,7 @@ using SWD.SheritonHotel.Validator.Interface;
 using SWD.SheritonHotel.Domain.Configs.Firebase;
 using Newtonsoft.Json;
 using Azure.Storage.Blobs;
+using SWD.SheritonHotel.API.WebSocket;
 using SWD.SheritonHotel.Domain.Commands;
 
 
@@ -73,7 +74,7 @@ StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("SheritonDB_D");
+    var connectionString = builder.Configuration.GetConnectionString("SheritonDB");
     options.UseSqlServer(connectionString);
 });
 #endregion
@@ -231,6 +232,8 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<EmailVerify>();
 builder.Services.AddScoped<IPaymentIntentCustomizeService, PaymentIntentCustomizeService>();
 builder.Services.AddScoped<TokenGenerator>();
+builder.Services.AddSingleton<SocketIOServer>();
+builder.Services.AddHostedService<ApplicationWorker>();
 #endregion
 
 #region Add MediatR
@@ -308,4 +311,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 //RUN
-app.Run();
+await app.RunAsync();
