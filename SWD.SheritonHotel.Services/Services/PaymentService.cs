@@ -28,5 +28,16 @@ namespace SWD.SheritonHotel.Services.Services
         {
             return await _paymentRepository.GetPaymentByBookingIdAsync(bookingId);
         }
+
+        public async Task<Payment> UpdatePaymentStatusAsync(string paymentIntentId, string status)
+        {
+            var payment = await _paymentRepository.GetPaymentByPaymentIntentIdAsync(paymentIntentId);
+            if (payment != null)
+            {
+                payment.Status = status;
+                await _paymentRepository.UpdatePaymentAsync(payment);
+            }
+            return payment;
+        }
     }
 }

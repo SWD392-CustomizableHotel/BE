@@ -17,7 +17,7 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = "CUSTOMER")]
+        [Authorize(Roles = "CUSTOMER")]
         [Route("create-payment")]
         public async Task<IActionResult> CreatePayment(CreatePaymentCommand command)
         {
@@ -32,6 +32,27 @@ namespace SWD.SheritonHotel.API.Controllers
         {
             var result = await _mediator.Send(query);
             return Ok(result);
+        }
+
+        [HttpPost("payment-for-later")]
+        [Authorize(Roles = "STAFF")]
+        public async Task<IActionResult> CreatePaymentForLater(CreatePaymentForLaterCommand request)
+        {
+            if (request == null || request.BookingId <= 0)
+            {
+                return BadRequest("Invalid request");
+            }
+
+            var paymentId = await _mediator.Send(request);
+            return Ok(paymentId);
+        }
+
+        [HttpPost("update-payment-status")]
+        [Authorize(Roles = "STAFF")]
+        public async Task<IActionResult> UpdatePaymentStatus([FromBody] UpdatePaymentStatusCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
         }
     }
 }

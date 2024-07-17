@@ -31,6 +31,7 @@ using BookingService = Entities.BookingService;
 using Newtonsoft.Json;
 using Azure.Storage.Blobs;
 using SWD.SheritonHotel.Domain.Commands;
+using Google.Api;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -230,6 +231,7 @@ builder.Services.AddScoped<TokenGenerator>();
 var handler = typeof(AppHandler).GetTypeInfo().Assembly;
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
 builder.Services.AddMediatR(typeof(UpdateUserCommandHandler).Assembly);
+builder.Services.AddMediatR(typeof(CreatePaymentForLaterHandler).Assembly);
 
 builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCommand, List<string>>, CreatePaymentIntentHandler>();
 builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCustomizableCommand, List<string>>, CreatePaymentIntentCustomizeCommandHandler>();

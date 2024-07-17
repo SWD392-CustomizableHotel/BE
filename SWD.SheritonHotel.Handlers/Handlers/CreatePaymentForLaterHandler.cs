@@ -2,10 +2,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Stripe;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Services.Interfaces;
-using SWD.SheritonHotel.Services.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,31 +14,22 @@ using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Handlers.Handlers
 {
-    public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, ResponseDto<int>>
+    public class CreatePaymentForLaterHandler : IRequestHandler<CreatePaymentForLaterCommand, ResponseDto<int>>
     {
         private readonly IPaymentService _paymentService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CreatePaymentCommandHandler(IPaymentService paymentService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        public CreatePaymentForLaterHandler(IPaymentService paymentService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
             _paymentService = paymentService;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ResponseDto<int>> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseDto<int>> Handle(CreatePaymentForLaterCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-            if (user == null || !(await _userManager.IsInRoleAsync(user, "CUSTOMER")))
-            {
-                return new ResponseDto<int>
-                {
-                    IsSucceeded = false,
-                    Message = "Unauthorized",
-                    Errors = new[] { "You must be an customer to perform this operation." }
-                };
-            }
 
             var newPayment = new Payment
             {

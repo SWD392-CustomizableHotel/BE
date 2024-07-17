@@ -45,13 +45,14 @@ public class BookingController : ControllerBase
         }
     }
     [HttpPost]
-    //[Authorize(Roles = "CUSTOMER")]
+    [Authorize(Roles = "CUSTOMER")]
     [Route("create-booking")]
     public async Task<IActionResult> CreateBooking(CreateBookingCommand command)
     {
         var bookingId = await _mediator.Send(command);
         return Ok(bookingId);
     }
+
 	[HttpGet]
 	[Authorize(Roles = "STAFF")]
 	[Route("check-in")]

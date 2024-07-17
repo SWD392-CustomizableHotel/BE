@@ -13,5 +13,7 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
     {
         Task<int> CreatePaymentAsync(Payment payment);
         Task<PaymentDto> GetPaymentByBookingIdAsync(int bookingId);
+        Task<Payment> GetPaymentByPaymentIntentIdAsync(string paymentIntentId);
+        Task UpdatePaymentAsync(Payment payment);
     }
 }

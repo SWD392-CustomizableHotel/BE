@@ -10,7 +10,6 @@ namespace SWD.SheritonHotel.Domain.Commands
     public class CreatePaymentIntentCommand : IRequest<List<string>>
     {
         public Item[] Items { get; set; }
-
         public class Item
         {
             public string RoomId { get; set; }

@@ -40,4 +40,9 @@ public class BookingHistoryService : IBookingService
         _bookingAmenityRepository.Add(bookingAmenity);
         return await _bookingAmenityRepository.SaveChangesAsync();
     }
+
+    public async Task<Booking> GetBookingByIdAsync(int bookingId)
+    {
+        return await _bookingRepository.GetBookingByIdAsync(bookingId);
+    }
 }

@@ -72,7 +72,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             //Finalize invoice
             var finalizeOptions = new InvoiceFinalizeOptions
             {
-                Expand = new List<string> { "payment_intent"}
+                Expand = new List<string> { "payment_intent" }
             };
             var finalizeService = new InvoiceService();
             var finalizeInvoice = finalizeService.FinalizeInvoice(invoice.Id, finalizeOptions);
@@ -80,9 +80,11 @@ namespace SWD.SheritonHotel.Handlers.Handlers
             //Client secret get
             var clientSecret = finalizeInvoice.PaymentIntent.ClientSecret;
             var invoiceId = invoice.Id;
-            var list = new List<string>{clientSecret, invoiceId };
+            var list = new List<string> { clientSecret, invoiceId };
+
             //Return to FE
             return Task.FromResult(list);
+
         }
 
         private int CalculateOrderAmount(CreatePaymentIntentCommand.Item[] items)

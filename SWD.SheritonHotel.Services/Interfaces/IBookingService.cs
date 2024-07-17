@@ -11,5 +11,6 @@ public interface IBookingService
     Task<List<BookingDatesDto>> GetBookingDatesAsync(string userId);
     Task<(List<CombinedBookingHistoryDto>, int)> GetAllBookingHistoryByStartDateAsync(int pageNumber, int pageSize, CombineBookingFilter combineBookingFilter, string searchTerm);
     Task<int> CreateBookingAmenityAsync(BookingAmenity bookingAmenity);
+    Task<Booking> GetBookingByIdAsync(int bookingId);
 }
 

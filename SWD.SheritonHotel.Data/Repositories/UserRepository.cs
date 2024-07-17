@@ -103,23 +103,5 @@ namespace SWD.SheritonHotel.Data.Repositories
             }
             return user;
         }
-    }
-
-		public async Task<List<CustomerDTO>> GetCustomerByRoleAsync(string role)
-		{
-			var users = await _userManager.Users.ToListAsync();
-			var customer = new List<ApplicationUser>();
-
-			foreach (var user in users)
-			{
-				if (await _userManager.IsInRoleAsync(user, role))
-				{
-					customer.Add(user);
-				}
-			}
-
-			return _mapper.Map<List<CustomerDTO>>(customer);
-		}
-
 	}
 }

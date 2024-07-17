@@ -41,5 +41,16 @@ namespace SWD.SheritonHotel.Data.Repositories
 
             return _mapper.Map<PaymentDto>(payment);
         }
+
+        public async Task<Payment> GetPaymentByPaymentIntentIdAsync(string paymentIntentId)
+        {
+            return await _context.Payment.FirstOrDefaultAsync(p => p.PaymentIntentId == paymentIntentId);
+        }
+
+        public async Task UpdatePaymentAsync(Payment payment)
+        {
+            _context.Payment.Update(payment);
+            await _context.SaveChangesAsync();
+        }
     }
 }

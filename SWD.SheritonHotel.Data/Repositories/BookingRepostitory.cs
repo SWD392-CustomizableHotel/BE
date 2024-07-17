@@ -157,20 +157,6 @@ public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
                 UserName = b.User.UserName,
                 StartDate = b.StartDate,
                 EndDate = b.EndDate,
-                //Services = b.BookingServices.Select(bs => new ServiceDto
-                //{
-                //    Name = bs.Service.Name,
-                //    Code = bs.Service.Code,
-                //    Description = bs.Service.Description,
-                //    Price = bs.Service.Price
-                //}).ToList(),
-                //Amenities = b.BookingAmenities.Select(ba => new AmenityDTO
-                //{
-                //    Name = ba.Amenity.Name,
-                //    Code = ba.Amenity.Code,
-                //    Description = ba.Amenity.Description,
-                //    Price = ba.Amenity.Price
-                //}).ToList(),
                 Payments = b.Payments.Select(p => new PaymentDto
                 {
                     Amount = p.Amount,
@@ -188,5 +174,10 @@ public class BookingRepostitory : BaseRepository<Booking>, IBookingRepository
             .ToListAsync();
 
         return (bookings, totalRecords);
+    }
+
+    public async Task<Booking> GetBookingByIdAsync(int bookingId)
+    {
+        return await _context.Booking.FindAsync(bookingId);
     }
 }
