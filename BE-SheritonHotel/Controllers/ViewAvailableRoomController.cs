@@ -1,5 +1,6 @@
 ﻿using Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SWD.SheritonHotel.Data.Base;
 using SWD.SheritonHotel.Domain.Queries;
@@ -7,8 +8,8 @@ using SWD.SheritonHotel.Domain.Queries;
 namespace SWD.SheritonHotel.API.Controllers
 {
     [ApiController]
-    //[Authorize]
-    [Route("api/[controller]")]
+    [Authorize]
+    [Route("api")]
     public class ViewAvailableRoomController : ControllerBase
     {
         private readonly IMediator _mediator;

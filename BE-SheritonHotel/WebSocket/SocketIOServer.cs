@@ -2,7 +2,7 @@
 
 namespace SWD.SheritonHotel.API.WebSocket
 {
-    public class SocketIOServer
+    public class SocketIOServer 
     {
         private readonly ILogger<SocketIOServer> _logger;
         private readonly List<IWebSocketConnection> _sockets = new();
@@ -24,28 +24,19 @@ namespace SWD.SheritonHotel.API.WebSocket
                 {
                     _sockets.Add(socket);
                     _logger.LogInformation("Connection opened. Client: {0}", socket.ConnectionInfo.ClientIpAddress);
-                    this.SendMessage("Fuwawa");
-                    socket.OnMessage = message =>
-                    {
-                        _logger.LogInformation("Client says: {0}", message);
-                        foreach (var s in _sockets)
-                        {
-                            s.Send($"Client says: {message}");
-                        }
-                    };
-                };
-                socket.OnClose = () =>
-                {
-                    _sockets.Remove(socket);
-                    _logger.LogWarning("Connection closed. Client: {0}", socket.ConnectionInfo.ClientIpAddress);
                 };
                 socket.OnMessage = message =>
                 {
                     _logger.LogInformation("Client says: {0}", message);
                     foreach (var s in _sockets)
                     {
-                        s.Send($"Client says: {message}");
+                        s.Send($"{message}");
                     }
+                };
+                socket.OnClose = () =>
+                {
+                    _sockets.Remove(socket);
+                    _logger.LogWarning("Connection closed. Client: {0}", socket.ConnectionInfo.ClientIpAddress);
                 };
                 socket.OnError = ex =>
                 {
