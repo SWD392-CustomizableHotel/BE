@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SWD.SheritonHotel.Data.Base;
 using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
 using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Handlers.Handlers;
@@ -227,6 +228,38 @@ public class AuthController : ControllerBase
 
         var token = await _authService.GenerateToken(user);
         return Ok(new AuthServiceResponseDto { Token = token, IsSucceed = true });
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("GetUserFromJwt")]
+    public async Task<IActionResult> GetUserFromJwt([FromQuery] string jwt)
+    {
+        var query = new GetUserFromJwtQuery(jwt);
+        var response = await _mediator.Send(query);
+
+        if (response.IsSucceeded)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("GetUserDetailsByID")]
+    public async Task<IActionResult> GetUserDetailsById([FromQuery] string userId)
+    {
+        var query = new GetUserByIdQuery(userId);
+        var response = await _mediator.Send(query);
+
+        if (response.IsSucceeded)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
     }
     [HttpPost]
     [Route("update-profile")]

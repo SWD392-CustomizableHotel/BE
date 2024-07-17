@@ -1,5 +1,6 @@
 ﻿using Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using SWD.SheritonHotel.Domain.DTO;
 using System;
 using System.Collections.Generic;
@@ -14,12 +15,14 @@ namespace SWD.SheritonHotel.Domain.Commands
         public int RoomId { get; set; }
         public string RoomType { get; set; }
         public decimal RoomPrice { get; set; }
+        public IFormFile  ImageFile {  get; set; }
 
-        public EditRoomDetailsCommand(int roomId, string type, decimal price)
+        public EditRoomDetailsCommand(int roomId, string type, decimal price, IFormFile imageFile)
         {
             RoomId = roomId;
             RoomType = type;
             RoomPrice = price;
+            ImageFile = imageFile;    
         }
     }
 }

@@ -51,5 +51,10 @@ namespace SWD.SheritonHotel.Services.Services
         {
             return await _amentiyRepository.GetAmenitiesByRoomIdAsync(roomId);
         }
+
+        public async Task<List<Amenity>> GetAmenitiesByTypeAsync(string type)
+        {
+            return await _amentiyRepository.GetAmenitiesByTypeAsync(type);
+        }
     }
 }

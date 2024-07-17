@@ -28,9 +28,12 @@ using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
 using BookingService = Entities.BookingService;
+using SWD.SheritonHotel.Validator.Interface;
+using SWD.SheritonHotel.Domain.Configs.Firebase;
+using Newtonsoft.Json;
 using Azure.Storage.Blobs;
 using SWD.SheritonHotel.API.WebSocket;
-
+using SWD.SheritonHotel.Domain.Commands;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,6 +48,7 @@ builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.Converters.Add(new StringEnumConverter());
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
     });
 builder.Services.AddScoped(_ =>
 {
@@ -52,8 +56,19 @@ builder.Services.AddScoped(_ =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.CustomSchemaIds(type =>
+    {
+        if (type == typeof(CreatePaymentIntentCommand.Item))
+            return "CreatePaymentIntentCommand_Item";
+        if (type == typeof(CreatePaymentIntentCustomizableCommand.Item))
+            return "CreatePaymentIntentCustomizableCommand_Item";
+        return type.FullName;
+    });
+});
 StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0vPLhPNERogsVubVaRuUb2xNYC6o4r0ZZ7ZH3eXh1jd715Ft00eh5S5EDO";
+
 
 #region Add Dbcontext
 // Add DB
@@ -126,6 +141,20 @@ builder.Services
         googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
     });
 
+builder.Services.Configure<JwtBearerOptions>(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["ValidIssuer"],
+        ValidAudience = jwtSettings["ValidAudience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"])),
+    };
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -185,11 +214,13 @@ builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IAmentiyRepository, AmenityRepository>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
+builder.Services.AddScoped<IBookingAmenityRepository, BookingAmenityRepository>();
 builder.Services.AddScoped<EmailSender>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IManageService, ManageServiceService>();
+builder.Services.AddScoped<ITokenValidator, TokenValidator>();
 builder.Services.AddScoped<IAccountService, SWD.SheritonHotel.Services.Services.AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
@@ -197,7 +228,9 @@ builder.Services.AddScoped<IAssignServiceRepository, AssignServiceRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepostitory>();
 builder.Services.AddScoped<IBookingService, BookingHistoryService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<EmailVerify>();
+builder.Services.AddScoped<IPaymentIntentCustomizeService, PaymentIntentCustomizeService>();
 builder.Services.AddScoped<TokenGenerator>();
 builder.Services.AddSingleton<SocketIOServer>();
 builder.Services.AddHostedService<ApplicationWorker>();
@@ -209,6 +242,9 @@ var handler = typeof(AppHandler).GetTypeInfo().Assembly;
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
 builder.Services.AddMediatR(typeof(UpdateUserCommandHandler).Assembly);
 
+builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCommand, List<string>>, CreatePaymentIntentHandler>();
+builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCustomizableCommand, List<string>>, CreatePaymentIntentCustomizeCommandHandler>();
+
 #endregion
 
 #region Add CORS
@@ -217,12 +253,6 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 {
     build.WithOrigins("https://fe-customizablehotel.vercel.app", "http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
 }));
-#endregion
-
-#region Mapping Profile
-
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
 #endregion
 
 #region Mapping Profile
@@ -243,7 +273,12 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.MaxDepth = 32;
 });
-
+#region FireBase
+builder.Services.Configure<FirebaseConfig>(builder.Configuration.GetSection("FirebaseConfig"));
+// Set the environment variable for Google credentials
+var firebaseConfig = builder.Configuration.GetSection("FirebaseConfig").Get<FirebaseConfig>();
+Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", Path.Combine(builder.Environment.ContentRootPath, firebaseConfig.KeyFilePath));
+#endregion
 // #region Add MediateR
 // var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;
 // builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);

@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.Data.Repositories
@@ -15,12 +18,14 @@ namespace SWD.SheritonHotel.Data.Repositories
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserRepository(UserManager<ApplicationUser> userManager, ApplicationDbContext context, IMapper mapper)
+        public UserRepository(UserManager<ApplicationUser> userManager, ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _context = context;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ApplicationUser> FindUserByEmail(string email)
@@ -71,6 +76,42 @@ namespace SWD.SheritonHotel.Data.Repositories
         {
             return await _context.Users.FindAsync(staffId);
         }
+
+        public async Task<ApplicationUser> GetUserFromJWTAsync(string jWTAsync)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(jWTAsync) as JwtSecurityToken;
+            if (jsonToken != null)
+            {
+                var emailClaim = jsonToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
+
+                if (!string.IsNullOrEmpty(emailClaim))
+                {
+                    return await GetUserByEmailAsync(emailClaim);
+                }
+            }
+            return null;
+        }
+
+        public async Task<ApplicationUser> GetUserDetailsByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
+
+        public async Task<ApplicationUser> GetUserAsync()
+        {
+            if (_httpContextAccessor.HttpContext == null || _httpContextAccessor.HttpContext.User == null)
+            {
+                throw new Exception("You are not logged in");
+            }
+            var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+            if (user == null)
+            {
+                throw new Exception("Need logged in");
+            }
+            return user;
+        }
+
         public async Task<List<StaffDTO>> GetUsersByRoleAsync(string role)
         {
             var users = await _userManager.Users.ToListAsync();
