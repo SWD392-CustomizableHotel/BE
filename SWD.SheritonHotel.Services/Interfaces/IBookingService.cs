@@ -18,8 +18,5 @@ public interface IBookingService
     Task<Booking> GetBookingByIdAsync(int bookingId);
     Task<bool> CheckOut(int bookingId);
     Task<bool> Payment(int bookingId, string paymentMethod);
-
-    Task<(List<BookingHistoryDto>, int)> GetBookingHistoryByEmailAsync(string email, int pageNumber, int pageSize,
-        BookingFilter bookingFilter, string searchTerm = null);
 }
 

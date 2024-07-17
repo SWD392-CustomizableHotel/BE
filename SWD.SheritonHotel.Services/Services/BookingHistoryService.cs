@@ -126,10 +126,4 @@ public class BookingHistoryService : IBookingService
 
         return true;
     }
-
-    public async Task<(List<BookingHistoryDto>, int)> GetBookingHistoryByEmailAsync(string email, int pageNumber, int pageSize, BookingFilter bookingFilter,
-        string searchTerm = null)
-    {
-        return await _bookingRepository.GetBookingHistoryByEmailAsync(email, pageNumber, pageSize, bookingFilter, searchTerm);
-    }
 }
