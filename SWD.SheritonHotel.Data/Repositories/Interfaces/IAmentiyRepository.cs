@@ -27,5 +27,6 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
                     AmenityFilter? amenityFilter, string searchTerm = null);
         Task<List<Amenity>> GetAmenitiesByRoomIdAsync(int roomId);
         Task<List<Amenity>> GetAmenitiesByTypeAsync(string type);
+        Task Update(Amenity amenity);
     }
 }

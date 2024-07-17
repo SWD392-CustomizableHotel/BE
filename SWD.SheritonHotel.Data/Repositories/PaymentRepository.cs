@@ -24,5 +24,11 @@ namespace SWD.SheritonHotel.Data.Repositories
             await _context.SaveChangesAsync();
             return payment.Id;
         }
+
+        public async Task UpdatePayment(Payment payment)
+        {
+            _context.Update(payment);
+            await _context.SaveChangesAsync();
+        }
     }
 }

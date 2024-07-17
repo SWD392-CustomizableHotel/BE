@@ -11,5 +11,6 @@ namespace SWD.SheritonHotel.Data.Repositories.Interfaces
     public interface IPaymentRepository : IBaseRepository<Payment>
     {
         Task<int> CreatePaymentAsync(Payment payment);
+        Task UpdatePayment(Payment payment);
     }
 }

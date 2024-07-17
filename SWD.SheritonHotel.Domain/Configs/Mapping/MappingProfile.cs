@@ -33,6 +33,24 @@ namespace SWD.SheritonHotel.Domain.Configs.Mapping
 
             CreateMap<CreatePaymentIntentCustomizableCommand, CreatePaymentIntentDTO>().ReverseMap();
             CreateMap<CreatePaymentIntentCustomizableCommand.Item, CreatePaymentIntentDTO.Item>().ReverseMap();
+            CreateMap<Booking, BookingDetailsDto>()
+                .ForMember(dest => dest.RoomType, opt => opt.MapFrom(src => src.Room.Type))
+                .ForMember(dest => dest.RoomDescription, opt => opt.MapFrom(src => src.Room.Description))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
+                .ForMember(dest => dest.Amenities, opt => opt.MapFrom(src => src.BookingAmenities.Select(ba => new AmenityDTO
+                {
+                    Name = ba.Amenity.Name,
+                    Code = ba.Amenity.Code,
+                    Description = ba.Amenity.Description,
+                    Price = ba.Amenity.Price,
+                })))
+                .ForMember(dest => dest.Payments, opt => opt.MapFrom(src => src.Payments.Select(p => new PaymentDto
+                {
+                    Amount = p.Amount,
+                    Status = p.Status,
+                    PaymentMethod = p.PaymentMethod,
+                })))
+                .ForMember(dest => dest.TotalPrice, opt => opt.Ignore());
         }
     }
 }

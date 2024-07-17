@@ -9,4 +9,7 @@ public interface IBookingRepository : IBaseRepository<Booking>
 {
     Task<(List<BookingHistoryDto>, int)> GetBookingHistoryAsync(string userId, int pageNumber, int pageSize, BookingFilter bookingFilter, string searchTerm = null);
     Task<int> CreateBookingAsync(Booking booking);
+    Task<(List<BookingHistoryDto>, int)> GetAllBookingHistoryByEndDateAsync(int pageNumber, int pageSize, BookingFilter bookingFilter, string searchTerm);
+    Task<Booking> GetByIdAsync(int bookingId);
+    Task<(List<BookingHistoryDto>, int)> GetBookingHistoryByEmailAsync(string email, int pageNumber, int pageSize, BookingFilter bookingFilter, string searchTerm);
 }
