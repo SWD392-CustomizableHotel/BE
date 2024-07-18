@@ -1,7 +1,7 @@
-﻿using Entities;
-using SWD.SheritonHotel.Data.Base;
+﻿using SWD.SheritonHotel.Data.Base;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

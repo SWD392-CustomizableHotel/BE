@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SWD.SheritonHotel.Application.Queries;
-using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.Queries.OtherQuery;
 using System.Threading.Tasks;
 
 namespace SWD.SheritonHotel.API.Controllers

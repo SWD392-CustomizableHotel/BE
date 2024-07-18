@@ -1,9 +1,9 @@
-﻿using Entities;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.Commands.IdentityCard;
 using SWD.SheritonHotel.Domain.Queries;
+using SWD.SheritonHotel.Domain.Queries.IdentityCardQuery;
 
 namespace SWD.SheritonHotel.API.Controllers
 {
@@ -20,7 +20,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "STAFF")]
-        [Route("upload-identity-card")]
         public async Task<IActionResult> UploadIdentityCard([FromForm] UploadIdentityCardCommand command)
         {
             var result = await _mediator.Send(command);
@@ -29,7 +28,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "STAFF")]
-        [Route("get-all-identity-cards")]
         public async Task<IActionResult> GetAllIdentityCards()
         {
             var query = new GetAllIdentityCardsQuery();

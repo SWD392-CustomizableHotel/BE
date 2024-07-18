@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using Entities;
 
 namespace SWD.SheritonHotel.Domain.Entities;
 

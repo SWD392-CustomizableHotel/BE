@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using SWD.SheritonHotel.Domain.Base;
-using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.IdentityCard;
 using SWD.SheritonHotel.Domain.Entities;
 using System;
 using System.Collections.Generic;

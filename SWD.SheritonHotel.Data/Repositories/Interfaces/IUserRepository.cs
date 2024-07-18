@@ -1,7 +1,7 @@
-﻿using Entities;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using SWD.SheritonHotel.Domain.Base;
-using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Account;
+using SWD.SheritonHotel.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

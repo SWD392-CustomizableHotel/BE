@@ -1,7 +1,7 @@
-﻿using Dtos;
-using Entities;
-using Google.Apis.Auth;
-using SWD.SheritonHotel.Domain.DTO;
+﻿using Google.Apis.Auth;
+using SWD.SheritonHotel.Domain.DTO.Auth;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.Entities;
 
 namespace Interfaces
 {

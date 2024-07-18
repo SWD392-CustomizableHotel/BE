@@ -6,11 +6,17 @@ using Microsoft.AspNetCore.Mvc;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Domain.Commands;
 using SWD.SheritonHotel.Domain.Queries;
-using Entities;
 using SWD.SheritonHotel.Domain.DTO;
+using Swashbuckle.AspNetCore.Annotations;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.Entities;
+using SWD.SheritonHotel.Domain.Commands.HotelCommand;
+using SWD.SheritonHotel.Domain.Queries.HotelQuery;
 
 namespace SWD.SheritonHotel.API.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class HotelController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -19,9 +25,8 @@ namespace SWD.SheritonHotel.API.Controllers
             _mediator = mediator;
         }
 
+        [SwaggerOperation(Summary = "Get all hotels")]
         [HttpGet]
-        //[Authorize(Roles = "ADMIN")]
-        [Route("get-hotels")]
         public async Task<IActionResult> GetAllHotels()
         {
             var query = new GetAllHotelsQuery();
@@ -29,6 +34,7 @@ namespace SWD.SheritonHotel.API.Controllers
             return Ok(result);
         }
 
+        [SwaggerOperation(Summary = "Seed available hotels by system", Description = "This API is just for seeding hotels")]
         [HttpPost]
         [Route("seed-hotels")]
         public async Task<IActionResult> SeedHotels()
@@ -37,9 +43,9 @@ namespace SWD.SheritonHotel.API.Controllers
             {
                 new Hotel
                 {
-                    Code = "Hotel 1",
-                    Address = "123 Main St",
-                    Phone = "123-456-7890",
+                    Code = "Ho Chi Minh",
+                    Address = "Ho Chi Minh",
+                    Phone = "0963500436",
                     Description = "A lovely hotel in the heart of the city",
                     CreatedBy = "System",
                     IsDeleted = false,
@@ -48,9 +54,9 @@ namespace SWD.SheritonHotel.API.Controllers
                 },
                 new Hotel
                 {
-                    Code = "Hotel 2",
-                    Address = "456 Elm St",
-                    Phone = "987-654-3210",
+                    Code = "Ha Noi",
+                    Address = "Ha Noi",
+                    Phone = "0963500436",
                     Description = "A cozy hotel near the park",
                     CreatedBy = "System",
                     IsDeleted = false,

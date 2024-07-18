@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.Commands.PaymentCommand;
 
 namespace SWD.SheritonHotel.API.Controllers
 {

@@ -1,5 +1,4 @@
-﻿using Entities;
-using Interfaces;
+﻿using Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -13,13 +12,11 @@ using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Handlers;
-using SWD.SheritonHotel.Handlers.Handlers;
 using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services;
 using SWD.SheritonHotel.Services.Services;
 using SWD.SheritonHotel.Data.Context;
 using Microsoft.AspNetCore.Http.Features;
-using SWD.SheritonHotel.Domain.Handlers;
 using Stripe;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -27,14 +24,20 @@ using SWD.SheritonHotel.Validator;
 using System.Reflection;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System.Text;
-using BookingService = Entities.BookingService;
+using BookingService = SWD.SheritonHotel.Domain.Entities.BookingService;
 using SWD.SheritonHotel.Validator.Interface;
 using SWD.SheritonHotel.Domain.Configs.Firebase;
 using Newtonsoft.Json;
 using Azure.Storage.Blobs;
 using SWD.SheritonHotel.API.WebSocket;
-using SWD.SheritonHotel.Domain.Commands;
 using Google.Api;
+using SWD.SheritonHotel.Domain.Entities;
+using SWD.SheritonHotel.Domain.Commands.PaymentCommand;
+using SWD.SheritonHotel.Handlers.Handlers.ServiceHandler.QueriesHandler;
+using SWD.SheritonHotel.Handlers.Handlers.PaymentHandler.CommandsHandler;
+using SWD.SheritonHotel.Handlers.Handlers.ServiceHandler.CommandsHandler;
+using SWD.SheritonHotel.Handlers.Handlers.RoomHandler.QueriesHandler;
+using SWD.SheritonHotel.API;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -68,6 +71,8 @@ builder.Services.AddSwaggerGen(c =>
             return "CreatePaymentIntentCustomizableCommand_Item";
         return type.FullName;
     });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sheriton Hotel API", Version = "v1.0" });
+    c.DocumentFilter<LowercaseDocumentFilter>();
 });
 StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0vPLhPNERogsVubVaRuUb2xNYC6o4r0ZZ7ZH3eXh1jd715Ft00eh5S5EDO";
 
@@ -76,7 +81,7 @@ StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("SheritonDB_D");
+    var connectionString = builder.Configuration.GetConnectionString("SheritonDB");
     options.UseSqlServer(connectionString);
 });
 #endregion

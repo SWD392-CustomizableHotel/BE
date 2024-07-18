@@ -1,8 +1,7 @@
-﻿using SWD.SheritonHotel.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Entities
+namespace SWD.SheritonHotel.Domain.Entities
 {
     public class Hotel : BaseEntity
     {

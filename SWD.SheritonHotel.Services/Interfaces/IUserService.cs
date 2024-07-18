@@ -1,4 +1,4 @@
-﻿using Entities;
+﻿using SWD.SheritonHotel.Domain.Entities;
 
 namespace Interfaces
 {

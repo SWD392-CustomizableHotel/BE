@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
-using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Account;
+using SWD.SheritonHotel.Domain.Entities;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

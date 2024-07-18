@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Base;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
-using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Service;
 using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Domain.OtherObjects;
 

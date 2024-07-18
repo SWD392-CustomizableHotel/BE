@@ -1,15 +1,17 @@
-﻿using Entities;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Domain.Queries;
+using SWD.SheritonHotel.Domain.Queries.RoomQuery;
 
 namespace SWD.SheritonHotel.API.Controllers
 {
     [ApiController]
     [Authorize]
-    [Route("api")]
+    [Route("api/view-available-room")]
     public class ViewAvailableRoomController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -20,7 +22,6 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpGet]
-        [Route("rooms")]
         public async Task<IActionResult> GetAllRoom(CancellationToken cancellationToken = default)
         {
             try

@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SWD.SheritonHotel.Domain.Commands;
-using SWD.SheritonHotel.Domain.Queries;
+using SWD.SheritonHotel.Domain.Commands.PaymentCommand;
+using SWD.SheritonHotel.Domain.Queries.PaymentQuery;
 
 namespace SWD.SheritonHotel.API.Controllers
 {
@@ -18,7 +18,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpPost]
         [Authorize]
-        [Route("create-payment")]
         public async Task<IActionResult> CreatePayment(CreatePaymentCommand command)
         {
             var paymentId = await _mediator.Send(command);
@@ -27,7 +26,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "STAFF")]
-        [Route("get-payment")]
         public async Task<IActionResult> GetPaymentId([FromQuery] GetPaymentIdQuery query)
         {
             var result = await _mediator.Send(query);
@@ -47,7 +45,7 @@ namespace SWD.SheritonHotel.API.Controllers
             return Ok(paymentId);
         }
 
-        [HttpPost("update-payment-status")]
+        [HttpPut]
         [Authorize(Roles = "STAFF")]
         public async Task<IActionResult> UpdatePaymentStatus([FromBody] UpdatePaymentStatusCommand command)
         {

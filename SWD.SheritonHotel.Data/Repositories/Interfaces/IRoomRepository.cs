@@ -1,5 +1,4 @@
-﻿using Entities;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using SWD.SheritonHotel.Domain.Base;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System;
@@ -8,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SWD.SheritonHotel.Domain.Base;
+using SWD.SheritonHotel.Domain.Entities;
 
 namespace SWD.SheritonHotel.Data.Repositories.Interfaces
 {

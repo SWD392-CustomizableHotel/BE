@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.Commands.AmenityCommand;
 
 namespace SWD.SheritonHotel.Validator
 {

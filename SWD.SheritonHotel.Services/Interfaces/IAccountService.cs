@@ -1,4 +1,4 @@
-using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Account;
 using SWD.SheritonHotel.Domain.OtherObjects;
 
 namespace SWD.SheritonHotel.Services.Interfaces;

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Entities;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
-using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Service;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Services.Interfaces;
 using System;

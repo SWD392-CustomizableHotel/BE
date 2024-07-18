@@ -1,10 +1,7 @@
-﻿using Entities;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
-using SWD.SheritonHotel.Domain.Commands;
-using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Services.Interfaces;
 using FluentValidation.Results;
@@ -13,6 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.DTO.IdentityCard;
+using SWD.SheritonHotel.Domain.Commands.IdentityCard;
 
 namespace SWD.SheritonHotel.Services.Services
 {

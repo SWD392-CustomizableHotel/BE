@@ -1,12 +1,13 @@
-﻿using Entities;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OtherObjects;
-using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.Commands.ServiceCommand;
 using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Domain.Queries;
+using SWD.SheritonHotel.Domain.Queries.AccountQuery;
+using SWD.SheritonHotel.Domain.Queries.RoomQuery;
+using SWD.SheritonHotel.Domain.Queries.ServiceQuery;
 using SWD.SheritonHotel.Handlers.Handlers;
 using SWD.SheritonHotel.Services.Interfaces;
 
@@ -27,7 +28,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
-        [Route("get-all-services")]
         public async Task<IActionResult> GetAllServices([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] ServiceFilter serviceFilter = null, [FromQuery] string? searchTerm = null)
         {
             var paginationFilter = new PaginationFilter(pageNumber, pageSize);
@@ -39,7 +39,7 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
-        [Route("get-service-by-id/{serviceId}")]
+        [Route("{serviceId}")]
         public async Task<IActionResult> GetServiceById(int serviceId)
         {
             var query = new GetServiceByIdQuery(serviceId);
@@ -49,7 +49,7 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
-        [Route("get-room-service/{roomId}")]
+        [Route("room/{roomId}")]
         public async Task<IActionResult> GetAmenitiesByRoomId(int roomId)
         {
             var query = new GetServicesByRoomIdQuery(roomId);
@@ -59,7 +59,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        [Route("create-service")]
         public async Task<IActionResult> CreateService(CreateServiceCommand command)
         {
             var newService = await _mediator.Send(command);
@@ -68,7 +67,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpPut]
         [Authorize(Roles = "ADMIN")]
-        [Route("update-service")]
         public async Task<IActionResult> UpdateService([FromBody] UpdateServiceCommand command)
         {
             var result = await _mediator.Send(command);
@@ -85,7 +83,7 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpPut]
         [Authorize(Roles = "ADMIN")]
-        [Route("update-service-status")]
+        [Route("status")]
         public async Task<IActionResult> UpdateServiceStatus(int serviceId, ServiceStatus status)
         {
             var command = new UpdateServiceStatusCommand
@@ -99,7 +97,7 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpDelete]
         [Authorize(Roles = "ADMIN")]
-        [Route("delete-service/{serviceId}")]
+        [Route("{serviceId}")]
         public async Task<IActionResult> DeleteService(int serviceId)
         {
             var command = new DeleteServiceCommand

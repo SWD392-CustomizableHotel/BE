@@ -1,10 +1,14 @@
-﻿using Entities;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.Commands.Booking;
+using SWD.SheritonHotel.Domain.Commands.PaymentCommand;
+using SWD.SheritonHotel.Domain.Commands.RoomCommand;
 using SWD.SheritonHotel.Domain.DTO;
-using SWD.SheritonHotel.Domain.Queries;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.Entities;
+using SWD.SheritonHotel.Domain.Queries.RoomQuery;
 
 namespace SWD.SheritonHotel.API.Controllers
 {
@@ -23,7 +27,6 @@ namespace SWD.SheritonHotel.API.Controllers
          * @return base response
          */
         [HttpPost]
-        [Route("get-all")]
         public async Task<IActionResult> GetAllRooms([FromBody] GetAllCustomizableRoomsQuery query)
         {
             var results = await _mediator.Send(query);
@@ -99,26 +102,6 @@ namespace SWD.SheritonHotel.API.Controllers
                     Message = "Error: " + ex.Message,
                 });
             }
-        }
-
-        /*
-         * Lấy amenities dựa trên Amenities Type (Basic, Advanced, Family)
-         */
-        [HttpGet]
-        [Route("get-amenity/{type}")]
-        public async Task<IActionResult> GetAmenityByType(string type)
-        {
-            var query = new GetAmenityByTypeQuery()
-            {
-                AmenityType = type
-            };
-            var results = await _mediator.Send(query);
-            return Ok(new BaseResponse<Amenity>
-            {
-                IsSucceed = true,
-                Results = results,
-                Message = "Retrieved amenity successfully"
-            });
         }
 
         /*
