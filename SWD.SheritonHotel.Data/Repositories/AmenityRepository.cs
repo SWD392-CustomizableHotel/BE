@@ -45,7 +45,6 @@ namespace SWD.SheritonHotel.Data.Repositories
                 amenity.InUse = inUse;
                 amenity.LastUpdatedBy = updatedBy;
                 Update(amenity);
-                await _context.SaveChangesAsync();
                 return amenity;
             }
             else
