@@ -61,6 +61,7 @@ namespace SWD.SheritonHotel.Handlers.Handlers.RoomHandler.CommandsHandler
                 Description = request.Description,
                 HotelId = request.HotelId,
                 CreatedBy = user.UserName,
+                RoomSize = request.RoomSize,
                 LastUpdatedBy = user.UserName,
                 CreatedDate = DateTime.UtcNow,
                 StartDate = request.StartDate,
