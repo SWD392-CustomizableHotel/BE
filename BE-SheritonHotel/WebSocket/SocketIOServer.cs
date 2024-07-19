@@ -11,7 +11,7 @@ namespace SWD.SheritonHotel.API.WebSocket
         public SocketIOServer(ILogger<SocketIOServer> logger)
         {
             _logger = logger;
-            _server = new WebSocketServer("ws://sheritonhotel.azurewebsites.net:8181");
+            _server = new WebSocketServer("ws://0.0.0.0:8181");
             _server.SupportedSubProtocols = new []{ "superchat", "chat", "websocket" };
         }
 
