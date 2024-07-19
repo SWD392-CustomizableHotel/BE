@@ -81,7 +81,7 @@ StripeConfiguration.ApiKey =
 // Add DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("SheritonDB");
+    var connectionString = builder.Configuration.GetConnectionString("SheritonDB_D");
     options.UseSqlServer(connectionString);
 });
 #endregion
