@@ -57,7 +57,7 @@ public class BookingController : ControllerBase
     }
     
     [HttpGet]
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "STAFF")]
     [Route("check-out")]
     public async Task<IActionResult> GetBookingByEndDate([FromQuery] BookingFilter bookingFilter,
         [FromQuery] string? searchTerm = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
