@@ -49,7 +49,7 @@ public class BookingController : ControllerBase
         }
     }
     [HttpPost]
-    [Authorize(Roles = "STAFF")]
+    [Authorize]
     public async Task<IActionResult> CreateBooking(CreateBookingCommand command)
     {
         var bookingId = await _mediator.Send(command);
