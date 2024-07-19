@@ -80,7 +80,7 @@ namespace SWD.SheritonHotel.API.Controllers
         [HttpPut]
         [Authorize(Roles = "ADMIN")]
         [Route("{roomId}")]
-        public async Task<IActionResult> EditRoomDetails(int roomId, string type, decimal price, IFormFile ImageFile)
+        public async Task<IActionResult> EditRoomDetails(int roomId, string type, decimal price, IFormFile? ImageFile)
         {
             var command = new EditRoomDetailsCommand(roomId, type, price, ImageFile);
             var result = await _mediator.Send(command);
