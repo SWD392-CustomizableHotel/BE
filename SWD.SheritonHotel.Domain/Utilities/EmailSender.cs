@@ -20,7 +20,7 @@ namespace SWD.SheritonHotel.Domain.Utilities
         {
             var subject = "[Sheriton Hotel] Reset password request";
             var baseUrl = "https://fe-customizablehotel.vercel.app";
-            var verifyUrl = $"{baseUrl}/reset-password?email={email}&token={token}";
+            var verifyUrl = $"{baseUrl}/reset-password?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
             var message = @"
 <!DOCTYPE html>
 <html dir='ltr' xmlns='http://www.w3.org/1999/xhtml' xmlns:o='urn:schemas-microsoft-com:office:office'>

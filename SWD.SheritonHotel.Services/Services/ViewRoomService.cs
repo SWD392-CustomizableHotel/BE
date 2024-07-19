@@ -1,5 +1,5 @@
-﻿using Entities;
-using SWD.SheritonHotel.Data.Repositories.Interfaces;
+﻿using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Services.Interfaces;
 using System;
 using System.Collections.Generic;

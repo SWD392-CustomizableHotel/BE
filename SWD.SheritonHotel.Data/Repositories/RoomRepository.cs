@@ -1,5 +1,4 @@
 ﻿using static Microsoft.EntityFrameworkCore.DbContext;
-using Entities;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.OtherObjects;
@@ -15,6 +14,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Storage.v1.Data;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using SWD.SheritonHotel.Domain.Entities;
 
 namespace SWD.SheritonHotel.Data.Repositories
 {
@@ -274,6 +274,12 @@ namespace SWD.SheritonHotel.Data.Repositories
                 .Include(entity => entity.Hotel)
                 .ToListAsync();
             return results;
+        }
+
+        public async Task Update(Room room)
+        {
+            _context.Room.Update(room); 
+            await _context.SaveChangesAsync();
         }
     }
 }

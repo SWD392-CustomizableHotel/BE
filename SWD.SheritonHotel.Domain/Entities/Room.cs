@@ -1,8 +1,7 @@
-﻿using SWD.SheritonHotel.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Entities
+namespace SWD.SheritonHotel.Domain.Entities
 {
     public class Room : BaseEntity
     {
@@ -13,8 +12,8 @@ namespace Entities
         public string Description { get; set; }
         public string Status { get; set; }
         public string? ImagePath { get; set; }
-        public string? Image {  get; set; }
-        public string? CanvasImage {  get; set; } // Customizing Request
+        public string? Image { get; set; }
+        public string? CanvasImage { get; set; } // Customizing Request
         public int NumberOfPeople { get; set; }
 
         [ForeignKey("HotelId")]

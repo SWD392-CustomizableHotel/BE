@@ -1,14 +1,14 @@
-﻿using Interfaces;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SWD.SheritonHotel.Domain.OtherObjects;
-using SWD.SheritonHotel.Domain.Commands;
-using SWD.SheritonHotel.Domain.Queries;
+using SWD.SheritonHotel.Domain.Commands.RoomCommand;
+using SWD.SheritonHotel.Domain.Queries.RoomQuery;
 
 namespace SWD.SheritonHotel.API.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class RoomController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -20,7 +20,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        [Route("create-room")]
         public async Task<IActionResult> CreateRoom([FromForm]CreateRoomCommand command)
         {
             var result = await _mediator.Send(command);
@@ -34,7 +33,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
-        [Route("get-rooms")]
         public async Task<IActionResult> GetAllRooms([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] RoomFilter roomFilter = null, [FromQuery] string? searchTerm = null)
         {
             var paginationFilter = new PaginationFilter(pageNumber, pageSize);
@@ -44,7 +42,7 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpGet]
-        [Route("get-room-details/{roomId}")]
+        [Route("{roomId}")]
         public async Task<IActionResult> GetRoomDetails(int roomId)
         {
             var query = new GetRoomDetailsQuery(roomId);
@@ -53,7 +51,8 @@ namespace SWD.SheritonHotel.API.Controllers
         }
 
         [HttpPut]
-        [Route("update-room-status")]
+        [Authorize]
+        [Route("status")]
         public async Task<IActionResult> UpdateRoomStatus(int roomId, string status)
         {
             var command = new UpdateRoomStatusCommand
@@ -67,7 +66,7 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpDelete]
         [Authorize(Roles = "ADMIN")]
-        [Route("delete-room/{roomId}")]
+        [Route("{roomId}")]
         public async Task<IActionResult> DeleteRoom(int roomId)
         {
             var command = new DeleteRoomCommand
@@ -80,8 +79,8 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpPut]
         [Authorize(Roles = "ADMIN")]
-        [Route("edit-room-details/{roomId}")]
-        public async Task<IActionResult> EditRoomDetails(int roomId, string type, decimal price, IFormFile ImageFile)
+        [Route("{roomId}")]
+        public async Task<IActionResult> EditRoomDetails(int roomId, string type, decimal price, IFormFile? ImageFile)
         {
             var command = new EditRoomDetailsCommand(roomId, type, price, ImageFile);
             var result = await _mediator.Send(command);

@@ -1,49 +1,55 @@
-using Entities;
+﻿using System.Reflection;
+using System.Text;
+using Azure.Storage.Blobs;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Google.Api;
 using Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Services;
+using Stripe;
+using SWD.SheritonHotel.API;
+using SWD.SheritonHotel.API.WebSocket;
+using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.Commands.PaymentCommand;
+using SWD.SheritonHotel.Domain.Configs.Firebase;
+using SWD.SheritonHotel.Domain.Entities;
+using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Domain.Utilities;
 using SWD.SheritonHotel.Handlers;
-using SWD.SheritonHotel.Handlers.Handlers;
-using SWD.SheritonHotel.Services.Interfaces;
+using SWD.SheritonHotel.Handlers.Handlers.PaymentHandler.CommandsHandler;
+using SWD.SheritonHotel.Handlers.Handlers.RoomHandler.QueriesHandler;
+using SWD.SheritonHotel.Handlers.Handlers.ServiceHandler.CommandsHandler;
+using SWD.SheritonHotel.Handlers.Handlers.ServiceHandler.QueriesHandler;
 using SWD.SheritonHotel.Services;
+using SWD.SheritonHotel.Services.Interfaces;
 using SWD.SheritonHotel.Services.Services;
-using SWD.SheritonHotel.Data.Context;
-using Microsoft.AspNetCore.Http.Features;
-using SWD.SheritonHotel.Domain.Handlers;
-using Stripe;
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using SWD.SheritonHotel.Validator;
-using System.Reflection;
-using SWD.SheritonHotel.Domain.OtherObjects;
-using System.Text;
-using BookingService = Entities.BookingService;
 using SWD.SheritonHotel.Validator.Interface;
-using SWD.SheritonHotel.Domain.Configs.Firebase;
-using Newtonsoft.Json;
-using Azure.Storage.Blobs;
-using SWD.SheritonHotel.Domain.Commands;
-
+using BookingService = SWD.SheritonHotel.Domain.Entities.BookingService;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"C:\VisionAI\vision-ai-428311-e8ec8670484d.json");
 
 builder.Services.AddControllers();
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 20971520; // 20MB
 });
-builder.Services.AddControllers()
+builder
+    .Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.Converters.Add(new StringEnumConverter());
@@ -65,9 +71,11 @@ builder.Services.AddSwaggerGen(c =>
             return "CreatePaymentIntentCustomizableCommand_Item";
         return type.FullName;
     });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sheriton Hotel API", Version = "v1.0" });
+    c.DocumentFilter<LowercaseDocumentFilter>();
 });
-StripeConfiguration.ApiKey = "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0vPLhPNERogsVubVaRuUb2xNYC6o4r0ZZ7ZH3eXh1jd715Ft00eh5S5EDO";
-
+StripeConfiguration.ApiKey =
+    "sk_test_51PZTGERt4Jb0KcASvnNu77y3c6lmQJNpLD3gvERz0vPLhPNERogsVubVaRuUb2xNYC6o4r0ZZ7ZH3eXh1jd715Ft00eh5S5EDO";
 
 #region Add Dbcontext
 // Add DB
@@ -82,11 +90,10 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 #region Add, Config Identity and Role
 // Add Identity
-builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole>()
+builder
+    .Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-
 
 // Config Identity
 builder.Services.Configure<IdentityOptions>(options =>
@@ -102,8 +109,12 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 // Config Token expiration
 builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
-   opt.TokenLifespan = TimeSpan.FromDays(1));
+    opt.TokenLifespan = TimeSpan.FromDays(1)
+);
 
+// Config FPT AI
+builder.Services.Configure<FPTAIOptions>(builder.Configuration.GetSection("FPTAI"));
+builder.Services.AddHttpClient();
 #endregion
 
 #region JwtBear and Authentication, Swagger API
@@ -111,8 +122,8 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
 // Add Authentication and JwtBearer
 var jwtSettings = builder.Configuration.GetSection("JWT");
 
-builder.Services
-    .AddAuthentication(options =>
+builder
+    .Services.AddAuthentication(options =>
     {
         // options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -130,12 +141,16 @@ builder.Services
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings["ValidIssuer"],
             ValidAudience = jwtSettings["ValidAudience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"])),
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings["Secret"])
+            ),
         };
     })
     .AddGoogle(googleOptions =>
     {
-        IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("GoogleAuthSettings:Google");
+        IConfigurationSection googleAuthNSection = builder.Configuration.GetSection(
+            "GoogleAuthSettings:Google"
+        );
         googleOptions.ClientId = googleAuthNSection["ClientId"];
         googleOptions.ClientSecret = googleAuthNSection["ClientSecret"];
     });
@@ -155,47 +170,63 @@ builder.Services.Configure<JwtBearerOptions>(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Please enter your token with this format: ''Bearer YOUR_TOKEN''",
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-        BearerFormat = "JWT",
-        Scheme = "bearer"
-    });
-    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
+    options.AddSecurityDefinition(
+        "Bearer",
+        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
         {
-            new OpenApiSecurityScheme
-            {
-                Name = "Bearer",
-                In = ParameterLocation.Header,
-                Reference = new OpenApiReference
-                {
-                    Id = "Bearer",
-                    Type = ReferenceType.SecurityScheme
-                }
-            },
-            new List<string>()
+            Name = "Authorization",
+            In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+            Description = "Please enter your token with this format: ''Bearer YOUR_TOKEN''",
+            Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+            BearerFormat = "JWT",
+            Scheme = "bearer"
         }
-    });
-    options.MapType<ServiceStatus>(() => new OpenApiSchema
-    {
-        Type = "string",
-        Enum = Enum.GetNames(typeof(ServiceStatus))
-                    .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
-    });
-    options.MapType<AmenityStatus>(() => new OpenApiSchema
-    {
-        Type = "string",
-        Enum = Enum.GetNames(typeof(AmenityStatus))
-                   .Select(name => (IOpenApiAny)new OpenApiString(name)).ToList()
-    });
-});
+    );
+    options.AddSecurityRequirement(
+        new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Name = "Bearer",
+                    In = ParameterLocation.Header,
+                    Reference = new OpenApiReference
+                    {
+                        Id = "Bearer",
+                        Type = ReferenceType.SecurityScheme
+                    }
+                },
+                new List<string>()
+            }
+        }
+    );
+    options.OperationFilter<FileUploadOperationFilter>();
 
+    options.MapType<ServiceStatus>(
+        () =>
+            new OpenApiSchema
+            {
+                Type = "string",
+                Enum = Enum.GetNames(typeof(ServiceStatus))
+                    .Select(name => (IOpenApiAny)new OpenApiString(name))
+                    .ToList()
+            }
+    );
+    options.MapType<AmenityStatus>(
+        () =>
+            new OpenApiSchema
+            {
+                Type = "string",
+                Enum = Enum.GetNames(typeof(AmenityStatus))
+                    .Select(name => (IOpenApiAny)new OpenApiString(name))
+                    .ToList()
+            }
+    );
+    options.MapType<IFormFile>(() => new OpenApiSchema { Type = "file" });
+});
 
 #endregion
 
@@ -220,6 +251,8 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IManageService, ManageServiceService>();
 builder.Services.AddScoped<ITokenValidator, TokenValidator>();
+builder.Services.AddScoped<IIdentityCardRepository, IdentityCardRepository>();
+builder.Services.AddScoped<IIdentityCardService, IdentityCardService>();
 builder.Services.AddScoped<IAccountService, SWD.SheritonHotel.Services.Services.AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAssignServiceService, AssignServiceService>();
@@ -231,6 +264,8 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<EmailVerify>();
 builder.Services.AddScoped<IPaymentIntentCustomizeService, PaymentIntentCustomizeService>();
 builder.Services.AddScoped<TokenGenerator>();
+builder.Services.AddSingleton<SocketIOServer>();
+builder.Services.AddHostedService<ApplicationWorker>();
 #endregion
 
 #region Add MediatR
@@ -238,18 +273,33 @@ builder.Services.AddScoped<TokenGenerator>();
 var handler = typeof(AppHandler).GetTypeInfo().Assembly;
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly(), handler);
 builder.Services.AddMediatR(typeof(UpdateUserCommandHandler).Assembly);
+builder.Services.AddMediatR(typeof(CreatePaymentForLaterHandler).Assembly);
 
-builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCommand, List<string>>, CreatePaymentIntentHandler>();
-builder.Services.AddTransient<IRequestHandler<CreatePaymentIntentCustomizableCommand, List<string>>, CreatePaymentIntentCustomizeCommandHandler>();
+builder.Services.AddTransient<
+    IRequestHandler<CreatePaymentIntentCommand, List<string>>,
+    CreatePaymentIntentHandler
+>();
+builder.Services.AddTransient<
+    IRequestHandler<CreatePaymentIntentCustomizableCommand, List<string>>,
+    CreatePaymentIntentCustomizeCommandHandler
+>();
 
 #endregion
 
 #region Add CORS
 //CORS
-builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
-{
-    build.WithOrigins("https://fe-customizablehotel.vercel.app", "http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
-}));
+builder.Services.AddCors(p =>
+    p.AddPolicy(
+        "corspolicy",
+        build =>
+        {
+            build
+                .WithOrigins("https://fe-customizablehotel.vercel.app", "http://localhost:4200")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        }
+    )
+);
 #endregion
 
 #region Mapping Profile
@@ -259,22 +309,33 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 #endregion
 
 #region FluentValidator
-builder.Services.AddFluentValidationAutoValidation()
-                .AddFluentValidationClientsideAdapters();
+builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateServiceCommandValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateServiceCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UploadIdentityCardCommandValidator>();
 #endregion
 // Add Controllers
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-    options.JsonSerializerOptions.MaxDepth = 32;
-});
+builder
+    .Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System
+            .Text
+            .Json
+            .Serialization
+            .ReferenceHandler
+            .IgnoreCycles;
+        options.JsonSerializerOptions.MaxDepth = 32;
+    });
 #region FireBase
 builder.Services.Configure<FirebaseConfig>(builder.Configuration.GetSection("FirebaseConfig"));
+
 // Set the environment variable for Google credentials
 var firebaseConfig = builder.Configuration.GetSection("FirebaseConfig").Get<FirebaseConfig>();
-Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", Path.Combine(builder.Environment.ContentRootPath, firebaseConfig.KeyFilePath));
+Environment.SetEnvironmentVariable(
+    "GOOGLE_APPLICATION_CREDENTIALS",
+    Path.Combine(builder.Environment.ContentRootPath, firebaseConfig.KeyFilePath)
+);
 #endregion
 // #region Add MediateR
 // var handler = typeof(GetAllRoomsQueryHandler).GetTypeInfo().Assembly;
@@ -289,7 +350,6 @@ Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", Path.Combin
 //#endregion
 
 var app = builder.Build();
-
 
 if (app.Environment.IsDevelopment())
 {
@@ -307,5 +367,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
 //RUN
-app.Run();
+await app.RunAsync();

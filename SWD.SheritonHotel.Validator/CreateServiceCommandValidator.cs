@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.Commands.ServiceCommand;
 using System;
 using System.Collections.Generic;
 using System.Linq;

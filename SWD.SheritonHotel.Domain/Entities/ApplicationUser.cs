@@ -3,9 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
-using SWD.SheritonHotel.Domain.Entities;
 
-namespace Entities
+namespace SWD.SheritonHotel.Domain.Entities
 {
     public class ApplicationUser : IdentityUser<string>
     {

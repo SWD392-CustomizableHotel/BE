@@ -1,20 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
-using Dtos;
-using Entities;
 using Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SWD.SheritonHotel.Data.Base;
-using SWD.SheritonHotel.Domain.Commands;
-using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Domain.Queries;
 using SWD.SheritonHotel.Domain.Utilities;
-using SWD.SheritonHotel.Handlers.Handlers;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
+using SWD.SheritonHotel.Domain.DTO.Auth;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.Commands.Auth;
+using SWD.SheritonHotel.Domain.Entities;
+using SWD.SheritonHotel.Domain.Queries.AccountQuery;
 
 namespace Controllers;
 
@@ -187,7 +183,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost]
-    [Route("RegisterAdditionalInfo")]
+    [Route("register-additional-info")]
     public async Task<IActionResult> RegisterAdditionalInfo([FromBody] RegisterAdditionalInfoDto additionalInfoDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -199,7 +195,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet]
-    [Route("CheckUserRegistrationStatus")]
+    [Route("check-user-registration-status")]
     public async Task<IActionResult> CheckUserRegistrationStatus([FromQuery] string idToken)
     {
         try
@@ -215,7 +211,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost]
-    [Route("ExternalLogin")]
+    [Route("external-login")]
     public async Task<IActionResult> LoginWithGoogle([FromBody] AuthGoogleDto authGoogleDto)
     {
         var payload = await _authService.VerifyGoogleToken(authGoogleDto);
@@ -232,7 +228,7 @@ public class AuthController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    [Route("GetUserFromJwt")]
+    [Route("get-user-from-jwt")]
     public async Task<IActionResult> GetUserFromJwt([FromQuery] string jwt)
     {
         var query = new GetUserFromJwtQuery(jwt);
@@ -248,7 +244,7 @@ public class AuthController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    [Route("GetUserDetailsByID")]
+    [Route("get-user-details")]
     public async Task<IActionResult> GetUserDetailsById([FromQuery] string userId)
     {
         var query = new GetUserByIdQuery(userId);

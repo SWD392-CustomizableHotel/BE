@@ -1,4 +1,4 @@
-﻿using SWD.SheritonHotel.Domain.DTO;
+﻿using SWD.SheritonHotel.Domain.DTO.Payment;
 using System;
 using System.Collections.Generic;
 using System.Linq;
