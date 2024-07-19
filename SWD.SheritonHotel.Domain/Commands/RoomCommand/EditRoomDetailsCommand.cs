@@ -1,12 +1,12 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Http;
-using SWD.SheritonHotel.Domain.DTO.Responses;
-using SWD.SheritonHotel.Domain.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.Entities;
 
 namespace SWD.SheritonHotel.Domain.Commands.RoomCommand
 {
@@ -15,9 +15,9 @@ namespace SWD.SheritonHotel.Domain.Commands.RoomCommand
         public int RoomId { get; set; }
         public string RoomType { get; set; }
         public decimal RoomPrice { get; set; }
-        public IFormFile ImageFile { get; set; }
+        public IFormFile? ImageFile { get; set; }
 
-        public EditRoomDetailsCommand(int roomId, string type, decimal price, IFormFile imageFile)
+        public EditRoomDetailsCommand(int roomId, string type, decimal price, IFormFile? imageFile)
         {
             RoomId = roomId;
             RoomType = type;
