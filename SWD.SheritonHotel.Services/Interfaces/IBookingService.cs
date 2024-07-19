@@ -1,5 +1,5 @@
-using Entities;
-using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Booking;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Domain.OtherObjects;
 
 namespace SWD.SheritonHotel.Services.Interfaces;

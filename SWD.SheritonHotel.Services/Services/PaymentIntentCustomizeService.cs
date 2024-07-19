@@ -1,6 +1,5 @@
 ﻿using Stripe.Forwarding;
 using Stripe;
-using SWD.SheritonHotel.Domain.DTO;
 using SWD.SheritonHotel.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -8,9 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SWD.SheritonHotel.Domain.Commands;
-using Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using SWD.SheritonHotel.Domain.DTO.Payment;
+using SWD.SheritonHotel.Domain.Entities;
 
 namespace SWD.SheritonHotel.Services.Services
 {

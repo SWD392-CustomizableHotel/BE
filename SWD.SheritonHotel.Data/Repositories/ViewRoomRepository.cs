@@ -1,8 +1,8 @@
-﻿using Entities;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

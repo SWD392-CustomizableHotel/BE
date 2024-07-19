@@ -1,6 +1,6 @@
-﻿using Entities;
-using Interfaces;
+﻿using Interfaces;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
+using SWD.SheritonHotel.Domain.Entities;
 
 namespace Services
 {

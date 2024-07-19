@@ -1,11 +1,14 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OtherObjects;
 using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.Commands.ServiceCommand;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.DTO.Service;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Domain.Queries;
+using SWD.SheritonHotel.Domain.Queries.ServiceQuery;
 
 namespace SWD.SheritonHotel.API.Controllers;
 [Route("api/[controller]")]
@@ -19,7 +22,7 @@ public class AssignServiceController : ControllerBase
     {
         _mediator = mediator;
     }
-    [HttpPost("AssignServiceToStaff")]
+    [HttpPost]
     public async Task<IActionResult> AssignServiceToStaff([FromBody] AssignServiceDto? assignServiceDto)
     {
         try

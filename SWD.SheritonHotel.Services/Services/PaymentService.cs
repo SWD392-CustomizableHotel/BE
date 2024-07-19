@@ -1,9 +1,10 @@
-﻿using Entities;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
-using SWD.SheritonHotel.Domain.Commands;
-using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.Commands.PaymentCommand;
+using SWD.SheritonHotel.Domain.DTO.Payment;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Services.Interfaces;
 using System;
 using System.Collections.Generic;

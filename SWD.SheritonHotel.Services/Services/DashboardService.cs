@@ -1,6 +1,13 @@
-﻿using Entities;
-using SWD.SheritonHotel.Data.Repositories.Interfaces;
+﻿using SWD.SheritonHotel.Data.Repositories.Interfaces;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Amenity;
+using SWD.SheritonHotel.Domain.DTO.Booking;
+using SWD.SheritonHotel.Domain.DTO.Notification;
+using SWD.SheritonHotel.Domain.DTO.Payment;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.DTO.Room;
+using SWD.SheritonHotel.Domain.DTO.Service;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Services.Interfaces;
 using System;
 using System.Linq;

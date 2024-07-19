@@ -1,6 +1,6 @@
-﻿using Entities;
-using SWD.SheritonHotel.Domain.Base;
+﻿using SWD.SheritonHotel.Domain.Base;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System;
 using System.Collections.Generic;

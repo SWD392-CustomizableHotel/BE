@@ -1,6 +1,6 @@
-﻿using Entities;
-using MediatR;
-using SWD.SheritonHotel.Domain.DTO;
+﻿using MediatR;
+using SWD.SheritonHotel.Domain.DTO.Service;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using System;
 using System.Collections.Generic;

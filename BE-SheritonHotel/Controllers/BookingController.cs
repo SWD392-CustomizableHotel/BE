@@ -2,10 +2,14 @@ using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SWD.SheritonHotel.Domain.Commands;
+using SWD.SheritonHotel.Domain.Commands.Booking;
+using SWD.SheritonHotel.Domain.Commands.PaymentCommand;
 using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Booking;
+using SWD.SheritonHotel.Domain.DTO.Responses;
 using SWD.SheritonHotel.Domain.OtherObjects;
 using SWD.SheritonHotel.Domain.Queries;
+using SWD.SheritonHotel.Domain.Queries.BookingQuery;
 
 namespace SWD.SheritonHotel.API.Controllers;
 [Route("api/[controller]")]
@@ -45,8 +49,7 @@ public class BookingController : ControllerBase
         }
     }
     [HttpPost]
-    [Authorize(Roles = "STAFF")]
-    [Route("create-booking")]
+    [Authorize]
     public async Task<IActionResult> CreateBooking(CreateBookingCommand command)
     {
         var bookingId = await _mediator.Send(command);
@@ -54,7 +57,7 @@ public class BookingController : ControllerBase
     }
     
     [HttpGet]
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "STAFF")]
     [Route("check-out")]
     public async Task<IActionResult> GetBookingByEndDate([FromQuery] BookingFilter bookingFilter,
         [FromQuery] string? searchTerm = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -159,34 +162,6 @@ public class BookingController : ControllerBase
                 IsSucceed = false,
                 Result = null,
                 Message = e.Message,
-            });
-        }
-    }
-    
-    [HttpGet("history-by-email")]
-    public async Task<IActionResult> GetBookingHistoryByEmail([FromQuery] BookingFilter bookingFilter,
-        [FromQuery] string? searchTerm = null, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
-    {
-        try
-        {
-            var email = User.FindFirst(ClaimTypes.Email)?.Value; // Get email from claims
-            if (email == null)
-            {
-                return Unauthorized();
-            }
-
-            var paginationFilter = new PaginationFilter(pageNumber, pageSize);
-            var query = new GetBookingHistoryByEmailQuery(email, paginationFilter, bookingFilter, searchTerm);
-            var response = await _mediator.Send(query);
-            return Ok(response);
-        }
-        catch (Exception e)
-        {
-            return Ok(new BaseResponse<BookingHistoryDto>
-            {
-                IsSucceed = false,
-                Result = null,
-                Message = "Booking history not found!"
             });
         }
     }

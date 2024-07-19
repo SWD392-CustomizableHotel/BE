@@ -1,5 +1,5 @@
-﻿using Entities;
-using SWD.SheritonHotel.Domain.Base;
+﻿using SWD.SheritonHotel.Domain.Base;
+using SWD.SheritonHotel.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

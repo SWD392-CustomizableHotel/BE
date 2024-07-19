@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
-using SWD.SheritonHotel.Domain.Commands;
+using Swashbuckle.AspNetCore.Annotations;
+using SWD.SheritonHotel.Domain.Commands.AmenityCommand;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Domain.OtherObjects;
-using SWD.SheritonHotel.Domain.Queries;
+using SWD.SheritonHotel.Domain.Queries.AmenityQuery;
 using SWD.SheritonHotel.Services.Interfaces;
 
 namespace SWD.SheritonHotel.API.Controllers
@@ -23,7 +26,7 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
-        [Route("get-amenities")]
+        [SwaggerOperation(Summary = "Get all amenities for paging number, size, filter, search term")]
         public async Task<IActionResult> GetAllAmenities([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] AmenityFilter amenityFilter = null, [FromQuery] string? searchTerm = null)
         {
             var paginationFilter = new PaginationFilter(pageNumber, pageSize);
@@ -34,7 +37,7 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
-        [Route("get-amenity-details/{amenityId}")]
+        [Route("amenity/{amenityId}")]
         public async Task<IActionResult> GetAmenityDetails(int amenityId)
         {
             var query = new GetAmenityByIdQuery(amenityId);
@@ -44,7 +47,7 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
-        [Route("get-room-amenity/{roomId}")]
+        [Route("room/{roomId}")]
         public async Task<IActionResult> GetAmenitiesByRoomId(int roomId)
         {
             var query = new GetAmenitiesByRoomIdQuery(roomId);
@@ -54,7 +57,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        [Route("create-amenity")]
         public async Task<IActionResult> CreateAmenity(CreateAmenityCommand command)
         {
             var newAmenity = await _mediator.Send(command);
@@ -63,7 +65,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpPut]
         [Authorize(Roles = "ADMIN")]
-        [Route("update-amenity")]
         public async Task<IActionResult> UpdateAmenity(int amenityId, string name, string description, decimal price, int capacity, int inUse)
         {
             var command = new UpdateAmenityCommand
@@ -90,7 +91,7 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpPut]
         [Authorize(Roles = "ADMIN")]
-        [Route("update-amenity-status")]
+        [Route("status")]
         public async Task<IActionResult> UpdateAmenityStatus(int amenityId, AmenityStatus status)
         {
             var command = new UpdateAmenityStatusCommand
@@ -104,7 +105,6 @@ namespace SWD.SheritonHotel.API.Controllers
 
         [HttpDelete]
         [Authorize(Roles = "ADMIN")]
-        [Route("delete-amenity/{amenityId}")]
         public async Task<IActionResult> DeleteAmenity(int amenityId)
         {
             var command = new DeleteAmenityCommand
@@ -113,6 +113,26 @@ namespace SWD.SheritonHotel.API.Controllers
             };
             var result = await _mediator.Send(command);
             return Ok(result);
+        }
+
+        /*
+         * Lấy amenities dựa trên Amenities Type (Basic, Advanced, Family)
+         */
+        [HttpGet]
+        [Route("type/{type}")]
+        public async Task<IActionResult> GetAmenityByType(string type)
+        {
+            var query = new GetAmenityByTypeQuery()
+            {
+                AmenityType = type
+            };
+            var results = await _mediator.Send(query);
+            return Ok(new BaseResponse<Amenity>
+            {
+                IsSucceed = true,
+                Results = results,
+                Message = "Retrieved amenity successfully"
+            });
         }
     }
 }

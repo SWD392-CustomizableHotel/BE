@@ -1,12 +1,16 @@
 using System.Linq.Dynamic.Core;
 using AutoMapper;
-using Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Base;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
-using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.DTO.Amenity;
+using SWD.SheritonHotel.Domain.DTO.Booking;
+using SWD.SheritonHotel.Domain.DTO.IdentityCard;
+using SWD.SheritonHotel.Domain.DTO.Payment;
+using SWD.SheritonHotel.Domain.DTO.Service;
+using SWD.SheritonHotel.Domain.Entities;
 using SWD.SheritonHotel.Domain.OtherObjects;
 
 namespace SWD.SheritonHotel.Data.Repositories;

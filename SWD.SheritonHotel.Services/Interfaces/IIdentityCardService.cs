@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using SWD.SheritonHotel.Domain.Commands;
-using SWD.SheritonHotel.Domain.DTO;
+using SWD.SheritonHotel.Domain.Commands.IdentityCard;
+using SWD.SheritonHotel.Domain.DTO.IdentityCard;
+using SWD.SheritonHotel.Domain.DTO.Responses;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

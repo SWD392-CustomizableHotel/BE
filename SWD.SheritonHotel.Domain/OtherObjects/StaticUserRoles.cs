@@ -1,4 +1,4 @@
-﻿namespace OtherObjects
+﻿namespace SWD.SheritonHotel.Domain.OtherObjects
 {
     public static class StaticUserRoles
     {

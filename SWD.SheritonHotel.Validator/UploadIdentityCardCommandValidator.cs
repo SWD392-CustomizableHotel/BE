@@ -1,6 +1,5 @@
-﻿using Entities;
-using FluentValidation;
-using SWD.SheritonHotel.Domain.Commands;
+﻿using FluentValidation;
+using SWD.SheritonHotel.Domain.Commands.IdentityCard;
 using System;
 using System.Collections.Generic;
 using System.Linq;

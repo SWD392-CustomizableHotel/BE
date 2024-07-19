@@ -1,8 +1,6 @@
 ﻿using static Microsoft.EntityFrameworkCore.DbContext;
-using Entities;
 using Microsoft.EntityFrameworkCore;
 using SWD.SheritonHotel.Data.Repositories.Interfaces;
-using SWD.SheritonHotel.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using SWD.SheritonHotel.Data.Context;
 using SWD.SheritonHotel.Data.Base;
+using SWD.SheritonHotel.Domain.DTO.Responses;
+using SWD.SheritonHotel.Domain.Entities;
 
 namespace SWD.SheritonHotel.Data.Repositories
 {

@@ -1,16 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
-using SWD.SheritonHotel.Domain.Entities;
 
-namespace Entities
+namespace SWD.SheritonHotel.Domain.Entities
 {
     public class Payment : BaseEntity
     {
         public decimal Amount { get; set; }
         public string Status { get; set; }
         public string PaymentIntentId { get; set; }
-        
+
         public string PaymentMethod { get; set; }
 
         [ForeignKey("BookingId")]
