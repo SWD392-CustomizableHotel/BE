@@ -103,13 +103,6 @@ namespace SWD.SheritonHotel.Services.Services
                 BookingDate = p.CreatedDate
             }).ToList();
 
-            var yesterdayNotifications = yesterdayPayments.Select(p => new NotificationDto
-            {
-                RoomType = p.Booking.Room.Type,
-                Amount = p.Amount,
-                BookingDate = p.CreatedDate
-            }).ToList();
-
             return new DashboardDto
             {
                 OrdersCount = bookings.Count(b => b.Payments.Any(p => p.Status == "Success")),
@@ -123,7 +116,7 @@ namespace SWD.SheritonHotel.Services.Services
                 RecentBookings = recentBookings,
                 BestBookingRooms = bestBookingRooms,
                 TodayNotifications = todayNotifications,
-                YesterdayNotifications = yesterdayNotifications,
+                YesterdayNotifications = null,
                 MonthlyRevenue = monthlyRevenue
             };
         }
