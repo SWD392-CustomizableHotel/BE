@@ -105,7 +105,6 @@ namespace SWD.SheritonHotel.Services.Services
 
             var yesterdayNotifications = yesterdayPayments.Select(p => new NotificationDto
             {
-                UserName = p.Booking.User.UserName,
                 RoomType = p.Booking.Room.Type,
                 Amount = p.Amount,
                 BookingDate = p.CreatedDate
