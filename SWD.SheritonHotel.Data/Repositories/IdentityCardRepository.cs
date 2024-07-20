@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -30,9 +32,10 @@ namespace SWD.SheritonHotel.Data.Repositories
         private readonly string _apiKey;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly BlobServiceClient _blobServiceClient;
 
         public IdentityCardRepository(ApplicationDbContext context, IMapper mapper, IHttpClientFactory httpClientFactory, IConfiguration configuration, IOptions<FPTAIOptions> options, UserManager<ApplicationUser> userManager,
-            IHttpContextAccessor httpContextAccessor) : base(context, mapper)
+            IHttpContextAccessor httpContextAccessor, BlobServiceClient blobServiceClient) : base(context, mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -40,19 +43,21 @@ namespace SWD.SheritonHotel.Data.Repositories
             _apiKey = options.Value.ApiKey;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
+            _blobServiceClient = blobServiceClient;
         }
 
         public async Task<IdentityCardDto> UploadIdentityCardAsync(IFormFile frontFile, int paymentId, CancellationToken cancellationToken)
         {
+            var containerClient = _blobServiceClient.GetBlobContainerClient("identity-card");
+            await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
 
-            var tempDirectory = Path.Combine(Path.GetTempPath(), "/");
-            Directory.CreateDirectory(tempDirectory);
-
-            var frontFilePath = Path.Combine(tempDirectory, $"{Guid.NewGuid()}_front.tmp");
-            using (var stream = new FileStream(frontFilePath, FileMode.Create))
+            var blobClient = containerClient.GetBlobClient($"{Guid.NewGuid()}_front.jpg");
+            using (var stream = frontFile.OpenReadStream())
             {
-                await frontFile.CopyToAsync(stream, cancellationToken);
+                await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = frontFile.ContentType });
             }
+
+            var frontFilePath = blobClient.Uri.ToString();
 
             var frontDetails = await ExtractIdentityCardDetailsAsync(frontFilePath, paymentId);
 
@@ -86,17 +91,22 @@ namespace SWD.SheritonHotel.Data.Repositories
             return Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
         }
 
-        private async Task<IdentityCardDto> ExtractIdentityCardDetailsAsync(string filePath, int paymentId)
+        private async Task<IdentityCardDto> ExtractIdentityCardDetailsAsync(string fileUrl, int paymentId)
         {
             // Create HttpClient by using HttpClientFactory and add api key 
             using var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.Add("api_key", _apiKey);
 
+            // Download the file from Blob Storage URL
+            using var responseMessage = await client.GetAsync(fileUrl);
+            responseMessage.EnsureSuccessStatusCode();
+            var fileStream = await responseMessage.Content.ReadAsStreamAsync();
+
             // Create MultipartFormDataContent and add image file to it
             using var content = new MultipartFormDataContent();
-            using var fileContent = new StreamContent(new FileStream(filePath, FileMode.Open));
+            using var fileContent = new StreamContent(fileStream);
             fileContent.Headers.ContentType = new MediaTypeHeaderValue("multipart/form-data");
-            content.Add(fileContent, "image", Path.GetFileName(filePath));
+            content.Add(fileContent, "image", Path.GetFileName(fileUrl));
 
             // Request POST method to API FPT AI with content provided by FPT AI
             var response = await client.PostAsync("https://api.fpt.ai/vision/idr/vnm", content);

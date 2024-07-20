@@ -116,12 +116,12 @@ public class BookingHistoryService : IBookingService
             return false;
         }
 
-        foreach (var payments in booking.Payments)
+        foreach (var payment in booking.Payments)
         {
-            var payment = await _paymentRepository.GetById(payments.Id);
-            payments.Status = "Success";
-            payment.PaymentMethod = paymentMethod;
-            _paymentRepository.UpdatePayment(payment);
+            var paymentObj = await _paymentRepository.GetById(payment.Id);
+            paymentObj.Status = "Success";
+            paymentObj.PaymentMethod = paymentMethod;
+            _paymentRepository.UpdatePayment(paymentObj);
         }
 
         return true;
