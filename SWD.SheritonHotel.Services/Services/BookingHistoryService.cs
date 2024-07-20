@@ -99,12 +99,15 @@ public class BookingHistoryService : IBookingService
         room.Status = "Available";
         room.CanvasImage = null;
         _roomRepository.Update(room);
+        _roomRepository.SaveChanges();
         foreach (var bookingAmenity in booking.BookingAmenities)
         {
             var amenity = await _amentiyRepository.GetAmenityByIdAsync(bookingAmenity.AmenityId);
             amenity.InUse -= 1;
             _amentiyRepository.Update(amenity);
+            _amentiyRepository.SaveChanges();
         }
+   
         return true;
     }
 
@@ -121,8 +124,9 @@ public class BookingHistoryService : IBookingService
             var paymentObj = await _paymentRepository.GetById(payment.Id);
             paymentObj.Status = "Success";
             paymentObj.PaymentMethod = paymentMethod;
-            _paymentRepository.UpdatePayment(paymentObj);
+            _paymentRepository.Update(paymentObj);
         }
+        _paymentRepository.SaveChanges();
 
         return true;
     }
